@@ -1,0 +1,188 @@
+# Cells
+
+Live Coder text editor. Allows you to orgamize and run snippets and performance
+in multiple environments at the same time.
+
+Snippets represented as grid of cells like in Ableton. You are able to run all
+the snippets in line at the same time (like Scene in Ableton) or separately.
+
+You can edit snippets in edit mode in text editor.
+
+You navigate with vim-like keybindigs and run by SHIFT+Enter.
+
+In settings you configure the available track types. Configuration represents a
+pair of commands: one for running interpreter and another for stopping it. 
+
+So by using different kinds of track you can use different types of snippets.
+For example, you could use SuperCollider, Python and Tidal Cycles in the same
+project and run it simulteneously.
+
+The application also supports documents, which allow you to safe and restore all
+snippets, to make it organised.
+
+The project isn't keen to be very stable and performant, but it should be stable
+in it's main functionality and well tested to make it reliable enough to use in
+in live performances. 
+
+For a feature set it has just needed minimum. In overall, it's more like a hobby
+weekend project.
+
+It's written in Python and for GUI it uses Kivy.
+
+MacOS, Ubuntu and Windows are supported. May be mobile in the future.
+
+It's open source.
+
+
+
+
+## Backlog
+
+* each track will also have on-load script, which will be evaluated when a
+  project loads
+* SHIFT+Enter evaluates a cell, but CMD/CTRL+Enter evaluates all cells
+  horizontally (evaluates a scene).
+* code for the same track types evaluates synchronously in order from left track
+  to right.
+* to optimize I can use code input only in editor mode so only one code editor
+  will be opened at a time, when the view is simple cell, I don't need code
+  editor features as well as syntax highliting so I can use just a simple
+  non-editable preview. I can even make a screenshot of that visible part of the
+  code editor and use it for cell — it will look the same, but it's non-editable
+  and really fast. That screenshot/preview can also be considered as the cell's
+  background.
+  
+  But to keep all those PNG's in RAM will be very inefficient. So it would be a
+  lot better to use non-editable text inputs without syntax highlight and
+  without all the stuff needed to edit code.
+* [watchdog](https://github.com/gorakhargosh/watchdog) — package for monitoring
+  system events
+* for document model serialization/deserialization: https://github.com/marshmallow-code/marshmallow
+  to save document we'll serialize it into dictionary and then store it in a
+  binary file.
+  to load document we'll read a document, deserialize it from binary and then
+  deserialize it into models.
+  Document will react on events and automatically update models
+* нужно сделать так, чтобы не писать в каждом классе кучу if else для диспатча
+  ивентов, а просто:
+  
+  ```Python
+  @observer
+  class MyClass:
+    
+    @action(EventType)
+    def some_action(self, event):
+        pass
+  ```
+  
+  Что под капотом просто добавит в класс метод `on_event(e)` с чем-то типа:
+  
+  ```Python
+  def on_event(self, event):
+    self._actions[event.name](event)
+  ```
+  
+  Только, конечно, нужно проверять, есть ли что-то по этому ключу.
+  
+  a `@action` будет делать что-то типа:
+  
+  ```Python
+  self._subject.subscribe.filter(lambda e: e.id == EventType.id).(self.method_name)
+  ```
+  
+  И потом уже:
+  
+  ```Python
+  subject = Subject()
+  my_class = MyClass()
+  subject.subscribe(my_class.on_event)
+  ```
+  
+  Вообще можно сделать один Subject общий при инициализации программы. И этот
+  Subject посылать всем (view, document, keybindings etc.), и уже сама часть
+  программы будет подписываться на него и вызывать в нем нужные ивенты. Так
+  намного чище и внятнее будет:
+  
+  ```Python
+  class MyClass:
+    def __init__(self, subject):
+        self.subject = subject
+        self.subject.subscribe(self._on_event)
+        
+    ...
+    self.subject.on_next(SomeEvent())
+  ```
+  
+  Еще лучше, если будет subscribe автоматом меняться на только те ивенты,
+  которые используются в этом классе. То есть будет использовать filter и rxpy.
+  
+* ивенты и будут моделью. Мы ее будем сериализовывать/десериализовывать с
+  помощью marshmallow.
+* https://realpython.com/python-application-layouts/
+* [pytest getting started](https://docs.pytest.org/en/latest/getting-started.html#getstarted)
+* [decorators tutorial](https://dev.to/apcelent/python-decorator-tutorial-with-example-529f)
+* [что должно быть в cells.py](https://kivy.org/doc/stable/api-kivy.app.html#creating-an-application)
+
+
+
+
+## Bugs
+
+
+
+
+## To Do
+* [ ] study PySide2
+* [ ] design architecture (MVC?)
+    * [ ] view
+    * [ ] keybindigs
+    * [ ] events (they share models)
+        * [ ] use namedtuples for this
+    * [ ] models
+        * [ ] document
+    * [ ] settings
+    * [ ] observer
+        * [ ] `Observer` class (instead of `@observer` described above)
+        * [ ] `@action(Event)` decorator
+* [ ] menu
+    * [ ] file
+        * [ ] open
+        * [ ] save
+        * [ ] duplicate
+* [ ] settings
+    * [ ] track type
+        * [ ] start command
+        * [ ] end command
+        * [ ] language (lexer)
+        * [ ] picture/logo
+        * [ ] name
+        * [ ] color
+    * [ ] ?keybindigs
+    * [ ] https://github.com/ActiveState/appdirs
+* [ ] main grid
+    * [ ] add track
+    * [ ] track view
+        * [ ] header
+            * [ ] logo
+            * [ ] type name
+            * [ ] name
+            * [ ] setup code
+    * [ ] cell view
+        * [ ] preview
+        * [ ] play indication
+        * [ ] name
+    * [ ] code editor
+        * [ ] match brackets
+        * [ ] toggle comment
+        * [ ] keybindings
+    * [ ] cells manipulation
+        * [ ] copy/cut/paste
+        * [ ] ?drag and drop
+* [ ] document
+* [ ] keybindings
+* [ ] console
+    * [ ] different colors for STDOUT and STDERR
+    * [ ] defferent colors for different track types (as defined in
+          configurtion of the track type)
+* [ ] redesign/theming
+* [ ] documentation

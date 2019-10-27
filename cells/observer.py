@@ -10,3 +10,6 @@ class Observer:
         self.subject.pipe(
             op.filter(lambda e: isinstance(e, event_type))
         ).subscribe(responder)
+
+    def notify(self, event):
+        self.subject.on_next(event)

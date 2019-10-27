@@ -10,8 +10,8 @@ class Open(NamedTuple):
 
 
 class Save(NamedTuple):
-    path: str
+    pass
 
 
-class Duplicate(NamedTuple):
+class SaveAs(NamedTuple):
     path: str
