@@ -9,8 +9,7 @@ class App:
     def run(subject):
         app = QtWidgets.QApplication([])
 
-        widget = Main()
-        widget.resize(800, 600)
+        widget = Main(subject)
         widget.show()
 
         sys.exit(app.exec_())
