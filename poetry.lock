@@ -135,11 +135,11 @@ testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xm
 
 [[package]]
 category = "main"
-description = "A Regular Expression Library for Python"
-name = "rxpy"
+description = "Reactive Extensions (Rx) for Python"
+name = "rx"
 optional = false
-python-versions = "*"
-version = "0.1.0"
+python-versions = ">=3.6.0"
+version = "3.0.1"
 
 [[package]]
 category = "main"
@@ -182,7 +182,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pathlib2", "contextlib2", "unittest2"]
 
 [metadata]
-content-hash = "c404d99edf5299f4f96c2c7b5070f44aac359f8ba3e1264cca7699d85d20b7fb"
+content-hash = "8138509ab1fc8d71b78bad3f54c81890bc7a9a107021f876aa8fe4cb5260937e"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -234,9 +234,9 @@ pytest = [
     {file = "pytest-5.2.2-py3-none-any.whl", hash = "sha256:58cee9e09242937e136dbb3dab466116ba20d6b7828c7620f23947f37eb4dae4"},
     {file = "pytest-5.2.2.tar.gz", hash = "sha256:27abc3fef618a01bebb1f0d6d303d2816a99aa87a5968ebc32fe971be91eb1e6"},
 ]
-rxpy = [
-    {file = "RXPY-0.1.0.tar.gz", hash = "sha256:c26978f66219140844f2c2eb1c1b689bc40fa78da354fe42c160141ed68eb3a4"},
-    {file = "RXPY-0.1.0.zip", hash = "sha256:add79ae727155a056f6de35c488fcf64c1a40df28c12d29593f4fc43c80fddbc"},
+rx = [
+    {file = "Rx-3.0.1-py3-none-any.whl", hash = "sha256:00c4ab3ecd1ab9a55f310d05e20ae7f93d3cdd1150de5c56347e67a1ecd73963"},
+    {file = "Rx-3.0.1.tar.gz", hash = "sha256:c7d168618e3cec35fda9c9c8b5d7f966739df4b1a99b315eae1fc2d7d69e2512"},
 ]
 shiboken2 = [
     {file = "shiboken2-5.13.1-5.13.1-cp27-cp27m-macosx_10_12_intel.whl", hash = "sha256:f341940069fe764f2a9c3a06a9844c4c353c94227d3dbc304640f34b42c02d7a"},

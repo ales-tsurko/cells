@@ -9,8 +9,8 @@ cells = "cells.cells:main"
 
 [tool.poetry.dependencies]
 python = "^3.7"
-rxpy = "^0.1.0"
 pyside2 = "^5.13.1"
+rx = "^3.0.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
