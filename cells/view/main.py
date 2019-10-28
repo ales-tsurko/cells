@@ -83,7 +83,7 @@ class Main(QMainWindow, Observation):
         if self.document and not self.document.saved:
             reply = QMessageBox.question(self,
                                          'Closing Document',
-                                         "Do you save changes?",
+                                         "Do you want save changes?",
                                          QMessageBox.Yes | QMessageBox.No,
                                          QMessageBox.Yes)
 
