@@ -16,7 +16,7 @@ class Main(QMainWindow, Observation):
         self.setWindowTitle('Default')
         self.setMinimumSize(800, 600)
         self._createMenu()
-        self._init_central_widget()
+        self._initCentralWidget()
 
         self.document = None
 
@@ -41,7 +41,7 @@ class Main(QMainWindow, Observation):
         newAct.triggered.connect(callback)
         newAct.setShortcuts(shortcut)
 
-    def _init_central_widget(self):
+    def _initCentralWidget(self):
         scrollArea = QScrollArea()
         label = QLabel("Hi there")
         scrollArea.setWidget(label)
@@ -73,7 +73,6 @@ class Main(QMainWindow, Observation):
             self.notify(events.document.SaveAs(fname[0]))
 
     def documentLoadResponder(self, e):
-        print(e)
         self.document = e.document
 
     def keyPressEvent(self, e):
@@ -83,7 +82,7 @@ class Main(QMainWindow, Observation):
         if self.document and not self.document.saved:
             reply = QMessageBox.question(self,
                                          'Closing Document',
-                                         "Do you want save changes?",
+                                         "Do you want to save changes?",
                                          QMessageBox.Yes | QMessageBox.No,
                                          QMessageBox.Yes)
 
