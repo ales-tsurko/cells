@@ -11,6 +11,8 @@ cells = "cells.cells:main"
 python = "^3.7"
 pyside2 = "^5.13.1"
 rx = "^3.0.1"
+appdirs = "^1.4.3"
+toml = "^0.10.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

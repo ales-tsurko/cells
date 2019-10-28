@@ -1,6 +1,6 @@
 from typing import NamedTuple
 from rx.subject import Subject
-from cells.observer import Observer
+from cells.observation import Observation
 
 
 class AEvent(NamedTuple):
@@ -11,7 +11,7 @@ class BEvent(NamedTuple):
     number: int
 
 
-class AClass(Observer):
+class AClass(Observation):
     def __init__(self, subject):
         super().__init__(subject)
 

@@ -1,0 +1,2 @@
+class Quit:
+    pass

@@ -1,8 +1,8 @@
-from cells.observer import Observer
+from cells.observation import Observation
 from cells import events
 
 
-class Document(Observer):
+class Document(Observation):
     def __init__(self, subject):
         super().__init__(subject)
 

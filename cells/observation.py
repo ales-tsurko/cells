@@ -1,7 +1,7 @@
 from rx import operators as op
 
 
-class Observer:
+class Observation:
     def __init__(self, subject):
         self.subject = subject
         self.number = 0
