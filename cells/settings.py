@@ -4,7 +4,6 @@ import toml
 
 from appdirs import user_config_dir
 from cells import events
-from cells.events import settings
 from cells.observation import Observation
 
 
@@ -25,7 +24,7 @@ class Settings(Observation, dict):
 
         #  self.setdefault("foo", 12)
 
-        self.notify(settings.Load(self))
+        self.notify(events.settings.Load(self))
 
     def _init_path(self):
         settings_dir = user_config_dir(ApplicationInfo.name,

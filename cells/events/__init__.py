@@ -1,1 +1,1 @@
-__all__ = ['app', 'file', 'document', 'settings']
+__all__ = ['app', 'document', 'settings']
