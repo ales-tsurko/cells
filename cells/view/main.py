@@ -80,10 +80,10 @@ class Main(QMainWindow, Observation):
         pass
 
     def closeEvent(self, e):
-        if not self.document or not self.document.saved:
-            reply = QMessageBox.question(self, 
+        if self.document and not self.document.saved:
+            reply = QMessageBox.question(self,
                                          'Closing Document',
-                                         "Do you save changes?", 
+                                         "Do you save changes?",
                                          QMessageBox.Yes | QMessageBox.No,
                                          QMessageBox.Yes)
 
