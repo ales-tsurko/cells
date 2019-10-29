@@ -61,7 +61,7 @@ class Main(QMainWindow, Observation):
     def _initCentralWidget(self):
         centralView = QWidget()
         layout = QVBoxLayout()
-        editor = Editor(self)
+        editor = Editor(self.subject)
         console = Console(self.subject)
 
         layout.setSpacing(0)
@@ -76,6 +76,8 @@ class Main(QMainWindow, Observation):
         self.notify(events.document.New())
 
     def onFileOpen(self, e):
+        self.closeEvent(e)
+
         fname = QFileDialog.getOpenFileName(self,
                                             "Open Project",
                                             filter="Cells Files (*.cells)")
@@ -84,10 +86,11 @@ class Main(QMainWindow, Observation):
             self.notify(events.document.Open(fname[0]))
 
     def onFileSave(self, e):
-        if self.document is None:
+        if self.document is None or self.document.path is None:
             self.onFileSaveAs(e)
         else:
             self.notify(events.document.Save())
+            self.setWindowTitle(self.document.name)
 
     def onFileSaveAs(self, e):
         fname = QFileDialog.getSaveFileName(self,
@@ -97,12 +100,14 @@ class Main(QMainWindow, Observation):
         if fname[0]:
             self.notify(events.document.SaveAs(fname[0]))
 
+        self.setWindowTitle(self.document.name)
+
     def onSettings(self, e):
         settings = Settings(self.subject)
         settings.exec_()
 
     def onNewTrack(self, e):
-        print("new track event")
+        self.notify(events.track.New())
 
     def documentLoadResponder(self, e):
         self.document = e.document
@@ -112,7 +117,7 @@ class Main(QMainWindow, Observation):
         if self.document is None:
             self.document = e.document
 
-        self.setWindowTitle(e.document.name)
+        self.setWindowTitle("* " + e.document.name)
 
     def documentErrorResponder(self, e):
         dialog = QMessageBox()
@@ -124,7 +129,7 @@ class Main(QMainWindow, Observation):
         pass
 
     def closeEvent(self, e):
-        if self.document and not self.document.saved:
+        if self.document is not None and not self.document.saved:
             reply = QMessageBox.question(self,
                                          'Closing Document',
                                          "Do you want to save changes?",
