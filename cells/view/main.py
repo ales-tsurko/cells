@@ -1,19 +1,20 @@
 from PySide2.QtGui import QKeySequence
 from PySide2.QtWidgets import (QFileDialog, QLabel, QMainWindow, QMessageBox,
-                               QScrollArea)
+                               QScrollArea, QVBoxLayout, QWidget)
 
 from cells import events
 from cells.observation import Observation
 
+from .console import Console
+
 
 class Main(QMainWindow, Observation):
-    """Main Window."""
+
     def __init__(self, subject):
-        """Initializer."""
         QMainWindow.__init__(self)
         Observation.__init__(self, subject)
 
-        self.setWindowTitle('Default')
+        self.setWindowTitle("Default")
         self.setMinimumSize(800, 600)
         self._createMenu()
         self._initCentralWidget()
@@ -42,10 +43,19 @@ class Main(QMainWindow, Observation):
         newAct.setShortcuts(shortcut)
 
     def _initCentralWidget(self):
+        centralView = QWidget()
+        layout = QVBoxLayout()
         scrollArea = QScrollArea()
-        label = QLabel("Hi there")
-        scrollArea.setWidget(label)
-        self.setCentralWidget(scrollArea)
+        console = Console(self.subject)
+
+        self.layout().setSpacing(0)
+        layout.setSpacing(0)
+        layout.addWidget(scrollArea)
+        layout.addWidget(console)
+
+        centralView.setLayout(layout)
+        centralView.layout().setContentsMargins(0, 0, 0, 0)
+        self.setCentralWidget(centralView)
 
     def onFileNew(self, e):
         self.notify(events.document.New())
@@ -74,6 +84,7 @@ class Main(QMainWindow, Observation):
 
     def documentLoadResponder(self, e):
         self.document = e.document
+        self.setWindowTitle(self.document.name)
 
     def keyPressEvent(self, e):
         pass

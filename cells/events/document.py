@@ -27,5 +27,5 @@ class Close(NamedTuple):
     document: Document
 
 
-class Change(NamedTuple):
+class Update(NamedTuple):
     document: Document
