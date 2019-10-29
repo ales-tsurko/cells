@@ -1,6 +1,7 @@
 from PySide2.QtGui import QKeySequence
 from PySide2.QtWidgets import (QFileDialog, QMainWindow, QMessageBox,
                                QVBoxLayout, QWidget)
+from PySide2.QtCore import Qt
 
 from cells import events
 from cells.observation import Observation
@@ -29,7 +30,6 @@ class Main(QMainWindow, Observation):
         self.add_responder(events.document.Error, self.documentErrorResponder)
 
     def _createMenu(self):
-        self.menuBar().addAction("Set")
         self._createFileMenu()
         self._createEditMenu()
 
@@ -46,14 +46,17 @@ class Main(QMainWindow, Observation):
                             self.onFileSaveAs)
 
     def _createEditMenu(self):
-        editMenu = self.menuBar().addMenu("Help")
+        editMenu = self.menuBar().addMenu("Edit")
+        self._addMenuAction(editMenu, "New Track", self.tr('Ctrl+t'),
+                            self.onNewTrack)
+        editMenu.addSeparator()
         self._addMenuAction(editMenu, "Settings", QKeySequence.Preferences,
                             self.onSettings)
 
     def _addMenuAction(self, menu, name, shortcut, callback):
         newAct = menu.addAction(name)
         newAct.triggered.connect(callback)
-        newAct.setShortcuts(shortcut)
+        newAct.setShortcut(shortcut)
 
     def _initCentralWidget(self):
         centralView = QWidget()
@@ -97,6 +100,9 @@ class Main(QMainWindow, Observation):
     def onSettings(self, e):
         settings = Settings(self.subject)
         settings.exec_()
+
+    def onNewTrack(self, e):
+        print("new track event")
 
     def documentLoadResponder(self, e):
         self.document = e.document
