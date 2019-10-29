@@ -1,12 +1,13 @@
 from PySide2.QtGui import QKeySequence
-from PySide2.QtWidgets import (QFileDialog, QFrame, QMainWindow, QMessageBox,
-                               QScrollArea, QVBoxLayout, QWidget)
+from PySide2.QtWidgets import (QFileDialog, QMainWindow, QMessageBox,
+                               QVBoxLayout, QWidget)
 
 from cells import events
 from cells.observation import Observation
 
 from .console import Console
 from .settings import Settings
+from .editor import Editor
 
 
 class Main(QMainWindow, Observation):
@@ -23,7 +24,8 @@ class Main(QMainWindow, Observation):
         self.document = None
 
         self.add_responder(events.document.Load, self.documentLoadResponder)
-        self.add_responder(events.document.Update, self.documentUpdateResponder)
+        self.add_responder(events.document.Update,
+                           self.documentUpdateResponder)
         self.add_responder(events.document.Error, self.documentErrorResponder)
 
     def _createMenu(self):
@@ -56,13 +58,11 @@ class Main(QMainWindow, Observation):
     def _initCentralWidget(self):
         centralView = QWidget()
         layout = QVBoxLayout()
-        scrollArea = QScrollArea()
+        editor = Editor(self)
         console = Console(self.subject)
 
-        scrollArea.setFrameShape(QFrame.NoFrame)
-
         layout.setSpacing(0)
-        layout.addWidget(scrollArea)
+        layout.addWidget(editor)
         layout.addWidget(console)
 
         centralView.setLayout(layout)
