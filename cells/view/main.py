@@ -6,6 +6,7 @@ from cells import events
 from cells.observation import Observation
 
 from .console import Console
+from .settings import Settings
 
 
 class Main(QMainWindow, Observation):
@@ -28,18 +29,26 @@ class Main(QMainWindow, Observation):
     def _createMenu(self):
         self.menuBar().addAction("Set")
         self._createFileMenu()
+        self._createEditMenu()
 
     def _createFileMenu(self):
         fileMenu = self.menuBar().addMenu("File")
-        self._addAction(fileMenu, "New", QKeySequence.New, self.onFileNew)
-        self._addAction(fileMenu, "Open", QKeySequence.Open, self.onFileOpen)
-        self._addAction(fileMenu, "Save", QKeySequence.Save, self.onFileSave)
-        self._addAction(fileMenu,
-                        "Duplicate",
-                        QKeySequence.SaveAs,
-                        self.onFileSaveAs)
+        self._addMenuAction(fileMenu, "New", QKeySequence.New, self.onFileNew)
+        self._addMenuAction(fileMenu, "Open", QKeySequence.Open,
+                            self.onFileOpen)
+        self._addMenuAction(fileMenu, "Save", QKeySequence.Save,
+                            self.onFileSave)
+        self._addMenuAction(fileMenu,
+                            "Duplicate",
+                            QKeySequence.SaveAs,
+                            self.onFileSaveAs)
 
-    def _addAction(self, menu, name, shortcut, callback):
+    def _createEditMenu(self):
+        editMenu = self.menuBar().addMenu("Help")
+        self._addMenuAction(editMenu, "Settings", QKeySequence.Preferences,
+                            self.onSettings)
+
+    def _addMenuAction(self, menu, name, shortcut, callback):
         newAct = menu.addAction(name)
         newAct.triggered.connect(callback)
         newAct.setShortcuts(shortcut)
@@ -84,6 +93,10 @@ class Main(QMainWindow, Observation):
 
         if fname[0]:
             self.notify(events.document.SaveAs(fname[0]))
+
+    def onSettings(self, e):
+        settings = Settings(self.subject)
+        settings.exec_()
 
     def documentLoadResponder(self, e):
         self.document = e.document
