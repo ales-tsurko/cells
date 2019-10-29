@@ -1,4 +1,5 @@
 import json
+import os
 
 from cells import events
 from cells.observation import Observation
@@ -42,8 +43,13 @@ class Document(Observation, dict):
             f.write(json.dumps(dict(self)))
             self.saved = True
 
+    def _update_name(self):
+        base = os.path.basename(self.path)
+        self.name, _ = os.path.splitext(base)
+
     def save_as(self, path):
         with open(path, "w+") as f:
             f.write(json.dumps(dict(self)))
             self.saved = True
             self.path = path
+            self._update_name()

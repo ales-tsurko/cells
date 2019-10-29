@@ -92,6 +92,8 @@ class Main(QMainWindow, Observation):
         if self.document is None:
             self.document = e.document
 
+        self.setWindowTitle(e.document.name)
+
     def keyPressEvent(self, e):
         pass
 
