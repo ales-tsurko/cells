@@ -1,6 +1,6 @@
 from PySide2.QtGui import QKeySequence
-from PySide2.QtWidgets import (QFileDialog, QFrame, QMainWindow,
-                               QMessageBox, QScrollArea, QVBoxLayout, QWidget)
+from PySide2.QtWidgets import (QFileDialog, QFrame, QMainWindow, QMessageBox,
+                               QScrollArea, QVBoxLayout, QWidget)
 
 from cells import events
 from cells.observation import Observation
@@ -23,6 +23,7 @@ class Main(QMainWindow, Observation):
 
         self.add_responder(events.document.Load, self.documentLoadResponder)
         self.add_responder(events.document.Update, self.documentUpdateResponder)
+        self.add_responder(events.document.Error, self.documentErrorResponder)
 
     def _createMenu(self):
         self.menuBar().addAction("Set")
@@ -93,6 +94,12 @@ class Main(QMainWindow, Observation):
             self.document = e.document
 
         self.setWindowTitle(e.document.name)
+
+    def documentErrorResponder(self, e):
+        dialog = QMessageBox()
+        dialog.setText(e.message)
+        dialog.setWindowTitle("Error")
+        dialog.exec_()
 
     def keyPressEvent(self, e):
         pass

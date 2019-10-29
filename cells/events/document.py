@@ -29,3 +29,8 @@ class Close(NamedTuple):
 
 class Update(NamedTuple):
     document: Document
+
+
+class Error(NamedTuple):
+    document: Document
+    message: str

@@ -34,9 +34,14 @@ class Document(Observation, dict):
 
     def open(self, path):
         with open(path, "w+") as f:
-            self.update(json.load(f))
-            self.path = path
-            self.notify(events.document.Load(self))
+            try:
+                self.update(json.load(f))
+                self.path = path
+                self.saved = True
+                self._update_name()
+                self.notify(events.document.Load(self))
+            except json.decoder.JSONDecodeError:
+                self.notify(events.document.Error(self, "Can't open file"))
 
     def save(self):
         with open(self.path, "w+") as f:
@@ -49,7 +54,10 @@ class Document(Observation, dict):
 
     def save_as(self, path):
         with open(path, "w+") as f:
-            f.write(json.dumps(dict(self)))
-            self.saved = True
-            self.path = path
-            self._update_name()
+            try:
+                f.write(json.dumps(dict(self)))
+                self.saved = True
+                self.path = path
+                self._update_name()
+            except json.decoder.JSONDecodeError:
+                self.notify(events.document.Error(self, "Can't save file"))
