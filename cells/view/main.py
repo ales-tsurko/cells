@@ -1,6 +1,6 @@
 from PySide2.QtGui import QKeySequence
-from PySide2.QtWidgets import (QFileDialog, QLabel, QMainWindow, QMessageBox,
-                               QScrollArea, QVBoxLayout, QWidget)
+from PySide2.QtWidgets import (QFileDialog, QFrame, QLabel, QMainWindow,
+                               QMessageBox, QScrollArea, QVBoxLayout, QWidget)
 
 from cells import events
 from cells.observation import Observation
@@ -48,7 +48,8 @@ class Main(QMainWindow, Observation):
         scrollArea = QScrollArea()
         console = Console(self.subject)
 
-        self.layout().setSpacing(0)
+        scrollArea.setFrameShape(QFrame.NoFrame)
+
         layout.setSpacing(0)
         layout.addWidget(scrollArea)
         layout.addWidget(console)
@@ -69,7 +70,7 @@ class Main(QMainWindow, Observation):
             self.notify(events.document.Open(fname[0]))
 
     def onFileSave(self, e):
-        if not self.document:
+        if self.document is None:
             self.onFileSaveAs(e)
         else:
             self.notify(events.document.Save())
