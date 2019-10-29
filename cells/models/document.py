@@ -1,5 +1,7 @@
-from cells.observation import Observation
+import json
+
 from cells import events
+from cells.observation import Observation
 
 
 class Document(Observation, dict):
@@ -9,9 +11,11 @@ class Document(Observation, dict):
 
         self.saved = True
         self.name = "* New Document"
+        self.path = None
 
         self.add_responder(events.document.Open, self.on_open_responder)
         self.add_responder(events.document.Save, self.on_save_responder)
+        self.add_responder(events.document.SaveAs, self.on_save_as_responder)
 
     def __setattr__(self, name, value):
         self.__dict__["saved"] = False
@@ -19,15 +23,27 @@ class Document(Observation, dict):
         self.notify(events.document.Update(self))
 
     def on_open_responder(self, e):
-        self.open()
+        self.open(e.path)
 
     def on_save_responder(self, e):
         self.save()
 
-    def open(self):
-        self.notify(events.document.Load(self))
-        self.saved = True
+    def on_save_as_responder(self, e):
+        self.save_as(e.path)
+
+    def open(self, path):
+        with open(path, "w+") as f:
+            self.update(json.load(f))
+            self.path = path
+            self.notify(events.document.Load(self))
 
     def save(self):
-        self.saved = True
+        with open(self.path, "w+") as f:
+            f.write(json.dumps(dict(self)))
+            self.saved = True
 
+    def save_as(self, path):
+        with open(path, "w+") as f:
+            f.write(json.dumps(dict(self)))
+            self.saved = True
+            self.path = path
