@@ -29,7 +29,9 @@ class Editor(Observation, QScrollArea):
         self.add_responder(events.document.Load, self.document_load_responder)
 
     def track_new_responder(self, e):
-        self.innerLayout.addWidget(Track(self.subject))
+        track = Track(self.subject)
+        track.setName("Track " + str(self.innerLayout.count() + 1))
+        self.innerLayout.addWidget(track)
 
     def document_load_responder(self, e):
         for i in reversed(range(self.innerLayout.count())):

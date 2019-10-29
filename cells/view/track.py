@@ -1,6 +1,6 @@
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QColor
-from PySide2.QtWidgets import QVBoxLayout, QWidget
+from PySide2.QtWidgets import QVBoxLayout, QWidget, QLabel
 
 from cells.observation import Observation
 
@@ -25,7 +25,7 @@ class Track(Observation, QWidget):
         self.layout().setAlignment(Qt.AlignTop)
 
     def setName(self, name):
-        print(name)
+        self.header.setName(name)
 
 
 class Header(QWidget):
@@ -38,3 +38,14 @@ class Header(QWidget):
         self.setPalette(palette)
 
         self.setFixedHeight(100)
+
+        self.setLayout(QVBoxLayout())
+        self.layout().setSpacing(0)
+        self.layout().setContentsMargins(0, 0, 0, 0)
+
+        self.nameLabel = QLabel(self)
+        self.nameLabel.setAlignment(Qt.AlignCenter)
+        self.layout().addWidget(self.nameLabel)
+
+    def setName(self, name):
+        self.nameLabel.setText(name)
