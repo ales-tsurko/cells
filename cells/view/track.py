@@ -1,5 +1,5 @@
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QLineEdit, QVBoxLayout, QWidget
+from PySide2.QtWidgets import QLineEdit, QMessageBox, QVBoxLayout, QWidget
 
 from cells import events
 from cells.observation import Observation
@@ -26,8 +26,30 @@ class Track(Observation, QWidget):
 
         self.setName(name)
 
+        self.setFocusPolicy(Qt.ClickFocus)
+
+        self.add_responder(events.view.track.Remove,
+                           self.selfRemoveResponder)
+
+    def selfRemoveResponder(self, e):
+        if self.index == e.index:
+            name = self.header.nameLabel.text()
+            question = f'Do you really want to delete track {name}?'
+            msgBox = QMessageBox()
+            msgBox.setWindowTitle("Delete Track")
+            msgBox.setText(question)
+            msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+            msgBox.setDefaultButton(QMessageBox.Yes)
+            reply = msgBox.exec()
+
+            if reply == QMessageBox.Yes:
+                self.close()
+
     def setName(self, name):
         self.header.setName(name)
+
+    def focusInEvent(self, e):
+        self.header.setFocus()
 
 
 class Header(Observation, QWidget):
@@ -49,7 +71,8 @@ class Header(Observation, QWidget):
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().addWidget(self.nameLabel)
 
-        self.setFocusPolicy(Qt.ClickFocus)
+        self.add_responder(events.view.main.TrackRemove,
+                           self.mainTrackRemoveResponder)
 
     def _initNameLabel(self):
         self.nameLabel = QLineEdit(self)
@@ -60,17 +83,25 @@ class Header(Observation, QWidget):
         self.nameLabel.setContextMenuPolicy(Qt.NoContextMenu)
         self.nameLabel.textChanged.connect(self.onNameChanged)
 
-    def setName(self, name):
-        self.nameLabel.setText(name)
+    def mainTrackRemoveResponder(self, e):
+        # I don't know why, but it doesn't work inside of Track itself:
+        # - self.hasFocus() always returns False
+        # - if I introduce self.selected, it changes correctly inside
+        #   focusEvents but it somehow remains always True after just one
+        #   select inside the responder (even given the fact, that it's
+        #   changing inside delegates %-| )
+
+        if self.hasFocus():
+            self.notify(events.view.track.Remove(self.index))
 
     def onNameChanged(self, name):
         self.notify(events.view.track.NameChanged(self.index, name))
 
     def focusInEvent(self, e):
-        #  self.setStyleSheet("background-color: green; border: 1px solid black;")
         self.setStyleSheet("background-color: green;")
-        print("focus in")
 
     def focusOutEvent(self, e):
         self.setStyleSheet("background-color: grey;")
-        print("focus out")
+
+    def setName(self, name):
+        self.nameLabel.setText(name)

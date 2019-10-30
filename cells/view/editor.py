@@ -3,6 +3,7 @@ from PySide2.QtWidgets import QFrame, QHBoxLayout, QScrollArea, QWidget
 
 from cells import events
 from cells.observation import Observation
+from cells.models.document import DUMMY_TRACK_NAME
 
 from .track import Track
 
@@ -41,8 +42,9 @@ class Editor(Observation, QScrollArea):
         self.clear()
 
         for (n, track) in enumerate(e.document.tracks):
-            track_view = Track(self.subject, n, track.name)
-            self.innerLayout.addWidget(track_view)
+            if track.name != DUMMY_TRACK_NAME:
+                track_view = Track(self.subject, n, track.name)
+                self.innerLayout.addWidget(track_view)
 
     def clear(self):
         for i in reversed(range(self.innerLayout.count())):

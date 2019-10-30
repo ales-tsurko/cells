@@ -52,6 +52,9 @@ class Main(QMainWindow, Observation):
         editMenu = self.menuBar().addMenu("Edit")
         self._addMenuAction(editMenu, "New Track", self.tr('Ctrl+t'),
                             self.onNewTrack)
+        self._addMenuAction(editMenu, "Remove Selected Track", self.tr('Backspace'),
+                            self.onRemoveTrack)
+
         editMenu.addSeparator()
         self._addMenuAction(editMenu, "Settings", QKeySequence.Preferences,
                             self.onSettings)
@@ -135,16 +138,20 @@ class Main(QMainWindow, Observation):
     def onNewTrack(self, e):
         self.notify(events.view.main.TrackNew())
 
+    def onRemoveTrack(self, e):
+        self.notify(events.view.main.TrackRemove())
+
     def keyPressEvent(self, e):
         pass
 
     def checkSave(self, e):
         if not self.saved:
-            reply = QMessageBox.question(self,
-                                         'Closing Document',
-                                         "Do you want to save changes?",
-                                         QMessageBox.Yes | QMessageBox.No,
-                                         QMessageBox.Yes)
+            msgBox = QMessageBox()
+            msgBox.setWindowTitle("Closing Document")
+            msgBox.setText("Do you want to save changes?")
+            msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+            msgBox.setDefaultButton(QMessageBox.Yes)
+            reply = msgBox.exec()
 
             if reply == QMessageBox.Yes:
                 self.onFileSave(e)

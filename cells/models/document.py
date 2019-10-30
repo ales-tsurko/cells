@@ -7,6 +7,9 @@ from cells import events
 from cells.observation import Observation
 
 
+DUMMY_TRACK_NAME = "IMADUMMYTRACKDONTEVENTTRYTOUSETHISNAMEFORYOURTRACKSYOUWILLLOSTTHEM"
+
+
 @dataclass_json
 @dataclass
 class TrackModel:
@@ -44,8 +47,9 @@ class Document(Observation, dict):
 
         self.add_responder(events.view.track.NameChanged,
                            self.track_name_changed_responder)
+        self.add_responder(events.view.track.Remove, self.track_remove_responder)
+
         self.add_responder(events.track.Move, self.on_track_move)
-        self.add_responder(events.track.Remove, self.on_track_remove)
 
     def main_new_responder(self, e):
         self.model = DocumentModel("New Document", [], None)
@@ -73,8 +77,9 @@ class Document(Observation, dict):
         self.model.tracks.insert(track, e.new_index)
 
     @notify_update
-    def on_track_remove(self, e):
-        del self.tracks[e.index]
+    def track_remove_responder(self, e):
+        dummy = TrackModel(DUMMY_TRACK_NAME)
+        self.model.tracks[e.index] = dummy
 
     def open(self, path):
         with open(path, "r") as f:
