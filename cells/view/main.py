@@ -77,15 +77,15 @@ class Main(QMainWindow, Observation):
 
     def documentNewResponder(self, e):
         self.document = e.document
-        self.setWindowTitle(self.document.model.name)
+        self.setWindowTitle(self.document.name)
 
     def documentOpenResponder(self, e):
         self.document = e.document
-        self.setWindowTitle(self.document.model.name)
+        self.setWindowTitle(self.document.name)
 
     def documentUpdateResponder(self, e):
         self.saved = False
-        self.setWindowTitle("* " + e.document.model.name)
+        self.setWindowTitle("* " + e.document.name)
 
     def documentErrorResponder(self, e):
         dialog = QMessageBox()
@@ -108,11 +108,11 @@ class Main(QMainWindow, Observation):
             self.notify(events.view.main.FileOpen(fname[0]))
 
     def onFileSave(self, e):
-        if self.document is None or self.document.path is None:
+        if self.document.path is None:
             self.onFileSaveAs(e)
         else:
             self.notify(events.view.main.FileSave(self.document.path))
-            self.setWindowTitle(self.document.model.name)
+            self.setWindowTitle(self.document.name)
 
         self.saved = True
 
@@ -124,7 +124,7 @@ class Main(QMainWindow, Observation):
         if fname[0]:
             self.notify(events.view.main.FileSaveAs(fname[0]))
 
-        self.setWindowTitle(self.document.model.name)
+        self.setWindowTitle(self.document.name)
         self.saved = True
 
     def onSettings(self, e):

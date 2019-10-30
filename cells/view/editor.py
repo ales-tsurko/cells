@@ -40,7 +40,7 @@ class Editor(Observation, QScrollArea):
     def document_open_responder(self, e):
         self.clear()
 
-        for track in e.document.model.tracks:
+        for track in e.document.tracks:
             track_view = Track(self.subject, track.name)
             self.innerLayout.addWidget(track_view)
 
