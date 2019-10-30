@@ -26,17 +26,24 @@ class Editor(Observation, QScrollArea):
         self.setWidgetResizable(True)
 
         self.add_responder(events.track.New, self.track_new_responder)
-        self.add_responder(events.document.Load, self.document_load_responder)
+        self.add_responder(events.document.New, self.document_new_responder)
+        self.add_responder(events.document.Open, self.document_open_responder)
 
     def track_new_responder(self, e):
         name = "Track " + str(self.innerLayout.count() + 1)
         track = Track(self.subject, name)
         self.innerLayout.addWidget(track)
 
-    def document_load_responder(self, e):
-        for i in reversed(range(self.innerLayout.count())):
-            self.innerLayout.itemAt(i).widget().deleteLater()
+    def document_new_responder(self, e):
+        self.clear()
+
+    def document_open_responder(self, e):
+        self.clear()
 
         for track in e.document.model.tracks:
             track_view = Track(self.subject, track.name)
             self.innerLayout.addWidget(track_view)
+
+    def clear(self):
+        for i in reversed(range(self.innerLayout.count())):
+            self.innerLayout.itemAt(i).widget().deleteLater()

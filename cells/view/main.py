@@ -23,11 +23,14 @@ class Main(QMainWindow, Observation):
         self._initCentralWidget()
 
         self.document = None
+        self.saved = True
 
-        self.add_responder(events.document.Load, self.documentLoadResponder)
+        self.add_responder(events.document.New, self.documentNewResponder)
+        self.add_responder(events.document.Open, self.documentOpenResponder)
         self.add_responder(events.document.Update,
                            self.documentUpdateResponder)
         self.add_responder(events.document.Error, self.documentErrorResponder)
+        self.notify(events.view.main.FileNew())
 
     def _createMenu(self):
         self._createFileMenu()
@@ -72,8 +75,27 @@ class Main(QMainWindow, Observation):
         centralView.layout().setContentsMargins(0, 0, 0, 0)
         self.setCentralWidget(centralView)
 
+    def documentNewResponder(self, e):
+        self.document = e.document
+        self.setWindowTitle(self.document.model.name)
+
+    def documentOpenResponder(self, e):
+        self.document = e.document
+        self.setWindowTitle(self.document.model.name)
+
+    def documentUpdateResponder(self, e):
+        self.saved = False
+        self.setWindowTitle("* " + e.document.model.name)
+
+    def documentErrorResponder(self, e):
+        dialog = QMessageBox()
+        dialog.setText(e.message)
+        dialog.setWindowTitle("Error")
+        dialog.exec_()
+
     def onFileNew(self, e):
-        self.notify(events.document.New())
+        self.checkSave(e)
+        self.notify(events.view.main.FileNew())
 
     def onFileOpen(self, e):
         self.closeEvent(e)
@@ -83,14 +105,16 @@ class Main(QMainWindow, Observation):
                                             filter="Cells Files (*.cells)")
 
         if fname[0]:
-            self.notify(events.document.Open(fname[0]))
+            self.notify(events.view.main.FileOpen(fname[0]))
 
     def onFileSave(self, e):
         if self.document is None or self.document.path is None:
             self.onFileSaveAs(e)
         else:
-            self.notify(events.document.Save())
+            self.notify(events.view.main.FileSave(self.document.path))
             self.setWindowTitle(self.document.model.name)
+
+        self.saved = True
 
     def onFileSaveAs(self, e):
         fname = QFileDialog.getSaveFileName(self,
@@ -98,38 +122,23 @@ class Main(QMainWindow, Observation):
                                             filter="Cells Files (*.cells)")
 
         if fname[0]:
-            self.notify(events.document.SaveAs(fname[0]))
+            self.notify(events.view.main.FileSaveAs(fname[0]))
 
         self.setWindowTitle(self.document.model.name)
+        self.saved = True
 
     def onSettings(self, e):
         settings = Settings(self.subject)
         settings.exec_()
 
     def onNewTrack(self, e):
-        self.notify(events.track.New())
-
-    def documentLoadResponder(self, e):
-        self.document = e.document
-        self.setWindowTitle(self.document.model.name)
-
-    def documentUpdateResponder(self, e):
-        if self.document is None:
-            self.document = e.document
-
-        self.setWindowTitle("* " + e.document.model.name)
-
-    def documentErrorResponder(self, e):
-        dialog = QMessageBox()
-        dialog.setText(e.message)
-        dialog.setWindowTitle("Error")
-        dialog.exec_()
+        self.notify(events.view.main.TrackNew())
 
     def keyPressEvent(self, e):
         pass
 
-    def closeEvent(self, e):
-        if self.document is not None and not self.document.saved:
+    def checkSave(self, e):
+        if not self.saved:
             reply = QMessageBox.question(self,
                                          'Closing Document',
                                          "Do you want to save changes?",
@@ -139,4 +148,9 @@ class Main(QMainWindow, Observation):
             if reply == QMessageBox.Yes:
                 self.onFileSave(e)
 
-        self.notify(events.document.Close(self.document))
+        self.saved = True
+
+    def closeEvent(self, e):
+        self.checkSave(e)
+
+        self.notify(events.view.main.Close())

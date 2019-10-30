@@ -1,8 +1,10 @@
 from typing import NamedTuple
 
+from cells.models.document import TrackModel
+
 
 class New(NamedTuple):
-    pass
+    track: TrackModel
 
 
 class Rename(NamedTuple):

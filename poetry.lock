@@ -112,14 +112,6 @@ python-versions = "*"
 version = "0.4.3"
 
 [[package]]
-category = "main"
-description = "Fast, correct Python JSON library supporting dataclasses and datetimes"
-name = "orjson"
-optional = false
-python-versions = ">=3.6"
-version = "2.1.1"
-
-[[package]]
 category = "dev"
 description = "Core utilities for Python packages"
 name = "packaging"
@@ -284,7 +276,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pathlib2", "contextlib2", "unittest2"]
 
 [metadata]
-content-hash = "56dd94a34bfbb8427de8f039c0ccf1ed9dd6521099d853d7630f6fb2272af29e"
+content-hash = "1874b18520d14c252fe45bc09c54b1b16be63f54e2a0dcf2ec014225587da480"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -327,16 +319,6 @@ more-itertools = [
 mypy-extensions = [
     {file = "mypy_extensions-0.4.3-py2.py3-none-any.whl", hash = "sha256:090fedd75945a69ae91ce1303b5824f428daf5a028d2f6ab8a299250a846f15d"},
     {file = "mypy_extensions-0.4.3.tar.gz", hash = "sha256:2d82818f5bb3e369420cb3c4060a7970edba416647068eb4c5343488a6c604a8"},
-]
-orjson = [
-    {file = "orjson-2.1.1-cp36-cp36m-macosx_10_7_x86_64.whl", hash = "sha256:eaf9317b4ca7341166cd94f9c0f4e275b4d64d278e1d66ca20d04af75072474d"},
-    {file = "orjson-2.1.1-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:3358a27b0189b2a71aefea09da05c6a95bbf820e46235df6c456e277b4f07e08"},
-    {file = "orjson-2.1.1-cp36-none-win_amd64.whl", hash = "sha256:6a4cf69847f1f1aa5e424379c5c85f653ac251c13bd141a42d9e7e4561f0019d"},
-    {file = "orjson-2.1.1-cp37-cp37m-macosx_10_7_x86_64.whl", hash = "sha256:3e9ceaf58626641267e2ec0f60d087571112cae25e1a5e5a7b3191086d51a898"},
-    {file = "orjson-2.1.1-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:6bff588611eff5db216f6ac3286819b1dce45ad51df488ccfea95363f99ecfd8"},
-    {file = "orjson-2.1.1-cp37-none-win_amd64.whl", hash = "sha256:36516ffa3043cff837781f83bf06058b490808d73a186ceeb8ca77aba88af6a9"},
-    {file = "orjson-2.1.1-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:eb977c484c5ac2ea91db12e837fd046f39a61c3b32cb035afe997932cb4d33a8"},
-    {file = "orjson-2.1.1.tar.gz", hash = "sha256:cd8c782e235dcc2b754a5fbed850a1f2ff94274885a0973c4404d87d1f69ad4b"},
 ]
 packaging = [
     {file = "packaging-19.2-py2.py3-none-any.whl", hash = "sha256:d9551545c6d761f3def1677baf08ab2a3ca17c56879e70fecba2fc4dde4ed108"},

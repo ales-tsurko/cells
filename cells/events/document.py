@@ -4,22 +4,18 @@ from cells.models.document import Document
 
 
 class New(NamedTuple):
-    pass
+    document: Document
 
 
 class Open(NamedTuple):
-    path: str
+    document: Document
 
 
 class Save(NamedTuple):
-    pass
+    document: Document
 
 
 class SaveAs(NamedTuple):
-    path: str
-
-
-class Load(NamedTuple):
     document: Document
 
 

@@ -11,20 +11,23 @@ from cells import events
 
 
 class App:
-    def run(subject):
-        app = QtWidgets.QApplication([])
-        app.setApplicationName(ApplicationInfo.name)
-        app.setApplicationDisplayName(ApplicationInfo.name)
+    def __init__(self, subject):
+        self.subject = subject
+
+        self.app = QtWidgets.QApplication([])
+        self.app.setApplicationName(ApplicationInfo.name)
+        self.app.setApplicationDisplayName(ApplicationInfo.name)
 
         font_path = os.path.join(App.get_resources_path(),
                                  "fonts", "FiraCode_2", "FiraCode-VF.ttf")
-        res = QFontDatabase.addApplicationFont(font_path)
+        QFontDatabase.addApplicationFont(font_path)
+        self.main = Main(subject)
 
-        widget = Main(subject)
-        widget.show()
-        res = app.exec_()
+    def run(self):
+        self.main.show()
+        res = self.app.exec_()
 
-        subject.on_next(events.app.Quit())
+        self.subject.on_next(events.app.Quit())
 
         sys.exit(res)
 

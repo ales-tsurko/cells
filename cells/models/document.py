@@ -28,28 +28,33 @@ class Document(Observation, dict):
         self.saved = True
         self.path = None
 
-        self.model = DocumentModel("New Document", [])
+        # main view events
+        self.add_responder(events.view.main.FileNew, self.main_new_responder)
+        self.add_responder(events.view.main.FileOpen, self.main_open_responder)
+        self.add_responder(events.view.main.FileSave, self.main_save_responder)
+        self.add_responder(events.view.main.FileSaveAs,
+                           self.main_save_responder)
+        self.add_responder(events.view.main.TrackNew,
+                           self.main_track_new_responder)
 
-        self.add_responder(events.document.Open, self.on_open_responder)
-        self.add_responder(events.document.Save, self.on_save_responder)
-        self.add_responder(events.document.SaveAs, self.on_save_as_responder)
-        self.add_responder(events.track.New, self.on_new_track_responder)
         self.add_responder(events.track.Move, self.on_track_move)
         self.add_responder(events.track.Remove, self.on_track_remove)
 
-    def on_open_responder(self, e):
+    def main_new_responder(self, e):
+        self.model = DocumentModel("New Document", [])
+        self.notify(events.document.New(self))
+
+    def main_open_responder(self, e):
         self.open(e.path)
 
-    def on_save_responder(self, e):
-        self.save()
+    def main_save_responder(self, e):
+        self.save(e.path)
 
-    def on_save_as_responder(self, e):
-        self.save_as(e.path)
-
-    def on_new_track_responder(self, e):
+    def main_track_new_responder(self, e):
         track = TrackModel("Track " + str(len(self.model.tracks) + 1))
         self.model.tracks.append(track)
         self.notify(events.document.Update(self))
+        self.notify(events.track.New(track))
 
     def on_track_move(self, e):
         track = self.tracks.pop(e.index)
@@ -67,21 +72,16 @@ class Document(Observation, dict):
                 self.path = path
                 self._update_name()
                 self.saved = True
-                self.notify(events.document.Load(self))
+                self.notify(events.document.Open(self))
             except TypeError as e:
                 print(e)
                 self.notify(events.document.Error(self, "Can't open file"))
-
-    def save(self):
-        with open(self.path, "w+") as f:
-            f.write(self.model.to_json())
-            self.saved = True
 
     def _update_name(self):
         base = os.path.basename(self.path)
         self.model.name, _ = os.path.splitext(base)
 
-    def save_as(self, path):
+    def save(self, path):
         with open(path, "w+") as f:
             try:
                 f.write(self.model.to_json())
