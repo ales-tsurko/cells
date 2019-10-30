@@ -11,10 +11,8 @@ class Track(Observation, QWidget):
         Observation.__init__(self, subject)
         QWidget.__init__(self)
 
-        self.setAutoFillBackground(True)
-        palette = self.palette()
-        palette.setColor(self.backgroundRole(), QColor("red"))
-        self.setPalette(palette)
+        self.setAttribute(Qt.WA_StyledBackground)
+        self.setStyleSheet("background-color:red;")
 
         self.setFixedWidth(200)
 
@@ -40,10 +38,12 @@ class Header(Observation, QWidget):
 
         self.index = index
 
-        self.setAutoFillBackground(True)
-        palette = self.palette()
-        palette.setColor(self.backgroundRole(), QColor("blue"))
-        self.setPalette(palette)
+        #  self.setAutoFillBackground(True)
+        #  palette = self.palette()
+        #  palette.setColor(self.backgroundRole(), QColor("grey"))
+        #  self.setPalette(palette)
+        self.setAttribute(Qt.WA_StyledBackground)
+        self.setStyleSheet("background-color: grey;")
 
         self.setFixedHeight(100)
 
@@ -54,11 +54,13 @@ class Header(Observation, QWidget):
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().addWidget(self.nameLabel)
 
+        self.setFocusPolicy(Qt.ClickFocus)
+
     def _initNameLabel(self):
         self.nameLabel = QLineEdit(self)
         self.nameLabel.setAlignment(Qt.AlignCenter)
         self.nameLabel.setWindowFlags(Qt.FramelessWindowHint)
-        self.nameLabel.setStyleSheet("background:transparent; border: none;")
+        self.nameLabel.setStyleSheet("background: transparent; border: none;")
         self.nameLabel.setMaxLength(30)
         self.nameLabel.setContextMenuPolicy(Qt.NoContextMenu)
         self.nameLabel.textChanged.connect(self.onNameChanged)
@@ -68,3 +70,12 @@ class Header(Observation, QWidget):
 
     def onNameChanged(self, name):
         self.notify(events.view.track.NameChanged(self.index, name))
+
+    def focusInEvent(self, e):
+        #  self.setStyleSheet("background-color: green; border: 1px solid black;")
+        self.setStyleSheet("background-color: green;")
+        print("focus in")
+
+    def focusOutEvent(self, e):
+        self.setStyleSheet("background-color: grey;")
+        print("focus out")
