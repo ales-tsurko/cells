@@ -31,7 +31,7 @@ class Editor(Observation, QScrollArea):
 
     def track_new_responder(self, e):
         name = "Track " + str(self.innerLayout.count() + 1)
-        track = Track(self.subject, name)
+        track = Track(self.subject, self.innerLayout.count(), name)
         self.innerLayout.addWidget(track)
 
     def document_new_responder(self, e):
@@ -40,8 +40,8 @@ class Editor(Observation, QScrollArea):
     def document_open_responder(self, e):
         self.clear()
 
-        for track in e.document.tracks:
-            track_view = Track(self.subject, track.name)
+        for (n, track) in enumerate(e.document.tracks):
+            track_view = Track(self.subject, n, track.name)
             self.innerLayout.addWidget(track_view)
 
     def clear(self):

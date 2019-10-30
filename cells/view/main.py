@@ -82,6 +82,7 @@ class Main(QMainWindow, Observation):
     def documentOpenResponder(self, e):
         self.document = e.document
         self.setWindowTitle(self.document.name)
+        self.saved = True
 
     def documentUpdateResponder(self, e):
         self.saved = False
@@ -98,7 +99,7 @@ class Main(QMainWindow, Observation):
         self.notify(events.view.main.FileNew())
 
     def onFileOpen(self, e):
-        self.closeEvent(e)
+        self.checkSave(e)
 
         fname = QFileDialog.getOpenFileName(self,
                                             "Open Project",

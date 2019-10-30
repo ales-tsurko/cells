@@ -21,6 +21,13 @@ class DocumentModel:
     path: str
 
 
+def notify_update(method):
+    def inner(instance, *args, **kwargs):
+        method(instance, *args, **kwargs)
+        instance.notify(events.document.Update(instance.model))
+    return inner
+
+
 class Document(Observation, dict):
     def __init__(self, subject):
         dict.__init__(self)
@@ -35,6 +42,8 @@ class Document(Observation, dict):
         self.add_responder(events.view.main.TrackNew,
                            self.main_track_new_responder)
 
+        self.add_responder(events.view.track.NameChanged,
+                           self.track_name_changed_responder)
         self.add_responder(events.track.Move, self.on_track_move)
         self.add_responder(events.track.Remove, self.on_track_remove)
 
@@ -49,41 +58,47 @@ class Document(Observation, dict):
         self.save(e.path)
 
     def main_track_new_responder(self, e):
-        track = TrackModel("Track " + str(len(self.model.tracks) + 1))
+        name = "Track " + str(len(self.model.tracks) + 1)
+        track = TrackModel(name)
         self.model.tracks.append(track)
-        self.notify(events.document.Update(self.model))
         self.notify(events.track.New(track))
 
+    @notify_update
+    def track_name_changed_responder(self, e):
+        self.model.tracks[e.index].name = e.name
+
+    @notify_update
     def on_track_move(self, e):
         track = self.tracks.pop(e.index)
         self.model.tracks.insert(track, e.new_index)
-        self.model.notify(events.document.Update(self.model))
 
+    @notify_update
     def on_track_remove(self, e):
         del self.tracks[e.index]
-        self.notify(events.document.Update(self.model))
 
     def open(self, path):
         with open(path, "r") as f:
             try:
-                self.model = DocumentModel.from_json(f.read())
                 self.model.path = path
-                self._update_name()
+                self.update_name()
+                self.model = DocumentModel.from_json(f.read())
                 self.notify(events.document.Open(self.model))
             except TypeError as e:
                 print(e)
-                self.notify(events.document.Error(self.model, "Can't open file"))
-
-    def _update_name(self):
-        base = os.path.basename(self.model.path)
-        self.model.name, _ = os.path.splitext(base)
+                self.notify(events.document.Error(self.model,
+                            "Can't open file"))
 
     def save(self, path):
         with open(path, "w+") as f:
             try:
-                f.write(self.model.to_json())
                 self.model.path = path
-                self._update_name()
+                self.update_name()
+                f.write(self.model.to_json())
             except TypeError as e:
                 print(e)
-                self.notify(events.document.Error(self.model, "Can't save file"))
+                self.notify(events.document.Error(self.model,
+                            "Can't save file"))
+
+    def update_name(self):
+        base = os.path.basename(self.model.path)
+        self.model.name, _ = os.path.splitext(base)
