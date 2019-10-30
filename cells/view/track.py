@@ -1,5 +1,4 @@
 from PySide2.QtCore import Qt
-from PySide2.QtGui import QColor
 from PySide2.QtWidgets import QLineEdit, QVBoxLayout, QWidget
 
 from cells import events
@@ -38,10 +37,6 @@ class Header(Observation, QWidget):
 
         self.index = index
 
-        #  self.setAutoFillBackground(True)
-        #  palette = self.palette()
-        #  palette.setColor(self.backgroundRole(), QColor("grey"))
-        #  self.setPalette(palette)
         self.setAttribute(Qt.WA_StyledBackground)
         self.setStyleSheet("background-color: grey;")
 

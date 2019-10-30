@@ -124,9 +124,9 @@ class Main(QMainWindow, Observation):
 
         if fname[0]:
             self.notify(events.view.main.FileSaveAs(fname[0]))
+            self.saved = True
 
         self.setWindowTitle(self.document.name)
-        self.saved = True
 
     def onSettings(self, e):
         settings = Settings(self.subject)
