@@ -1,14 +1,14 @@
+from PySide2.QtCore import Qt
 from PySide2.QtGui import QKeySequence
 from PySide2.QtWidgets import (QFileDialog, QMainWindow, QMessageBox,
                                QVBoxLayout, QWidget)
-from PySide2.QtCore import Qt
 
 from cells import events
 from cells.observation import Observation
 
 from .console import Console
-from .settings import Settings
 from .editor import Editor
+from .settings import Settings
 
 
 class Main(QMainWindow, Observation):
@@ -90,7 +90,7 @@ class Main(QMainWindow, Observation):
             self.onFileSaveAs(e)
         else:
             self.notify(events.document.Save())
-            self.setWindowTitle(self.document.name)
+            self.setWindowTitle(self.document.model.name)
 
     def onFileSaveAs(self, e):
         fname = QFileDialog.getSaveFileName(self,
@@ -100,7 +100,7 @@ class Main(QMainWindow, Observation):
         if fname[0]:
             self.notify(events.document.SaveAs(fname[0]))
 
-        self.setWindowTitle(self.document.name)
+        self.setWindowTitle(self.document.model.name)
 
     def onSettings(self, e):
         settings = Settings(self.subject)
@@ -111,13 +111,13 @@ class Main(QMainWindow, Observation):
 
     def documentLoadResponder(self, e):
         self.document = e.document
-        self.setWindowTitle(self.document.name)
+        self.setWindowTitle(self.document.model.name)
 
     def documentUpdateResponder(self, e):
         if self.document is None:
             self.document = e.document
 
-        self.setWindowTitle("* " + e.document.name)
+        self.setWindowTitle("* " + e.document.model.name)
 
     def documentErrorResponder(self, e):
         dialog = QMessageBox()

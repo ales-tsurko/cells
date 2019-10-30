@@ -6,7 +6,7 @@ from cells.observation import Observation
 
 
 class Track(Observation, QWidget):
-    def __init__(self, subject):
+    def __init__(self, subject, name):
         Observation.__init__(self, subject)
         QWidget.__init__(self)
 
@@ -23,6 +23,8 @@ class Track(Observation, QWidget):
         self.layout().setSpacing(0)
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setAlignment(Qt.AlignTop)
+
+        self.setName(name)
 
     def setName(self, name):
         self.header.setName(name)

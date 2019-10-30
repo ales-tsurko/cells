@@ -1,7 +1,5 @@
 from typing import NamedTuple
 
-from cells.models.document import Track
-
 
 class New(NamedTuple):
     pass
