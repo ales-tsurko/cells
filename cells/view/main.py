@@ -97,6 +97,7 @@ class Main(QMainWindow, Observation):
     def onFileNew(self, e):
         self.checkSave(e)
         self.notify(events.view.main.FileNew())
+        self.saved = True
 
     def onFileOpen(self, e):
         self.checkSave(e)
@@ -107,6 +108,7 @@ class Main(QMainWindow, Observation):
 
         if fname[0]:
             self.notify(events.view.main.FileOpen(fname[0]))
+            self.saved = True
 
     def onFileSave(self, e):
         if self.document.path is None:
@@ -114,8 +116,7 @@ class Main(QMainWindow, Observation):
         else:
             self.notify(events.view.main.FileSave(self.document.path))
             self.setWindowTitle(self.document.name)
-
-        self.saved = True
+            self.saved = True
 
     def onFileSaveAs(self, e):
         fname = QFileDialog.getSaveFileName(self,
@@ -124,9 +125,8 @@ class Main(QMainWindow, Observation):
 
         if fname[0]:
             self.notify(events.view.main.FileSaveAs(fname[0]))
+            self.setWindowTitle(self.document.name)
             self.saved = True
-
-        self.setWindowTitle(self.document.name)
 
     def onSettings(self, e):
         settings = Settings(self.subject)
