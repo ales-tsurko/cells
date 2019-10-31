@@ -57,12 +57,14 @@ class Main(QMainWindow, Observation):
         self._addMenuAction(trackSub, "Remove",
                             self.tr('Ctrl+Backspace'),
                             self.onTrackRemove)
+        trackSub.addSeparator()
         self._addMenuAction(trackSub, "Select Left",
                             self.tr('h'),
                             self.onTrackSelectLeft)
         self._addMenuAction(trackSub, "Select Right",
                             self.tr('l'),
                             self.onTrackSelectRight)
+        trackSub.addSeparator()
         self._addMenuAction(trackSub, "Move Left",
                             self.tr('Shift+h'),
                             self.onTrackMoveLeft)
@@ -71,23 +73,27 @@ class Main(QMainWindow, Observation):
                             self.onTrackMoveRight)
 
         rowSub = editMenu.addMenu("Row")
-        self._addMenuAction(rowSub, "Add", self.tr('Enter'),
-                            self.onRowAdd)
         self._addMenuAction(rowSub, "Evaluate", self.tr('Ctrl+Enter'),
                             self.onRowEvaluate)
+        rowSub.addSeparator()
+        self._addMenuAction(rowSub, "Add", self.tr('Enter'),
+                            self.onRowAdd)
         self._addMenuAction(rowSub, "Remove",
                             self.tr('Shift+Backspace'),
                             self.onRowRemove)
+        rowSub.addSeparator()
         self._addMenuAction(rowSub, "Select Up",
                             self.tr('k'),
                             self.onRowSelectUp)
         self._addMenuAction(rowSub, "Select Down",
                             self.tr('j'),
                             self.onRowSelectDown)
+        rowSub.addSeparator()
         self._addMenuAction(rowSub, "Move Up", self.tr('Shift+K'),
                             self.onRowMoveUp)
         self._addMenuAction(rowSub, "Move Down", self.tr('Shift+J'),
                             self.onRowMoveDown)
+        rowSub.addSeparator()
         self._addMenuAction(rowSub, "Copy", self.tr('Ctrl+Shift+C'),
                             self.onRowCopy)
         self._addMenuAction(rowSub, "Cut", self.tr('Ctrl+Shift+X'),
@@ -198,6 +204,9 @@ class Main(QMainWindow, Observation):
     def onTrackMoveRight(self, e):
         self.notify(events.view.main.TrackMoveRight())
 
+    def onRowEvaluate(self, e):
+            self.notify(events.view.main.RowEvaluate())
+    
     def onRowAdd(self, e):
         self.notify(events.view.main.RowAdd())
 
@@ -215,9 +224,6 @@ class Main(QMainWindow, Observation):
 
     def onRowMoveDown(self, e):
         self.notify(events.view.main.RowMoveDown())
-
-    def onRowEvaluate(self, e):
-        self.notify(events.view.main.RowEvaluate())
 
     def onRowCopy(self, e):
         self.notify(events.view.main.RowCopy())

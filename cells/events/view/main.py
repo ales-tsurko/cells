@@ -73,6 +73,10 @@ class RowCopy(NamedTuple):
     pass
 
 
+class RowCut(NamedTuple):
+    pass
+
+
 class RowPaste(NamedTuple):
     pass
 

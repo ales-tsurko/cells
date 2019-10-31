@@ -6,7 +6,15 @@ class NameChanged(NamedTuple):
     name: str
 
 
+class WillRemove(NamedTuple):
+    index: int
+
+
 class Remove(NamedTuple):
+    index: int
+
+
+class Select(NamedTuple):
     index: int
 
 

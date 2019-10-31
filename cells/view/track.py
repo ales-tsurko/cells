@@ -83,6 +83,10 @@ class Header(Observation, QWidget):
 
         self.add_responder(events.view.main.TrackRemove,
                            self.mainTrackRemoveResponder)
+        self.add_responder(events.view.main.TrackSelectLeft,
+                           self.mainTrackSelectLeftResponder)
+        self.add_responder(events.view.main.TrackSelectRight, 
+                           self.mainTrackSelectRightResponder)
         self.add_responder(events.view.main.TrackMoveLeft,
                            self.mainTrackMoveLeftResponder)
         self.add_responder(events.view.main.TrackMoveRight,
@@ -106,14 +110,22 @@ class Header(Observation, QWidget):
         #   changing inside of delegates %-| )
 
         if self.hasFocus():
-            self.notify(events.view.track.Remove(self.index))
+            self.notify(events.view.track.WillRemove(self.index))
+            
+    def mainTrackSelectLeftResponder(self, e):
+        if self.hasFocus() and self.index > 0:
+            self.notify(events.view.track.Select(self.index - 1))
+    
+    def mainTrackSelectRightResponder(self, e):
+        if self.hasFocus() and self.index < self.totalTracksNum() - 1:
+            self.notify(events.view.track.Select(self.index + 1))
 
     def mainTrackMoveLeftResponder(self, e):
         if self.hasFocus() and self.index > 0:
             self.notify(events.view.track.Move(self.index, self.index - 1))
 
     def mainTrackMoveRightResponder(self, e):
-        length = self.parentWidget().parentWidget().layout().count() - 1
+        length = self.totalTracksNum() - 1
         if self.hasFocus() and self.index < length:
             self.notify(events.view.track.Move(self.index, self.index + 1))
 
@@ -125,6 +137,9 @@ class Header(Observation, QWidget):
 
     def focusOutEvent(self, e):
         self.setStyleSheet("background-color: grey;")
+        
+    def totalTracksNum(self):
+        return self.parentWidget().parentWidget().layout().count()
 
     def setName(self, name):
         self.nameLabel.setText(name)
