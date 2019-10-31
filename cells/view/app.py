@@ -9,7 +9,6 @@ from cells.settings import ApplicationInfo
 from .main import Main
 from cells import events
 from cells.observation import Observation
-from .settings import Settings
 
 from rx.subject import Subject
 
@@ -26,23 +25,22 @@ class App(Observation):
         font_path = os.path.join(get_resources_path(),
                                  "fonts", "FiraCode_2", "FiraCode-VF.ttf")
         QFontDatabase.addApplicationFont(font_path)
-        self.settings = Settings(subject)
         self.main = Main(subject)
-        
+
         self._init_responders()
 
     def document_new_responder(self, e):
         self.subject = Subject()
         self._init_responders()
-        
+
         self.main.close()
         self.main.deleteLater()
         self.main = Main(self.subject)
-        self.settings.subject = self.subject
         self.main.show()
-        
+
     def _init_responders(self):
-        self.add_responder(events.view.main.FileNew, self.document_new_responder)
+        self.add_responder(events.view.main.FileNew,
+                           self.document_new_responder)
 
     def run(self):
         self.main.show()

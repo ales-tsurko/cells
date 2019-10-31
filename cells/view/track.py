@@ -128,3 +128,32 @@ class Header(Observation, QWidget):
 
     def setName(self, name):
         self.nameLabel.setText(name)
+
+
+class Cell(Observation, QWidget):
+    def __init__(self, subject, index):
+        Observation.__init__(self, subject)
+        QWidget.__init__(self)
+
+        self.index = index
+
+        self.setAttribute(Qt.WA_StyledBackground)
+        self.setStyleSheet("background-color: yellow;")
+
+        self.setFixedHeight(100)
+
+        self._initNameLabel()
+
+        self.setLayout(QVBoxLayout())
+        self.layout().setSpacing(0)
+        self.layout().setContentsMargins(0, 0, 0, 0)
+        self.layout().addWidget(self.nameLabel)
+
+    def _initNameLabel(self):
+        self.nameLabel = QLineEdit(self)
+        self.nameLabel.setAlignment(Qt.AlignCenter)
+        self.nameLabel.setWindowFlags(Qt.FramelessWindowHint)
+        self.nameLabel.setStyleSheet("background: transparent; border: none;")
+        self.nameLabel.setMaxLength(30)
+        self.nameLabel.setContextMenuPolicy(Qt.NoContextMenu)
+        self.nameLabel.textChanged.connect(self.onNameChanged)

@@ -1,5 +1,5 @@
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List
 
 from dataclasses_json import dataclass_json
@@ -9,8 +9,16 @@ from cells.observation import Observation
 
 @dataclass_json
 @dataclass
+class Cell:
+    name: str = field(default="")
+    code: str = field(default="")
+
+
+@dataclass_json
+@dataclass
 class TrackModel:
     name: str
+    cells: List[Cell]
 
 
 @dataclass_json
@@ -35,7 +43,7 @@ class Document(Observation, dict):
 
         self.model = DocumentModel("New Document", [], None)
         self.notify(events.document.New)
-        
+
         # main view events
         # self.add_responder(events.view.main.FileNew, self.main_new_responder)
         self.add_responder(events.view.main.FileOpen, self.main_open_responder)
@@ -60,7 +68,7 @@ class Document(Observation, dict):
 
     def main_track_new_responder(self, e):
         name = "Track " + str(len(self.model.tracks) + 1)
-        track = TrackModel(name)
+        track = TrackModel(name, Cell())
         self.model.tracks.append(track)
         self.notify(events.track.New(track))
 
@@ -87,7 +95,7 @@ class Document(Observation, dict):
             except TypeError as e:
                 print(e)
                 self.notify(events.document.Error(self.model,
-                            "Can't open file"))
+                                                  "Can't open file"))
 
     def save(self, path):
         with open(path, "w+") as f:
@@ -98,7 +106,7 @@ class Document(Observation, dict):
             except TypeError as e:
                 print(e)
                 self.notify(events.document.Error(self.model,
-                            "Can't save file"))
+                                                  "Can't save file"))
 
     def update_name(self):
         base = os.path.basename(self.model.path)

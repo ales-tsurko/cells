@@ -25,11 +25,67 @@ class TrackRemove(NamedTuple):
     pass
 
 
+class TrackSelectLeft(NamedTuple):
+    pass
+
+
+class TrackSelectRight(NamedTuple):
+    pass
+
+
 class TrackMoveLeft(NamedTuple):
     pass
 
 
 class TrackMoveRight(NamedTuple):
+    pass
+
+
+class RowAdd(NamedTuple):
+    pass
+
+
+class RowRemove(NamedTuple):
+    pass
+
+
+class RowSelectUp(NamedTuple):
+    pass
+
+
+class RowSelectDown(NamedTuple):
+    pass
+
+
+class RowMoveUp(NamedTuple):
+    pass
+
+
+class RowMoveDown(NamedTuple):
+    pass
+
+
+class RowEvaluate(NamedTuple):
+    pass
+
+
+class RowCopy(NamedTuple):
+    pass
+
+
+class RowPaste(NamedTuple):
+    pass
+
+
+class CellEvaluate(NamedTuple):
+    pass
+
+
+class CellClear(NamedTuple):
+    pass
+
+
+class CellEdit(NamedTuple):
     pass
 
 
