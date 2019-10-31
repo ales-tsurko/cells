@@ -1,5 +1,5 @@
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QFrame, QHBoxLayout, QScrollArea, QWidget
+from PySide2.QtWidgets import QFrame, QHBoxLayout, QScrollArea, QWidget, QMessageBox
 
 from cells import events
 from cells.observation import Observation
@@ -28,16 +28,28 @@ class Editor(Observation, QScrollArea):
         self.add_responder(events.track.New, self.trackNewResponder)
         self.add_responder(events.document.New, self.documentNewResponder)
         self.add_responder(events.document.Open, self.documentOpenResponder)
-        self.add_responder(events.view.main.TrackMoveLeft,
-                           self.trackMoveLeftResponder)
-        self.add_responder(events.view.main.TrackMoveRight,
-                           self.trackMoveRightResponder)
+        self.add_responder(events.view.track.Move,
+                           self.trackMoveResponder)
+        self.add_responder(events.view.track.Remove, self.trackRemoveResponder)
 
     def trackNewResponder(self, e):
         length = self.innerLayout.count()
         name = "Track " + str(length + 1)
         track = Track(self.subject, length, name)
         self.innerLayout.addWidget(track)
+
+    def trackRemoveResponder(self, e):
+        track = self.innerLayout.itemAt(e.index).widget()
+        msgBox = self.initConfirmDelete(track.name())
+        reply = msgBox.exec_()
+
+        if reply == QMessageBox.Yes:
+            self.innerLayout.removeWidget(track)
+            track.close()
+            self.setFocusToTrack(e.index-1)
+            for n in range(e.index, self.innerLayout.count()):
+                track = self.innerLayout.itemAt(n).widget()
+                track.setIndex(track.index - 1)
 
     def documentNewResponder(self, e):
         self.clear()
@@ -49,12 +61,25 @@ class Editor(Observation, QScrollArea):
             track_view = Track(self.subject, n, track.name)
             self.innerLayout.addWidget(track_view)
 
-    def trackMoveLeftResponder(self, e):
-        print("move track left")
-
-    def trackMoveRightResponder(self, e):
-        print("move track right")
+    def trackMoveResponder(self, e):
+        track = self.innerLayout.takeAt(e.index)
+        self.innerLayout.insertWidget(e.new_index, track.widget())
 
     def clear(self):
         for i in reversed(range(self.innerLayout.count())):
             self.innerLayout.itemAt(i).widget().deleteLater()
+
+    def initConfirmDelete(self, name):
+        question = f'Do you really want to delete track {name}?'
+        msgBox = QMessageBox()
+        msgBox.setWindowTitle("Delete Track")
+        msgBox.setText(question)
+        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        msgBox.setDefaultButton(QMessageBox.Yes)
+
+        return msgBox
+    
+    def setFocusToTrack(self, index):
+        track = self.innerLayout.itemAt(index)
+        if track is not None:
+            track.widget().setFocus()

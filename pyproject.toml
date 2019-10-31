@@ -3,9 +3,11 @@ name = "cells"
 version = "0.1.0"
 description = ""
 authors = ["Ales Tsurko <ales.tsurko@gmail.com>"]
+license = "MIT"
+readme = "README.md"
 
 [tool.poetry.scripts]
-cells = "cells.cells:main"
+cells = "cells.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.7"

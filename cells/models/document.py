@@ -47,7 +47,7 @@ class Document(Observation, dict):
         self.add_responder(events.view.track.Remove,
                            self.track_remove_responder)
 
-        self.add_responder(events.track.Move, self.on_track_move)
+        self.add_responder(events.view.track.Move, self.track_move_responder)
 
     def main_new_responder(self, e):
         self.model = DocumentModel("New Document", [], None)
@@ -70,9 +70,9 @@ class Document(Observation, dict):
         self.model.tracks[e.index].name = e.name
 
     @notify_update
-    def on_track_move(self, e):
-        track = self.tracks.pop(e.index)
-        self.model.tracks.insert(track, e.new_index)
+    def track_move_responder(self, e):
+        track = self.model.tracks.pop(e.index)
+        self.model.tracks.insert(e.new_index, track)
 
     @notify_update
     def track_remove_responder(self, e):

@@ -8,3 +8,8 @@ class NameChanged(NamedTuple):
 
 class Remove(NamedTuple):
     index: int
+
+
+class Move(NamedTuple):
+    index: int
+    new_index: int

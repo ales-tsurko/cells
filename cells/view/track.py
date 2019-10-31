@@ -28,20 +28,14 @@ class Track(Observation, QWidget):
 
         self.setFocusPolicy(Qt.ClickFocus)
 
-        self.add_responder(events.view.track.Remove,
-                           self.selfRemoveResponder)
+        self.add_responder(events.view.track.Move,
+                           self.selfMoveResponder)
 
-    def selfRemoveResponder(self, e):
-        if self.index == e.index and self.isVisible():
-            msgBox = self.initConfirmDelete()
-            reply = msgBox.exec()
-
-            if reply == QMessageBox.Yes:
-                self.parentWidget().layout().removeWidget(self)
-                self.close()
-        elif self.index > e.index:
-            self.index -= 1
-            self.header.index = self.index
+    def selfMoveResponder(self, e):
+        if self.index == e.index:
+            self.setIndex(e.new_index)
+        elif self.index == e.new_index:
+            self.setIndex(e.index)
 
     def initConfirmDelete(self):
         name = self.header.nameLabel.text()
@@ -56,6 +50,13 @@ class Track(Observation, QWidget):
 
     def setName(self, name):
         self.header.setName(name)
+
+    def name(self):
+        return self.header.nameLabel.text()
+
+    def setIndex(self, index):
+        self.index = index
+        self.header.index = index
 
     def focusInEvent(self, e):
         self.header.setFocus()
@@ -82,6 +83,10 @@ class Header(Observation, QWidget):
 
         self.add_responder(events.view.main.TrackRemove,
                            self.mainTrackRemoveResponder)
+        self.add_responder(events.view.main.TrackMoveLeft,
+                           self.mainTrackMoveLeftResponder)
+        self.add_responder(events.view.main.TrackMoveRight,
+                           self.mainTrackMoveRightResponder)
 
     def _initNameLabel(self):
         self.nameLabel = QLineEdit(self)
@@ -98,10 +103,19 @@ class Header(Observation, QWidget):
         # - if I introduce self.selected, it changes correctly inside
         #   focusEvents but it somehow remains always True after just one
         #   select inside the responder (even given the fact, that it's
-        #   changing inside delegates %-| )
+        #   changing inside of delegates %-| )
 
         if self.hasFocus():
             self.notify(events.view.track.Remove(self.index))
+
+    def mainTrackMoveLeftResponder(self, e):
+        if self.hasFocus() and self.index > 0:
+            self.notify(events.view.track.Move(self.index, self.index - 1))
+
+    def mainTrackMoveRightResponder(self, e):
+        length = self.parentWidget().parentWidget().layout().count() - 1
+        if self.hasFocus() and self.index < length:
+            self.notify(events.view.track.Move(self.index, self.index + 1))
 
     def onNameChanged(self, name):
         self.notify(events.view.track.NameChanged(self.index, name))
