@@ -8,20 +8,41 @@ from cells.settings import ApplicationInfo
 
 from .main import Main
 from cells import events
+from cells.observation import Observation
+from .settings import Settings
+
+from rx.subject import Subject
 
 
-class App:
+class App(Observation):
     def __init__(self, subject):
+        super().__init__(subject)
         self.subject = subject
 
         self.app = QtWidgets.QApplication([])
         self.app.setApplicationName(ApplicationInfo.name)
         self.app.setApplicationDisplayName(ApplicationInfo.name)
 
-        font_path = os.path.join(App.get_resources_path(),
+        font_path = os.path.join(get_resources_path(),
                                  "fonts", "FiraCode_2", "FiraCode-VF.ttf")
         QFontDatabase.addApplicationFont(font_path)
+        self.settings = Settings(subject)
         self.main = Main(subject)
+        
+        self._init_responders()
+
+    def document_new_responder(self, e):
+        self.subject = Subject()
+        self._init_responders()
+        
+        self.main.close()
+        self.main.deleteLater()
+        self.main = Main(self.subject)
+        self.settings.subject = self.subject
+        self.main.show()
+        
+    def _init_responders(self):
+        self.add_responder(events.view.main.FileNew, self.document_new_responder)
 
     def run(self):
         self.main.show()
@@ -31,5 +52,6 @@ class App:
 
         sys.exit(res)
 
-    def get_resources_path():
-        return os.path.join(os.path.dirname(__file__), "resources")
+
+def get_resources_path():
+    return os.path.join(os.path.dirname(__file__), "resources")

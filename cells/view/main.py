@@ -8,12 +8,13 @@ from cells.observation import Observation
 from .console import Console
 from .editor import Editor
 from .settings import Settings
+from cells.models.document import Document
 
 
 class Main(QMainWindow, Observation):
 
     def __init__(self, subject):
-        QMainWindow.__init__(self)
+        QMainWindow.__init__(self, None)
         Observation.__init__(self, subject)
 
         self.setWindowTitle("Default")
@@ -21,15 +22,15 @@ class Main(QMainWindow, Observation):
         self._createMenu()
         self._initCentralWidget()
 
-        self.document = None
+        document = Document(self.subject)
+        self.document = document.model
+        self.setWindowTitle(self.document.name)
         self.saved = True
 
-        self.add_responder(events.document.New, self.documentNewResponder)
         self.add_responder(events.document.Open, self.documentOpenResponder)
         self.add_responder(events.document.Update,
                            self.documentUpdateResponder)
         self.add_responder(events.document.Error, self.documentErrorResponder)
-        self.notify(events.view.main.FileNew())
 
     def _createMenu(self):
         self._createFileMenu()
@@ -83,10 +84,6 @@ class Main(QMainWindow, Observation):
         centralView.setLayout(layout)
         centralView.layout().setContentsMargins(0, 0, 0, 0)
         self.setCentralWidget(centralView)
-
-    def documentNewResponder(self, e):
-        self.document = e.document
-        self.setWindowTitle(self.document.name)
 
     def documentOpenResponder(self, e):
         self.document = e.document
@@ -171,3 +168,4 @@ class Main(QMainWindow, Observation):
         self.checkSave(e)
 
         self.notify(events.view.main.Close())
+        super().closeEvent(e)

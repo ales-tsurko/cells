@@ -33,8 +33,11 @@ class Document(Observation, dict):
         dict.__init__(self)
         Observation.__init__(self, subject)
 
+        self.model = DocumentModel("New Document", [], None)
+        self.notify(events.document.New)
+        
         # main view events
-        self.add_responder(events.view.main.FileNew, self.main_new_responder)
+        # self.add_responder(events.view.main.FileNew, self.main_new_responder)
         self.add_responder(events.view.main.FileOpen, self.main_open_responder)
         self.add_responder(events.view.main.FileSave, self.main_save_responder)
         self.add_responder(events.view.main.FileSaveAs,
@@ -48,10 +51,6 @@ class Document(Observation, dict):
                            self.track_remove_responder)
 
         self.add_responder(events.view.track.Move, self.track_move_responder)
-
-    def main_new_responder(self, e):
-        self.model = DocumentModel("New Document", [], None)
-        self.notify(events.document.New(self.model))
 
     def main_open_responder(self, e):
         self.open(e.path)

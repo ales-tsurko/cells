@@ -26,7 +26,7 @@ class Editor(Observation, QScrollArea):
         self.setWidgetResizable(True)
 
         self.add_responder(events.track.New, self.trackNewResponder)
-        self.add_responder(events.document.New, self.documentNewResponder)
+        # self.add_responder(events.view.main.FileNew, self.documentNewResponder)
         self.add_responder(events.document.Open, self.documentOpenResponder)
         self.add_responder(events.view.track.Move,
                            self.trackMoveResponder)
