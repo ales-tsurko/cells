@@ -32,18 +32,27 @@ class Track(Observation, QWidget):
                            self.selfRemoveResponder)
 
     def selfRemoveResponder(self, e):
-        if self.index == e.index:
-            name = self.header.nameLabel.text()
-            question = f'Do you really want to delete track {name}?'
-            msgBox = QMessageBox()
-            msgBox.setWindowTitle("Delete Track")
-            msgBox.setText(question)
-            msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-            msgBox.setDefaultButton(QMessageBox.Yes)
+        if self.index == e.index and self.isVisible():
+            msgBox = self.initConfirmDelete()
             reply = msgBox.exec()
 
             if reply == QMessageBox.Yes:
+                self.parentWidget().layout().removeWidget(self)
                 self.close()
+        elif self.index > e.index:
+            self.index -= 1
+            self.header.index = self.index
+
+    def initConfirmDelete(self):
+        name = self.header.nameLabel.text()
+        question = f'Do you really want to delete track {name}?'
+        msgBox = QMessageBox()
+        msgBox.setWindowTitle("Delete Track")
+        msgBox.setText(question)
+        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        msgBox.setDefaultButton(QMessageBox.Yes)
+
+        return msgBox
 
     def setName(self, name):
         self.header.setName(name)

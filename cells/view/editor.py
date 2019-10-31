@@ -3,7 +3,6 @@ from PySide2.QtWidgets import QFrame, QHBoxLayout, QScrollArea, QWidget
 
 from cells import events
 from cells.observation import Observation
-from cells.models.document import DUMMY_TRACK_NAME
 
 from .track import Track
 
@@ -31,8 +30,9 @@ class Editor(Observation, QScrollArea):
         self.add_responder(events.document.Open, self.document_open_responder)
 
     def track_new_responder(self, e):
-        name = "Track " + str(self.innerLayout.count() + 1)
-        track = Track(self.subject, self.innerLayout.count(), name)
+        length = self.innerLayout.count()
+        name = "Track " + str(length + 1)
+        track = Track(self.subject, length, name)
         self.innerLayout.addWidget(track)
 
     def document_new_responder(self, e):
@@ -42,9 +42,8 @@ class Editor(Observation, QScrollArea):
         self.clear()
 
         for (n, track) in enumerate(e.document.tracks):
-            if track.name != DUMMY_TRACK_NAME:
-                track_view = Track(self.subject, n, track.name)
-                self.innerLayout.addWidget(track_view)
+            track_view = Track(self.subject, n, track.name)
+            self.innerLayout.addWidget(track_view)
 
     def clear(self):
         for i in reversed(range(self.innerLayout.count())):

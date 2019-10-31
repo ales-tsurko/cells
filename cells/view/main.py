@@ -1,4 +1,3 @@
-from PySide2.QtCore import Qt
 from PySide2.QtGui import QKeySequence
 from PySide2.QtWidgets import (QFileDialog, QMainWindow, QMessageBox,
                                QVBoxLayout, QWidget)
@@ -52,7 +51,8 @@ class Main(QMainWindow, Observation):
         editMenu = self.menuBar().addMenu("Edit")
         self._addMenuAction(editMenu, "New Track", self.tr('Ctrl+t'),
                             self.onNewTrack)
-        self._addMenuAction(editMenu, "Remove Selected Track", self.tr('Backspace'),
+        self._addMenuAction(editMenu, "Remove Selected Track",
+                            self.tr('Shift+Backspace'),
                             self.onRemoveTrack)
 
         editMenu.addSeparator()
@@ -140,9 +140,6 @@ class Main(QMainWindow, Observation):
 
     def onRemoveTrack(self, e):
         self.notify(events.view.main.TrackRemove())
-
-    def keyPressEvent(self, e):
-        pass
 
     def checkSave(self, e):
         if not self.saved:
