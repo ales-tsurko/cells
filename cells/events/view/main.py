@@ -25,5 +25,13 @@ class TrackRemove(NamedTuple):
     pass
 
 
+class TrackMoveLeft(NamedTuple):
+    pass
+
+
+class TrackMoveRight(NamedTuple):
+    pass
+
+
 class Close(NamedTuple):
     pass

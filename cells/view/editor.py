@@ -25,25 +25,35 @@ class Editor(Observation, QScrollArea):
         self.setWidget(widget)
         self.setWidgetResizable(True)
 
-        self.add_responder(events.track.New, self.track_new_responder)
-        self.add_responder(events.document.New, self.document_new_responder)
-        self.add_responder(events.document.Open, self.document_open_responder)
+        self.add_responder(events.track.New, self.trackNewResponder)
+        self.add_responder(events.document.New, self.documentNewResponder)
+        self.add_responder(events.document.Open, self.documentOpenResponder)
+        self.add_responder(events.view.main.TrackMoveLeft,
+                           self.trackMoveLeftResponder)
+        self.add_responder(events.view.main.TrackMoveRight,
+                           self.trackMoveRightResponder)
 
-    def track_new_responder(self, e):
+    def trackNewResponder(self, e):
         length = self.innerLayout.count()
         name = "Track " + str(length + 1)
         track = Track(self.subject, length, name)
         self.innerLayout.addWidget(track)
 
-    def document_new_responder(self, e):
+    def documentNewResponder(self, e):
         self.clear()
 
-    def document_open_responder(self, e):
+    def documentOpenResponder(self, e):
         self.clear()
 
         for (n, track) in enumerate(e.document.tracks):
             track_view = Track(self.subject, n, track.name)
             self.innerLayout.addWidget(track_view)
+
+    def trackMoveLeftResponder(self, e):
+        print("move track left")
+
+    def trackMoveRightResponder(self, e):
+        print("move track right")
 
     def clear(self):
         for i in reversed(range(self.innerLayout.count())):

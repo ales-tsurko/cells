@@ -54,6 +54,12 @@ class Main(QMainWindow, Observation):
         self._addMenuAction(editMenu, "Remove Selected Track",
                             self.tr('Shift+Backspace'),
                             self.onRemoveTrack)
+        self._addMenuAction(editMenu, "Move Selected Track Left",
+                            self.tr('Shift+h'),
+                            self.onMoveTrackLeft)
+        self._addMenuAction(editMenu, "Move Selected Track Right",
+                            self.tr('Shift+l'),
+                            self.onMoveTrackRight)
 
         editMenu.addSeparator()
         self._addMenuAction(editMenu, "Settings", QKeySequence.Preferences,
@@ -140,6 +146,12 @@ class Main(QMainWindow, Observation):
 
     def onRemoveTrack(self, e):
         self.notify(events.view.main.TrackRemove())
+
+    def onMoveTrackLeft(self, e):
+        self.notify(events.view.main.TrackMoveLeft())
+
+    def onMoveTrackRight(self, e):
+        self.notify(events.view.main.TrackMoveRight())
 
     def checkSave(self, e):
         if not self.saved:
