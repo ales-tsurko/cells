@@ -22,11 +22,18 @@ class Move(NamedTuple):
     index: int
     new_index: int
 
+
 class CellAdd(NamedTuple):
     track_index: int
     name: str
 
-class CellSelect(NamedTuple):
+
+class CellSelected(NamedTuple):
+    track_index: int
+    index: int
+
+
+class RowSelect(NamedTuple):
     index: int
 
 

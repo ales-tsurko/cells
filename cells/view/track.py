@@ -32,9 +32,31 @@ class Track(Observation, QWidget):
         self.setName(name)
 
         self.add_responder(events.view.main.RowAdd, self.rowAddResponder)
+        self.add_responder(events.view.main.RowSelectUp,
+                           self.rowSelectUpResponder)
+        self.add_responder(events.view.main.RowSelectDown,
+                           self.rowSelectDownResponder)
 
     def rowAddResponder(self, e):
         self.addCell()
+
+    def rowSelectUpResponder(self, e):
+        if not self.selected or len(self.cells) < 1:
+            return
+
+        if not self.isThereSelectedCell():
+            self.selectRowAt(len(self.cells) - 1)
+        else:
+            self.selectRowAt(self.selectedCellIndex - 1)
+
+    def rowSelectDownResponder(self, e):
+        if not self.selected or len(self.cells) < 1:
+            return
+
+        if not self.isThereSelectedCell():
+            self.selectRowAt(0)
+        else:
+            self.selectRowAt(self.selectedCellIndex + 1)
 
     def addCell(self, notify=True):
         index = len(self.cells)
@@ -66,18 +88,12 @@ class Track(Observation, QWidget):
         self.selected = value
         self.header.setSelected(value)
 
-    def selectCellAt(self, index):
+    def selectRowAt(self, index):
         if self.selectedCellIndex == index:
             return
 
-        if self.isThereSelectedCell():
-            self.cells[self.selectedCellIndex].setSelected(False)
-
-        if index in range(len(self.cells)):
-            self.cells[index].setSelected(True)
-
         self.selectedCellIndex = min(max(-1, index), len(self.cells))
-        self.notify(events.view.track.CellSelect(self.selectedCellIndex))
+        self.notify(events.view.track.RowSelect(self.selectedCellIndex))
 
     def isThereSelectedCell(self):
         return self.selectedCellIndex in range(len(self.cells))
@@ -176,8 +192,8 @@ class Cell(CellBase):
                            self.editNameResponder)
         self.add_responder(events.view.track.Select,
                            self.trackSelectResponder)
-        self.add_responder(events.view.track.CellSelect,
-                           self.cellSelectResponder)
+        self.add_responder(events.view.track.RowSelect,
+                           self.rowSelectResponder)
 
     def _initNameLabel(self):
         super()._initNameLabel()
@@ -193,14 +209,21 @@ class Cell(CellBase):
     def trackSelectResponder(self, e):
         self.updateStyle()
 
-    def cellSelectResponder(self, e):
+    def rowSelectResponder(self, e):
         if self.index == e.index:
             self.setSelected(True)
         else:
             self.setSelected(False)
 
+    def setSelected(self, value):
+        if value:
+            self.track.selectedCellIndex = self.index
+            self.notify(events.view.track.CellSelected(
+                self.track.index, self.index))
+        super().setSelected(value)
+
     def mousePressEvent(self, event):
-        self.track.selectCellAt(self.index)
+        self.track.selectRowAt(self.index)
         return super().mousePressEvent(event)
 
     def onEditingNameFinished(self):

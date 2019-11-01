@@ -41,6 +41,8 @@ class Editor(Observation, QScrollArea):
                            self.trackMoveRightResponder)
         self.add_responder(events.view.main.TrackRemove,
                            self.trackRemoveResponder)
+        self.add_responder(events.view.track.CellSelected,
+                           self.cellSelectedResponder)
 
     def documentOpenResponder(self, e):
         self.clear()
@@ -89,7 +91,7 @@ class Editor(Observation, QScrollArea):
 
     def trackMoveRightResponder(self, e):
         self.moveSelectedTrackTo(self.selectedTrackIndex + 1)
-        
+
     def moveSelectedTrackTo(self, index):
         if self.numOfTracks() < 1 or \
                 not self.isThereSelectedTrack() or \
@@ -124,6 +126,9 @@ class Editor(Observation, QScrollArea):
                 track = self.innerLayout.itemAt(n).widget()
                 track.setIndex(track.index - 1)
 
+    def cellSelectedResponder(self, e):
+        self.ensureTrackVisible(self.selectedTrackIndex)
+
     def selectTrackAt(self, index):
         if self.selectedTrackIndex == index:
             return
@@ -135,9 +140,24 @@ class Editor(Observation, QScrollArea):
         if index in range(self.numOfTracks()):
             track = self.innerLayout.itemAt(index)
             track.widget().setSelected(True)
+            self.ensureTrackVisible(index)
 
         self.selectedTrackIndex = min(max(-1, index), self.numOfTracks())
         self.notify(events.view.track.Select(self.selectedTrackIndex))
+
+    def ensureTrackVisible(self, index):
+        if index not in range(self.numOfTracks()):
+            return
+
+        track = self.innerLayout.itemAt(index).widget()
+
+        if track.selectedCellIndex in range(len(track.cells)):
+            cell = track.cells[track.selectedCellIndex]
+            self.ensureWidgetVisible(
+                cell, track.header.width(), track.header.height())
+        else:
+            self.ensureWidgetVisible(
+                track, track.header.width(), track.header.height())
 
     def isThereSelectedTrack(self):
         return self.selectedTrackIndex in range(self.numOfTracks())
@@ -147,7 +167,7 @@ class Editor(Observation, QScrollArea):
 
     def clear(self):
         for i in reversed(range(self.numOfTracks())):
-            self.innerLayout.itemAt(i).widget().deleteLater()
+            self.innerLayout.itemAt(i).widget().setParent(None)
 
     def initConfirmDelete(self, name):
         question = f'Do you really want to delete track {name}?'
