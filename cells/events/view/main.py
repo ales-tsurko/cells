@@ -97,5 +97,9 @@ class CellEdit(NamedTuple):
     pass
 
 
+class CellEditName(NamedTuple):
+    pass
+
+
 class Close(NamedTuple):
     pass

@@ -105,8 +105,10 @@ class Main(QMainWindow, Observation):
                             self.onRowPaste)
 
         cellSub = editMenu.addMenu("Cell")
-        self._addMenuAction(cellSub, "Edit", self.tr('E'),
+        self._addMenuAction(cellSub, "Edit", self.tr('e'),
                             self.onCellEdit)
+        self._addMenuAction(cellSub, "Edit Name", self.tr('n'),
+                            self.onCellEditName)
         self._addMenuAction(cellSub, "Evaluate", self.tr('Shift+Enter'),
                             self.onCellEvaluate)
         self._addMenuAction(cellSub, "Clear", self.tr('Backspace'),
@@ -248,6 +250,9 @@ class Main(QMainWindow, Observation):
 
     def onCellEdit(self, e):
         self.notify(events.view.main.CellEdit())
+
+    def onCellEditName(self, e):
+        self.notify(events.view.main.CellEditName())
 
     def checkSave(self, e):
         if not self.saved:

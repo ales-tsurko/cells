@@ -51,7 +51,7 @@ class Track(Observation, QWidget):
             self.header.onDeselect()
 
 
-class Header(Observation, QWidget):
+class CellBase(Observation, QWidget):
     def __init__(self, subject, index):
         Observation.__init__(self, subject)
         QWidget.__init__(self)
@@ -70,8 +70,6 @@ class Header(Observation, QWidget):
         self.layout().setSpacing(0)
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().addWidget(self.nameLabel)
-        
-        self.add_responder(events.view.main.TrackEditName, self.editNameResponder)
 
     def _initNameLabel(self):
         self.nameLabel = QLineEdit(self)
@@ -82,53 +80,55 @@ class Header(Observation, QWidget):
         self.nameLabel.setContextMenuPolicy(Qt.NoContextMenu)
         self.nameLabel.textChanged.connect(self.onNameChanged)
         self.nameLabel.editingFinished.connect(self.onEditingNameFinished)
-        
+
     def editNameResponder(self, e):
         if self.selected:
             self.nameLabel.setFocus()
 
     def onNameChanged(self, name):
-        self.notify(events.view.track.NameChanged(self.index, name))
-        
+        pass
+
     def onEditingNameFinished(self):
         self.nameLabel.clearFocus()
 
     def onSelect(self):
         self.selected = True
-        self.setStyleSheet("background-color: green;")
 
     def onDeselect(self):
         self.selected = False
-        self.setStyleSheet("background-color: grey;")
 
     def setName(self, name):
         self.nameLabel.setText(name)
 
 
-class Cell(Observation, QWidget):
+class Header(CellBase):
     def __init__(self, subject, index):
-        Observation.__init__(self, subject)
-        QWidget.__init__(self)
+        super().__init__(subject, index)
 
-        self.index = index
+        self.add_responder(events.view.main.TrackEditName,
+                           self.editNameResponder)
 
-        self.setAttribute(Qt.WA_StyledBackground)
+    def onNameChanged(self, name):
+        super().onNameChanged(name)
+        self.notify(events.view.track.NameChanged(self.index, name))
+
+    def onSelect(self):
+        super().onSelect()
+        self.setStyleSheet("background-color: green;")
+
+    def onDeselect(self):
+        super().onDeselect()
+        self.setStyleSheet("background-color: grey;")
+
+
+class Cell(CellBase):
+    def __init__(self, subject, index):
+        super().__init__(subject, index)
         self.setStyleSheet("background-color: yellow;")
 
-        self.setFixedHeight(100)
-
-        self._initNameLabel()
-
-        self.setLayout(QVBoxLayout())
-        self.layout().setSpacing(0)
-        self.layout().setContentsMargins(0, 0, 0, 0)
-        self.layout().addWidget(self.nameLabel)
+        self.add_responder(events.view.main.CellEditName,
+                           self.editNameResponder)
 
     def _initNameLabel(self):
-        self.nameLabel = QLineEdit(self)
-        self.nameLabel.setAlignment(Qt.AlignCenter)
-        self.nameLabel.setWindowFlags(Qt.FramelessWindowHint)
-        self.nameLabel.setStyleSheet("background: transparent; border: none;")
-        self.nameLabel.setMaxLength(30)
-        self.nameLabel.setContextMenuPolicy(Qt.NoContextMenu)
-        self.nameLabel.textChanged.connect(self.onNameChanged)
+        super()._initNameLabel()
+        self.nameLabel.setAlignment(Qt.AlignCenter | Qt.AlignTop)
