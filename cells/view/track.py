@@ -16,7 +16,7 @@ class Track(Observation, QWidget):
         self.selectedCellIndex = -1
 
         self.setAttribute(Qt.WA_StyledBackground)
-        self.setStyleSheet("background-color:red;")
+        self.setStyleSheet("background-color: rgba(0, 0, 0, 0.5);")
 
         self.setFixedWidth(200)
 
@@ -31,9 +31,9 @@ class Track(Observation, QWidget):
         self.layout().setAlignment(Qt.AlignTop)
 
         self.setName(name)
-        
+
         self.add_responder(events.view.main.RowAdd, self.rowAddResponder)
-        
+
     def rowAddResponder(self, e):
         self.addCell()
 
@@ -60,7 +60,7 @@ class Track(Observation, QWidget):
     def setSelected(self, value):
         self.selected = value
         self.header.setSelected(value)
-        
+
     def selectCellAt(self, index):
         if self.selectedCellIndex == index:
             return
@@ -72,6 +72,7 @@ class Track(Observation, QWidget):
             self.cells[index].setSelected(True)
 
         self.selectedCellIndex = min(max(-1, index), len(self.cells))
+        self.notify(events.view.track.CellSelect(self.selectedCellIndex))
 
     def isThereSelectedCell(self):
         return self.selectedCellIndex in range(len(self.cells))
@@ -104,7 +105,7 @@ class CellBase(Observation, QWidget):
         self.layout().setSpacing(0)
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().addWidget(self.nameLabel)
-        
+
         self.updateStyle()
 
     def _initNameLabel(self):
@@ -130,18 +131,19 @@ class CellBase(Observation, QWidget):
     def setSelected(self, value):
         self.selected = value
         self.updateStyle()
-        
+
     def updateStyle(self):
         pass
 
     def setName(self, name):
         self.nameLabel.setText(name)
-        
+
     def closeEvent(self, event):
         self.subject = None
         self.setSelected(False)
         return super().closeEvent(event)
-        
+
+
 class Header(CellBase):
     def __init__(self, subject, index):
         super().__init__(subject, index)
@@ -152,16 +154,16 @@ class Header(CellBase):
     def onNameChanged(self, name):
         super().onNameChanged(name)
         self.notify(events.view.track.NameChanged(self.index, name))
-        
+
     def updateStyle(self):
         if self.selected:
             self.setSelectedStyle()
         else:
             self.setNormalStyle()
-            
+
     def setSelectedStyle(self):
         self.setStyleSheet("background-color: green;")
-        
+
     def setNormalStyle(self):
         self.setStyleSheet("background-color: grey;")
 
@@ -169,25 +171,39 @@ class Header(CellBase):
 class Cell(CellBase):
     def __init__(self, track, subject, index):
         self.track = track
-        
+
         super().__init__(subject, index)
+
+        self.layout().setAlignment(Qt.AlignTop)
 
         self.add_responder(events.view.main.CellEditName,
                            self.editNameResponder)
         self.add_responder(events.view.track.Select,
                            self.trackSelectResponder)
+        self.add_responder(events.view.track.CellSelect,
+                           self.cellSelectResponder)
 
     def _initNameLabel(self):
         super()._initNameLabel()
-        self.nameLabel.setStyleSheet("background-color:rgba(255, 255, 255, 0.2); border: none;")
-        self.nameLabel.setAlignment(Qt.AlignCenter | Qt.AlignTop)
-    
+        self.nameLabel.setStyleSheet(
+            "background-color: rgba(255, 255, 255, 0.1); border: none;")
+
     def editNameResponder(self, e):
         if self.selected and self.track.selected:
             self.nameLabel.setFocus()
-        
+
     def trackSelectResponder(self, e):
         self.updateStyle()
+        
+    def cellSelectResponder(self, e):
+        if self.index == e.index:
+            self.setSelected(True)
+        else:
+            self.setSelected(False)
+
+    def mousePressEvent(self, event):
+        self.track.selectCellAt(self.index)
+        return super().mousePressEvent(event)
 
     def updateStyle(self):
         if self.track.selected and self.selected:
@@ -196,15 +212,15 @@ class Cell(CellBase):
             self.setInactiveStyle()
         else:
             self.setNormalStyle()
-            
+
     def setSelectedStyle(self):
         self.setStyleSheet("background-color: brown;")
 
     def setInactiveStyle(self):
         self.setStyleSheet("background-color: #444;")
-    
+
     def setNormalStyle(self):
         self.setStyleSheet("background-color: #333;")
-        
+
     def setEvaluatedStyle(self):
         self.setStyleSheet("background-color: #49967d")

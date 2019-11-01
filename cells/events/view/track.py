@@ -21,3 +21,7 @@ class Clicked(NamedTuple):
 class Move(NamedTuple):
     index: int
     new_index: int
+
+
+class CellSelect(NamedTuple):
+    index: int
