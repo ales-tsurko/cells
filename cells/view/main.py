@@ -76,10 +76,10 @@ class Main(QMainWindow, Observation):
                             self.onTrackMoveRight)
 
         rowSub = editMenu.addMenu("Row")
-        self._addMenuAction(rowSub, "Evaluate", self.tr('Ctrl+Enter'),
+        self._addMenuAction(rowSub, "Evaluate", self.tr('Ctrl+Return'),
                             self.onRowEvaluate)
         rowSub.addSeparator()
-        self._addMenuAction(rowSub, "Add", self.tr('Enter'),
+        self._addMenuAction(rowSub, "Add", self.tr('Return'),
                             self.onRowAdd)
         self._addMenuAction(rowSub, "Remove",
                             self.tr('Shift+Backspace'),
@@ -109,7 +109,7 @@ class Main(QMainWindow, Observation):
                             self.onCellEdit)
         self._addMenuAction(cellSub, "Edit Name", self.tr('n'),
                             self.onCellEditName)
-        self._addMenuAction(cellSub, "Evaluate", self.tr('Shift+Enter'),
+        self._addMenuAction(cellSub, "Evaluate", self.tr('Shift+Return'),
                             self.onCellEvaluate)
         self._addMenuAction(cellSub, "Clear", self.tr('Backspace'),
                             self.onCellClear)

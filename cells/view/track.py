@@ -20,14 +20,24 @@ class Track(Observation, QWidget):
         self.setFixedWidth(200)
 
         self.header = Header(subject, index)
+        self.cells = [Cell(self, subject, 0)]
 
         self.setLayout(QVBoxLayout())
         self.layout().addWidget(self.header)
+        self.layout().addWidget(self.cells[0])
         self.layout().setSpacing(0)
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setAlignment(Qt.AlignTop)
 
         self.setName(name)
+        
+        self.add_responder(events.view.main.RowAdd, self.rowAddResponder)
+        
+    def rowAddResponder(self, e):
+        index = len(self.cells)
+        cell = Cell(self, self.subject, index)
+        self.cells.append(cell)
+        self.layout().addWidget(cell)
 
     def setName(self, name):
         self.header.setName(name)
@@ -45,10 +55,7 @@ class Track(Observation, QWidget):
 
     def setSelected(self, value):
         self.selected = value
-        if value:
-            self.header.onSelect()
-        else:
-            self.header.onDeselect()
+        self.header.setSelected(value)
 
 
 class CellBase(Observation, QWidget):
@@ -70,6 +77,8 @@ class CellBase(Observation, QWidget):
         self.layout().setSpacing(0)
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().addWidget(self.nameLabel)
+        
+        self.updateStyle()
 
     def _initNameLabel(self):
         self.nameLabel = QLineEdit(self)
@@ -91,11 +100,12 @@ class CellBase(Observation, QWidget):
     def onEditingNameFinished(self):
         self.nameLabel.clearFocus()
 
-    def onSelect(self):
-        self.selected = True
-
-    def onDeselect(self):
-        self.selected = False
+    def setSelected(self, value):
+        self.selected = value
+        self.updateStyle()
+        
+    def updateStyle(self):
+        pass
 
     def setName(self, name):
         self.nameLabel.setText(name)
@@ -111,24 +121,59 @@ class Header(CellBase):
     def onNameChanged(self, name):
         super().onNameChanged(name)
         self.notify(events.view.track.NameChanged(self.index, name))
-
-    def onSelect(self):
-        super().onSelect()
+        
+    def updateStyle(self):
+        if self.selected:
+            self.setSelectedStyle()
+        else:
+            self.setNormalStyle()
+            
+    def setSelectedStyle(self):
         self.setStyleSheet("background-color: green;")
-
-    def onDeselect(self):
-        super().onDeselect()
+        
+    def setNormalStyle(self):
         self.setStyleSheet("background-color: grey;")
 
 
 class Cell(CellBase):
-    def __init__(self, subject, index):
+    def __init__(self, track, subject, index):
+        self.track = track
+        
         super().__init__(subject, index)
-        self.setStyleSheet("background-color: yellow;")
 
         self.add_responder(events.view.main.CellEditName,
                            self.editNameResponder)
+        self.add_responder(events.view.track.Select,
+                           self.trackSelectResponder)
 
     def _initNameLabel(self):
         super()._initNameLabel()
+        self.nameLabel.setStyleSheet("background-color:rgba(255, 255, 255, 0.2); border: none;")
         self.nameLabel.setAlignment(Qt.AlignCenter | Qt.AlignTop)
+    
+    def editNameResponder(self, e):
+        if self.selected and self.track.selected:
+            self.nameLabel.setFocus()
+        
+    def trackSelectResponder(self, e):
+        self.updateStyle()
+
+    def updateStyle(self):
+        if self.track.selected and self.selected:
+            self.setSelectedStyle()
+        elif self.track.selected:
+            self.setInactiveStyle()
+        else:
+            self.setNormalStyle()
+            
+    def setSelectedStyle(self):
+        self.setStyleSheet("background-color: brown;")
+
+    def setInactiveStyle(self):
+        self.setStyleSheet("background-color: #444;")
+    
+    def setNormalStyle(self):
+        self.setStyleSheet("background-color: #333;")
+        
+    def setEvaluatedStyle(self):
+        self.setStyleSheet("background-color: #49967d")

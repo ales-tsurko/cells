@@ -131,6 +131,7 @@ class Editor(Observation, QScrollArea):
             track.widget().setSelected(True)
 
         self.selectedTrackIndex = min(max(-1, index), self.numOfTracks())
+        self.notify(events.view.track.Select(self.selectedTrackIndex))
 
     def isThereSelectedTrack(self):
         return self.selectedTrackIndex in range(0, self.numOfTracks())
