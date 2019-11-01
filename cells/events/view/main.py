@@ -21,6 +21,10 @@ class TrackNew(NamedTuple):
     pass
 
 
+class TrackEditName(NamedTuple):
+    pass
+
+
 class TrackRemove(NamedTuple):
     pass
 

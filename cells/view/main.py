@@ -54,9 +54,12 @@ class Main(QMainWindow, Observation):
         trackSub = editMenu.addMenu("Track")
         self._addMenuAction(trackSub, "Add", self.tr('Ctrl+t'),
                             self.onTrackAdd)
+        self._addMenuAction(trackSub, "Edit Name", self.tr('Shift+n'),
+                            self.onTrackRename)
         self._addMenuAction(trackSub, "Remove",
                             self.tr('Ctrl+Backspace'),
                             self.onTrackRemove)
+        
         trackSub.addSeparator()
         self._addMenuAction(trackSub, "Select Left",
                             self.tr('h'),
@@ -191,6 +194,9 @@ class Main(QMainWindow, Observation):
 
     def onTrackRemove(self, e):
         self.notify(events.view.main.TrackRemove())
+        
+    def onTrackRename(self, e):
+        self.notify(events.view.main.TrackEditName())
 
     def onTrackSelectLeft(self, e):
         self.notify(events.view.main.TrackSelectLeft())

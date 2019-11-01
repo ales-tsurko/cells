@@ -68,7 +68,7 @@ class Document(Observation, dict):
 
     def main_track_new_responder(self, e):
         name = "Track " + str(len(self.model.tracks) + 1)
-        track = TrackModel(name, Cell())
+        track = TrackModel(name, [Cell()])
         self.model.tracks.append(track)
         self.notify(events.track.New(track))
 

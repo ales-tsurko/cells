@@ -29,28 +29,6 @@ class Track(Observation, QWidget):
 
         self.setName(name)
 
-        # self.setFocusPolicy(Qt.ClickFocus)
-
-        self.add_responder(events.view.track.Move,
-                           self.selfMoveResponder)
-
-    def selfMoveResponder(self, e):
-        if self.index == e.index:
-            self.setIndex(e.new_index)
-        elif self.index == e.new_index:
-            self.setIndex(e.index)
-
-    def initConfirmDelete(self):
-        name = self.header.nameLabel.text()
-        question = f'Do you really want to delete track {name}?'
-        msgBox = QMessageBox()
-        msgBox.setWindowTitle("Delete Track")
-        msgBox.setText(question)
-        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        msgBox.setDefaultButton(QMessageBox.Yes)
-
-        return msgBox
-
     def setName(self, name):
         self.header.setName(name)
 
@@ -92,11 +70,8 @@ class Header(Observation, QWidget):
         self.layout().setSpacing(0)
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().addWidget(self.nameLabel)
-
-        self.add_responder(events.view.main.TrackMoveLeft,
-                           self.mainTrackMoveLeftResponder)
-        self.add_responder(events.view.main.TrackMoveRight,
-                           self.mainTrackMoveRightResponder)
+        
+        self.add_responder(events.view.main.TrackEditName, self.editNameResponder)
 
     def _initNameLabel(self):
         self.nameLabel = QLineEdit(self)
@@ -106,29 +81,25 @@ class Header(Observation, QWidget):
         self.nameLabel.setMaxLength(30)
         self.nameLabel.setContextMenuPolicy(Qt.NoContextMenu)
         self.nameLabel.textChanged.connect(self.onNameChanged)
-
-    def mainTrackMoveLeftResponder(self, e):
-        if self.hasFocus() and self.index > 0:
-            self.notify(events.view.track.Move(self.index, self.index - 1))
-
-    def mainTrackMoveRightResponder(self, e):
-        length = self.totalTracksNum() - 1
-        if self.hasFocus() and self.index < length:
-            self.notify(events.view.track.Move(self.index, self.index + 1))
+        self.nameLabel.editingFinished.connect(self.onEditingNameFinished)
+        
+    def editNameResponder(self, e):
+        if self.selected:
+            self.nameLabel.setFocus()
 
     def onNameChanged(self, name):
         self.notify(events.view.track.NameChanged(self.index, name))
         
+    def onEditingNameFinished(self):
+        self.nameLabel.clearFocus()
+
     def onSelect(self):
         self.selected = True
         self.setStyleSheet("background-color: green;")
-        
+
     def onDeselect(self):
         self.selected = False
         self.setStyleSheet("background-color: grey;")
-
-    def totalTracksNum(self):
-        return self.parentWidget().parentWidget().layout().count()
 
     def setName(self, name):
         self.nameLabel.setText(name)
