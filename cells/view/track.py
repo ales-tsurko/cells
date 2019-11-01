@@ -14,6 +14,7 @@ class Track(Observation, QWidget):
         self.index = index
         self.selected = False
         self.selectedCellIndex = -1
+        self.cells = []
 
         self.setAttribute(Qt.WA_StyledBackground)
         self.setStyleSheet("background-color: rgba(0, 0, 0, 0.5);")
@@ -21,14 +22,14 @@ class Track(Observation, QWidget):
         self.setFixedWidth(200)
 
         self.header = Header(subject, index)
-        self.cells = [Cell(self, subject, 0)]
 
         self.setLayout(QVBoxLayout())
         self.layout().addWidget(self.header)
-        self.layout().addWidget(self.cells[0])
         self.layout().setSpacing(0)
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setAlignment(Qt.AlignTop)
+
+        self.addCell()
 
         self.setName(name)
 
@@ -40,8 +41,13 @@ class Track(Observation, QWidget):
     def addCell(self):
         index = len(self.cells)
         cell = Cell(self, self.subject, index)
+        cell.setName(str(index + 1))
         self.cells.append(cell)
         self.layout().addWidget(cell)
+
+        self.notify(events.view.track.CellAdd(self.index, cell.name()))
+
+        return cell
 
     def setName(self, name):
         self.header.setName(name)
@@ -76,14 +82,6 @@ class Track(Observation, QWidget):
 
     def isThereSelectedCell(self):
         return self.selectedCellIndex in range(len(self.cells))
-
-    def closeEvent(self, event):
-        self.subject = None
-        self.selected = False
-        self.header.close()
-        for cell in self.cells:
-            cell.close()
-        return super().closeEvent(event)
 
 
 class CellBase(Observation, QWidget):
@@ -138,10 +136,8 @@ class CellBase(Observation, QWidget):
     def setName(self, name):
         self.nameLabel.setText(name)
 
-    def closeEvent(self, event):
-        self.subject = None
-        self.setSelected(False)
-        return super().closeEvent(event)
+    def name(self):
+        return self.nameLabel.text()
 
 
 class Header(CellBase):
@@ -150,10 +146,10 @@ class Header(CellBase):
 
         self.add_responder(events.view.main.TrackEditName,
                            self.editNameResponder)
-
-    def onNameChanged(self, name):
-        super().onNameChanged(name)
-        self.notify(events.view.track.NameChanged(self.index, name))
+        
+    def onEditingNameFinished(self):
+        self.notify(events.view.track.NameChanged(self.index, self.name()))
+        return super().onEditingNameFinished()
 
     def updateStyle(self):
         if self.selected:
@@ -185,6 +181,7 @@ class Cell(CellBase):
 
     def _initNameLabel(self):
         super()._initNameLabel()
+        self.nameLabel.setAlignment(Qt.AlignLeft)
         self.nameLabel.setStyleSheet(
             "background-color: rgba(255, 255, 255, 0.1); border: none;")
 
@@ -194,7 +191,7 @@ class Cell(CellBase):
 
     def trackSelectResponder(self, e):
         self.updateStyle()
-        
+
     def cellSelectResponder(self, e):
         if self.index == e.index:
             self.setSelected(True)
@@ -204,6 +201,11 @@ class Cell(CellBase):
     def mousePressEvent(self, event):
         self.track.selectCellAt(self.index)
         return super().mousePressEvent(event)
+        
+    def onEditingNameFinished(self):
+        self.notify(events.view.track.CellNameChanged(
+            self.track.index, self.index, self.name()))
+        return super().onEditingNameFinished()
 
     def updateStyle(self):
         if self.track.selected and self.selected:

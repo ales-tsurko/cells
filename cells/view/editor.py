@@ -46,8 +46,12 @@ class Editor(Observation, QScrollArea):
         self.clear()
 
         for (n, track) in enumerate(e.document.tracks):
-            track_view = Track(self.subject, n, track.name)
-            self.innerLayout.addWidget(track_view)
+            trackView = Track(self.subject, n, track.name)
+            for cell in track.cells:
+                print(cell)
+                # newCell = trackView.addCell()
+                # newCell.setName(cell.name)
+            self.innerLayout.addWidget(trackView)
 
     def trackClickedResponder(self, e):
         self.selectTrackAt(e.index)
@@ -77,8 +81,8 @@ class Editor(Observation, QScrollArea):
         if self.numOfTracks() > 0:
             firstTrack = self.innerLayout.itemAt(0).widget()
             for cell in firstTrack.cells[1:]:
-                track.addCell()
-                track.cells[-1].setSelected(cell.selected)
+                new_cell = track.addCell()
+                new_cell.setSelected(cell.selected)
         self.innerLayout.addWidget(track)
 
     def trackMoveLeftResponder(self, e):
@@ -96,8 +100,7 @@ class Editor(Observation, QScrollArea):
         reply = msgBox.exec_()
 
         if reply == QMessageBox.Yes:
-            self.innerLayout.removeWidget(track)
-            track.close()
+            track.setParent(None)
             self.notify(events.view.track.Remove(self.selectedTrackIndex))
             self.selectTrackAt(self.selectedTrackIndex-1)
             for n in range(self.selectedTrackIndex+1, self.numOfTracks()):

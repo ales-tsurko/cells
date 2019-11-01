@@ -9,7 +9,7 @@ from cells.observation import Observation
 
 @dataclass_json
 @dataclass
-class Cell:
+class CellModel:
     name: str = field(default="")
     code: str = field(default="")
 
@@ -18,7 +18,7 @@ class Cell:
 @dataclass
 class TrackModel:
     name: str
-    cells: List[Cell]
+    cells: List[CellModel]
 
 
 @dataclass_json
@@ -51,12 +51,14 @@ class Document(Observation, dict):
                            self.main_save_responder)
         self.add_responder(events.view.main.TrackNew,
                            self.main_track_new_responder)
-
+        self.add_responder(events.view.track.CellAdd,
+                           self.cell_add_responder)
         self.add_responder(events.view.track.NameChanged,
                            self.track_name_changed_responder)
+        self.add_responder(events.view.track.CellNameChanged,
+                           self.cell_name_changed_responder)
         self.add_responder(events.view.track.Remove,
                            self.track_remove_responder)
-
         self.add_responder(events.view.track.Move, self.track_move_responder)
 
     def main_open_responder(self, e):
@@ -67,13 +69,22 @@ class Document(Observation, dict):
 
     def main_track_new_responder(self, e):
         name = "Track " + str(len(self.model.tracks) + 1)
-        track = TrackModel(name, [Cell()])
+        track = TrackModel(name, [CellModel()])
         self.model.tracks.append(track)
         self.notify(events.track.New(track))
 
     @notify_update
+    def cell_add_responder(self, e):
+        cell = CellModel(e.name, "")
+        self.model.tracks[e.track_index].cells.append(cell)
+
+    @notify_update
     def track_name_changed_responder(self, e):
         self.model.tracks[e.index].name = e.name
+
+    @notify_update
+    def cell_name_changed_responder(self, e):
+        self.model.tracks[e.track_index].cells[e.index].name = e.name
 
     @notify_update
     def track_move_responder(self, e):
