@@ -14,6 +14,8 @@ class Editor(Observation, QScrollArea):
 
         self.setFrameShape(QFrame.NoFrame)
 
+        self.selectedTrackIndex = -1
+
         self.innerLayout = QHBoxLayout()
 
         self.innerLayout.setSpacing(0)
@@ -27,10 +29,14 @@ class Editor(Observation, QScrollArea):
 
         self.add_responder(events.document.Open, self.documentOpenResponder)
         self.add_responder(events.track.New, self.trackNewResponder)
-        self.add_responder(events.view.track.Select, self.trackSelectResponder)
+        self.add_responder(events.view.track.Clicked, self.trackClickedResponder)
+        self.add_responder(events.view.main.TrackSelectLeft,
+                           self.trackSelectLeftResponder)
+        self.add_responder(events.view.main.TrackSelectRight,
+                           self.trackSelectRightResponder)
         self.add_responder(events.view.track.Move,
                            self.trackMoveResponder)
-        self.add_responder(events.view.track.WillRemove, self.trackRemoveResponder)
+        self.add_responder(events.view.main.TrackRemove, self.trackRemoveResponder)
 
     def documentOpenResponder(self, e):
         self.clear()
@@ -38,6 +44,27 @@ class Editor(Observation, QScrollArea):
         for (n, track) in enumerate(e.document.tracks):
             track_view = Track(self.subject, n, track.name)
             self.innerLayout.addWidget(track_view)
+            
+    def trackClickedResponder(self, e):
+        self.selectTrackAt(e.index)
+
+    def trackSelectLeftResponder(self, e):
+        if not self.numOfTracks() > 0:
+            return
+        
+        if not self.isThereSelectedTrack():
+            self.selectTrackAt(self.numOfTracks() - 1)
+        else:
+            self.selectTrackAt(self.selectedTrackIndex - 1)
+    
+    def trackSelectRightResponder(self, e):
+        if not self.numOfTracks() > 0:
+            return
+        
+        if not self.isThereSelectedTrack():
+            self.selectTrackAt(0)
+        else:
+            self.selectTrackAt(self.selectedTrackIndex + 1)
 
     def trackNewResponder(self, e):
         length = self.innerLayout.count()
@@ -54,21 +81,24 @@ class Editor(Observation, QScrollArea):
         self.innerLayout.insertWidget(e.new_index, track.widget())
 
     def trackRemoveResponder(self, e):
-        track = self.innerLayout.itemAt(e.index).widget()
+        if not self.isThereSelectedTrack():
+            return
+        
+        track = self.innerLayout.itemAt(self.selectedTrackIndex).widget()
         msgBox = self.initConfirmDelete(track.name())
         reply = msgBox.exec_()
 
         if reply == QMessageBox.Yes:
             self.innerLayout.removeWidget(track)
             track.close()
-            self.notify(events.view.track.Remove(e.index))
-            self.setFocusToTrack(e.index-1)
-            for n in range(e.index, self.innerLayout.count()):
+            self.notify(events.view.track.Remove(self.selectedTrackIndex))
+            self.selectTrackAt(self.selectedTrackIndex-1)
+            for n in range(self.selectedTrackIndex+1, self.innerLayout.count()):
                 track = self.innerLayout.itemAt(n).widget()
                 track.setIndex(track.index - 1)
 
     def clear(self):
-        for i in reversed(range(self.innerLayout.count())):
+        for i in reversed(range(self.numOfTracks())):
             self.innerLayout.itemAt(i).widget().deleteLater()
 
     def initConfirmDelete(self, name):
@@ -80,6 +110,27 @@ class Editor(Observation, QScrollArea):
         msgBox.setDefaultButton(QMessageBox.Yes)
 
         return msgBox
+    
+    def selectTrackAt(self, index):
+        if self.selectedTrackIndex == index:
+            return
+        
+        if self.isThereSelectedTrack():
+            track = self.innerLayout.itemAt(self.selectedTrackIndex)
+            track.widget().setSelected(False)
+            
+        trackNumRange = range(0, self.innerLayout.count())
+        if index in trackNumRange:
+            track = self.innerLayout.itemAt(index)
+            track.widget().setSelected(True)
+            
+        self.selectedTrackIndex = min(max(-1, index), self.numOfTracks())
+        
+    def isThereSelectedTrack(self):
+        return self.selectedTrackIndex in range(0, self.numOfTracks())
+    
+    def numOfTracks(self):
+        return self.innerLayout.count()
 
     def setFocusToTrack(self, index):
         track = self.innerLayout.itemAt(index)

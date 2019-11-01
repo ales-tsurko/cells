@@ -1,8 +1,9 @@
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QLineEdit, QMessageBox, QVBoxLayout, QWidget
-
-from cells import events
 from cells.observation import Observation
+from cells import events
+from PySide2.QtCore import Qt
+from PySide2.QtWidgets import (QLineEdit, QMessageBox, QVBoxLayout,
+                               QWidget, QAction)
+from PySide2.QtGui import QIcon
 
 
 class Track(Observation, QWidget):
@@ -10,13 +11,15 @@ class Track(Observation, QWidget):
         Observation.__init__(self, subject)
         QWidget.__init__(self)
 
+        self.index = index
+        self.selected = False
+
         self.setAttribute(Qt.WA_StyledBackground)
         self.setStyleSheet("background-color:red;")
 
         self.setFixedWidth(200)
 
         self.header = Header(subject, index)
-        self.index = index
 
         self.setLayout(QVBoxLayout())
         self.layout().addWidget(self.header)
@@ -26,7 +29,7 @@ class Track(Observation, QWidget):
 
         self.setName(name)
 
-        self.setFocusPolicy(Qt.ClickFocus)
+        # self.setFocusPolicy(Qt.ClickFocus)
 
         self.add_responder(events.view.track.Move,
                            self.selfMoveResponder)
@@ -58,8 +61,16 @@ class Track(Observation, QWidget):
         self.index = index
         self.header.index = index
 
-    def focusInEvent(self, e):
-        self.header.setFocus()
+    def mousePressEvent(self, event):
+        self.notify(events.view.track.Clicked(self.index))
+        return super().mousePressEvent(event)
+
+    def setSelected(self, value):
+        self.selected = value
+        if value:
+            self.header.onSelect()
+        else:
+            self.header.onDeselect()
 
 
 class Header(Observation, QWidget):
@@ -68,6 +79,7 @@ class Header(Observation, QWidget):
         QWidget.__init__(self)
 
         self.index = index
+        self.selected = False
 
         self.setAttribute(Qt.WA_StyledBackground)
         self.setStyleSheet("background-color: grey;")
@@ -81,12 +93,6 @@ class Header(Observation, QWidget):
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().addWidget(self.nameLabel)
 
-        self.add_responder(events.view.main.TrackRemove,
-                           self.mainTrackRemoveResponder)
-        self.add_responder(events.view.main.TrackSelectLeft,
-                           self.mainTrackSelectLeftResponder)
-        self.add_responder(events.view.main.TrackSelectRight, 
-                           self.mainTrackSelectRightResponder)
         self.add_responder(events.view.main.TrackMoveLeft,
                            self.mainTrackMoveLeftResponder)
         self.add_responder(events.view.main.TrackMoveRight,
@@ -101,25 +107,6 @@ class Header(Observation, QWidget):
         self.nameLabel.setContextMenuPolicy(Qt.NoContextMenu)
         self.nameLabel.textChanged.connect(self.onNameChanged)
 
-    def mainTrackRemoveResponder(self, e):
-        # I don't know why, but it doesn't work inside of Track itself:
-        # - self.hasFocus() always returns False
-        # - if I introduce self.selected, it changes correctly inside
-        #   focusEvents but it somehow remains always True after just one
-        #   select inside the responder (even given the fact, that it's
-        #   changing inside of delegates %-| )
-
-        if self.hasFocus():
-            self.notify(events.view.track.WillRemove(self.index))
-            
-    def mainTrackSelectLeftResponder(self, e):
-        if self.hasFocus() and self.index > 0:
-            self.notify(events.view.track.Select(self.index - 1))
-    
-    def mainTrackSelectRightResponder(self, e):
-        if self.hasFocus() and self.index < self.totalTracksNum() - 1:
-            self.notify(events.view.track.Select(self.index + 1))
-
     def mainTrackMoveLeftResponder(self, e):
         if self.hasFocus() and self.index > 0:
             self.notify(events.view.track.Move(self.index, self.index - 1))
@@ -131,13 +118,15 @@ class Header(Observation, QWidget):
 
     def onNameChanged(self, name):
         self.notify(events.view.track.NameChanged(self.index, name))
-
-    def focusInEvent(self, e):
-        self.setStyleSheet("background-color: green;")
-
-    def focusOutEvent(self, e):
-        self.setStyleSheet("background-color: grey;")
         
+    def onSelect(self):
+        self.selected = True
+        self.setStyleSheet("background-color: green;")
+        
+    def onDeselect(self):
+        self.selected = False
+        self.setStyleSheet("background-color: grey;")
+
     def totalTracksNum(self):
         return self.parentWidget().parentWidget().layout().count()
 
