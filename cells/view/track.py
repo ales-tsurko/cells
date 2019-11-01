@@ -29,8 +29,6 @@ class Track(Observation, QWidget):
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setAlignment(Qt.AlignTop)
 
-        self.addCell()
-
         self.setName(name)
 
         self.add_responder(events.view.main.RowAdd, self.rowAddResponder)
@@ -38,14 +36,15 @@ class Track(Observation, QWidget):
     def rowAddResponder(self, e):
         self.addCell()
 
-    def addCell(self):
+    def addCell(self, notify=True):
         index = len(self.cells)
         cell = Cell(self, self.subject, index)
         cell.setName(str(index + 1))
         self.cells.append(cell)
         self.layout().addWidget(cell)
 
-        self.notify(events.view.track.CellAdd(self.index, cell.name()))
+        if notify:
+            self.notify(events.view.track.CellAdd(self.index, cell.name()))
 
         return cell
 
@@ -119,6 +118,7 @@ class CellBase(Observation, QWidget):
     def editNameResponder(self, e):
         if self.selected:
             self.nameLabel.setFocus()
+            self.nameLabel.selectAll()
 
     def onNameChanged(self, name):
         pass
@@ -146,7 +146,7 @@ class Header(CellBase):
 
         self.add_responder(events.view.main.TrackEditName,
                            self.editNameResponder)
-        
+
     def onEditingNameFinished(self):
         self.notify(events.view.track.NameChanged(self.index, self.name()))
         return super().onEditingNameFinished()
@@ -188,6 +188,7 @@ class Cell(CellBase):
     def editNameResponder(self, e):
         if self.selected and self.track.selected:
             self.nameLabel.setFocus()
+            self.nameLabel.selectAll()
 
     def trackSelectResponder(self, e):
         self.updateStyle()
@@ -201,7 +202,7 @@ class Cell(CellBase):
     def mousePressEvent(self, event):
         self.track.selectCellAt(self.index)
         return super().mousePressEvent(event)
-        
+
     def onEditingNameFinished(self):
         self.notify(events.view.track.CellNameChanged(
             self.track.index, self.index, self.name()))

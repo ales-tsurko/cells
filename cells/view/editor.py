@@ -48,9 +48,8 @@ class Editor(Observation, QScrollArea):
         for (n, track) in enumerate(e.document.tracks):
             trackView = Track(self.subject, n, track.name)
             for cell in track.cells:
-                print(cell)
-                # newCell = trackView.addCell()
-                # newCell.setName(cell.name)
+                newCell = trackView.addCell(False)
+                newCell.setName(cell.name)
             self.innerLayout.addWidget(trackView)
 
     def trackClickedResponder(self, e):
@@ -80,7 +79,7 @@ class Editor(Observation, QScrollArea):
         track = Track(self.subject, length, name)
         if self.numOfTracks() > 0:
             firstTrack = self.innerLayout.itemAt(0).widget()
-            for cell in firstTrack.cells[1:]:
+            for cell in firstTrack.cells:
                 new_cell = track.addCell()
                 new_cell.setSelected(cell.selected)
         self.innerLayout.addWidget(track)
@@ -90,6 +89,24 @@ class Editor(Observation, QScrollArea):
 
     def trackMoveRightResponder(self, e):
         self.moveSelectedTrackTo(self.selectedTrackIndex + 1)
+        
+    def moveSelectedTrackTo(self, index):
+        if self.numOfTracks() < 1 or \
+                not self.isThereSelectedTrack() or \
+                not index in range(self.numOfTracks()) or \
+                self.selectedTrackIndex == index:
+            return
+
+        track = self.innerLayout.takeAt(self.selectedTrackIndex)
+        self.innerLayout.insertWidget(index, track.widget())
+        track.widget().setIndex(index)
+
+        previous = self.innerLayout.itemAt(self.selectedTrackIndex)
+        previous.widget().setIndex(self.selectedTrackIndex)
+
+        self.notify(events.view.track.Move(self.selectedTrackIndex, index))
+
+        self.selectTrackAt(index)
 
     def trackRemoveResponder(self, e):
         if not self.isThereSelectedTrack():
@@ -107,24 +124,6 @@ class Editor(Observation, QScrollArea):
                 track = self.innerLayout.itemAt(n).widget()
                 track.setIndex(track.index - 1)
 
-    def moveSelectedTrackTo(self, index):
-        if self.numOfTracks() < 1 or \
-                not self.isThereSelectedTrack() or \
-                not index in range(self.numOfTracks()) or \
-                self.selectedTrackIndex == index:
-            return
-
-        track = self.innerLayout.takeAt(self.selectedTrackIndex)
-        self.innerLayout.insertWidget(index, track.widget())
-        track.widget().setIndex(index)
-
-        previous = self.innerLayout.itemAt(self.selectedTrackIndex)
-        previous.widget().setIndex(index)
-
-        self.notify(events.view.track.Move(self.selectedTrackIndex, index))
-
-        self.selectTrackAt(index)
-
     def selectTrackAt(self, index):
         if self.selectedTrackIndex == index:
             return
@@ -133,8 +132,7 @@ class Editor(Observation, QScrollArea):
             track = self.innerLayout.itemAt(self.selectedTrackIndex)
             track.widget().setSelected(False)
 
-        trackNumRange = range(self.innerLayout.count())
-        if index in trackNumRange:
+        if index in range(self.numOfTracks()):
             track = self.innerLayout.itemAt(index)
             track.widget().setSelected(True)
 
