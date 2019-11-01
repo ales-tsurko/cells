@@ -4,7 +4,7 @@ from PySide2.QtWidgets import QFrame, QHBoxLayout, QScrollArea, QWidget, QMessag
 from cells import events
 from cells.observation import Observation
 
-from .track import Track, Header
+from .track import Track, Header, Cell
 
 
 class Editor(Observation, QScrollArea):
@@ -74,6 +74,11 @@ class Editor(Observation, QScrollArea):
         length = self.innerLayout.count()
         name = "Track " + str(length + 1)
         track = Track(self.subject, length, name)
+        if self.numOfTracks() > 0:
+            firstTrack = self.innerLayout.itemAt(0).widget()
+            for cell in firstTrack.cells[1:]:
+                track.addCell()
+                track.cells[-1].setSelected(cell.selected)
         self.innerLayout.addWidget(track)
 
     def trackMoveLeftResponder(self, e):
@@ -95,26 +100,26 @@ class Editor(Observation, QScrollArea):
             track.close()
             self.notify(events.view.track.Remove(self.selectedTrackIndex))
             self.selectTrackAt(self.selectedTrackIndex-1)
-            for n in range(self.selectedTrackIndex+1, self.innerLayout.count()):
+            for n in range(self.selectedTrackIndex+1, self.numOfTracks()):
                 track = self.innerLayout.itemAt(n).widget()
                 track.setIndex(track.index - 1)
 
     def moveSelectedTrackTo(self, index):
         if self.numOfTracks() < 1 or \
                 not self.isThereSelectedTrack() or \
-                not index in range(0, self.numOfTracks()) or \
+                not index in range(self.numOfTracks()) or \
                 self.selectedTrackIndex == index:
             return
-       
+
         track = self.innerLayout.takeAt(self.selectedTrackIndex)
         self.innerLayout.insertWidget(index, track.widget())
         track.widget().setIndex(index)
-        
+
         previous = self.innerLayout.itemAt(self.selectedTrackIndex)
         previous.widget().setIndex(index)
 
         self.notify(events.view.track.Move(self.selectedTrackIndex, index))
-        
+
         self.selectTrackAt(index)
 
     def selectTrackAt(self, index):
@@ -125,7 +130,7 @@ class Editor(Observation, QScrollArea):
             track = self.innerLayout.itemAt(self.selectedTrackIndex)
             track.widget().setSelected(False)
 
-        trackNumRange = range(0, self.innerLayout.count())
+        trackNumRange = range(self.innerLayout.count())
         if index in trackNumRange:
             track = self.innerLayout.itemAt(index)
             track.widget().setSelected(True)
@@ -134,7 +139,7 @@ class Editor(Observation, QScrollArea):
         self.notify(events.view.track.Select(self.selectedTrackIndex))
 
     def isThereSelectedTrack(self):
-        return self.selectedTrackIndex in range(0, self.numOfTracks())
+        return self.selectedTrackIndex in range(self.numOfTracks())
 
     def numOfTracks(self):
         return self.innerLayout.count()

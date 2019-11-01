@@ -13,6 +13,7 @@ class Track(Observation, QWidget):
 
         self.index = index
         self.selected = False
+        self.selectedCellIndex = -1
 
         self.setAttribute(Qt.WA_StyledBackground)
         self.setStyleSheet("background-color:red;")
@@ -34,6 +35,9 @@ class Track(Observation, QWidget):
         self.add_responder(events.view.main.RowAdd, self.rowAddResponder)
         
     def rowAddResponder(self, e):
+        self.addCell()
+
+    def addCell(self):
         index = len(self.cells)
         cell = Cell(self, self.subject, index)
         self.cells.append(cell)
@@ -56,6 +60,29 @@ class Track(Observation, QWidget):
     def setSelected(self, value):
         self.selected = value
         self.header.setSelected(value)
+        
+    def selectCellAt(self, index):
+        if self.selectedCellIndex == index:
+            return
+
+        if self.isThereSelectedCell():
+            self.cells[self.selectedCellIndex].setSelected(False)
+
+        if index in range(len(self.cells)):
+            self.cells[index].setSelected(True)
+
+        self.selectedCellIndex = min(max(-1, index), len(self.cells))
+
+    def isThereSelectedCell(self):
+        return self.selectedCellIndex in range(len(self.cells))
+
+    def closeEvent(self, event):
+        self.subject = None
+        self.selected = False
+        self.header.close()
+        for cell in self.cells:
+            cell.close()
+        return super().closeEvent(event)
 
 
 class CellBase(Observation, QWidget):
@@ -109,8 +136,12 @@ class CellBase(Observation, QWidget):
 
     def setName(self, name):
         self.nameLabel.setText(name)
-
-
+        
+    def closeEvent(self, event):
+        self.subject = None
+        self.setSelected(False)
+        return super().closeEvent(event)
+        
 class Header(CellBase):
     def __init__(self, subject, index):
         super().__init__(subject, index)

@@ -45,7 +45,6 @@ class Document(Observation, dict):
         self.notify(events.document.New)
 
         # main view events
-        # self.add_responder(events.view.main.FileNew, self.main_new_responder)
         self.add_responder(events.view.main.FileOpen, self.main_open_responder)
         self.add_responder(events.view.main.FileSave, self.main_save_responder)
         self.add_responder(events.view.main.FileSaveAs,
