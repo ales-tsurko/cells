@@ -49,8 +49,8 @@ class Document(Observation, dict):
         self.add_responder(events.view.main.FileSave, self.main_save_responder)
         self.add_responder(events.view.main.FileSaveAs,
                            self.main_save_responder)
-        self.add_responder(events.view.main.TrackNew,
-                           self.main_track_new_responder)
+        self.add_responder(events.view.track.New,
+                           self.track_new_responder)
         self.add_responder(events.view.track.CellAdd,
                            self.cell_add_responder)
         self.add_responder(events.view.track.NameChanged,
@@ -66,10 +66,10 @@ class Document(Observation, dict):
 
     def main_save_responder(self, e):
         self.save(e.path)
-
-    def main_track_new_responder(self, e):
-        name = "Track " + str(len(self.model.tracks) + 1)
-        track = TrackModel(name, [])
+        
+    @notify_update
+    def track_new_responder(self, e):
+        track = TrackModel(e.name, [])
         self.model.tracks.append(track)
         self.notify(events.track.New(track))
 

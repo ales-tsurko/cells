@@ -8,6 +8,7 @@ from cells.observation import Observation
 from .console import Console
 from .editor import Editor
 from .settings import Settings
+from .dialogs import ConfirmationDialog
 from cells.models.document import Document
 
 
@@ -59,7 +60,7 @@ class Main(QMainWindow, Observation):
         self._addMenuAction(trackSub, "Remove",
                             self.tr('Ctrl+Backspace'),
                             self.onTrackRemove)
-        
+
         trackSub.addSeparator()
         self._addMenuAction(trackSub, "Select Left",
                             self.tr('h'),
@@ -154,12 +155,15 @@ class Main(QMainWindow, Observation):
         dialog.exec_()
 
     def onFileNew(self, e):
-        self.checkSave(e)
+        if self.checkSave(e) == QMessageBox.Cancel:
+            return
+
         self.notify(events.view.main.FileNew())
         self.saved = True
 
     def onFileOpen(self, e):
-        self.checkSave(e)
+        if self.checkSave(e) == QMessageBox.Cancel:
+            return
 
         fname = QFileDialog.getOpenFileName(self,
                                             "Open Project",
@@ -196,13 +200,13 @@ class Main(QMainWindow, Observation):
 
     def onTrackRemove(self, e):
         self.notify(events.view.main.TrackRemove())
-        
+
     def onTrackRename(self, e):
         self.notify(events.view.main.TrackEditName())
 
     def onTrackSelectLeft(self, e):
         self.notify(events.view.main.TrackSelectLeft())
-        
+
     def onTrackSelectRight(self, e):
         self.notify(events.view.main.TrackSelectRight())
 
@@ -213,17 +217,17 @@ class Main(QMainWindow, Observation):
         self.notify(events.view.main.TrackMoveRight())
 
     def onRowEvaluate(self, e):
-            self.notify(events.view.main.RowEvaluate())
-    
+        self.notify(events.view.main.RowEvaluate())
+
     def onRowAdd(self, e):
         self.notify(events.view.main.RowAdd())
 
     def onRowRemove(self, e):
         self.notify(events.view.main.RowRemove())
-        
+
     def onRowSelectUp(self, e):
         self.notify(events.view.main.RowSelectUp())
-        
+
     def onRowSelectDown(self, e):
         self.notify(events.view.main.RowSelectDown())
 
@@ -254,22 +258,26 @@ class Main(QMainWindow, Observation):
     def onCellEditName(self, e):
         self.notify(events.view.main.CellEditName())
 
-    def checkSave(self, e):
-        if not self.saved:
-            msgBox = QMessageBox()
-            msgBox.setWindowTitle("Closing Document")
-            msgBox.setText("Do you want to save changes?")
-            msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-            msgBox.setDefaultButton(QMessageBox.Yes)
-            reply = msgBox.exec()
-
-            if reply == QMessageBox.Yes:
-                self.onFileSave(e)
-
-        self.saved = True
-
     def closeEvent(self, e):
-        self.checkSave(e)
+        reply = self.checkSave(e)
+
+        if reply == QMessageBox.Cancel:
+            e.ignore()
+            return
 
         self.notify(events.view.main.Close())
         super().closeEvent(e)
+
+    def checkSave(self, e):
+        confirmation = ConfirmationDialog(
+            "Closing Document", "Do you want to save changes?",  True)
+        reply = confirmation.exec_()
+
+        if reply == QMessageBox.Cancel:
+            return reply
+        elif reply == QMessageBox.Yes:
+            self.onFileSave(e)
+
+        self.saved = True
+
+        return reply

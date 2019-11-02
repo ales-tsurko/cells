@@ -1,6 +1,10 @@
 from typing import NamedTuple
 
 
+class New(NamedTuple):
+    name: str
+
+
 class NameChanged(NamedTuple):
     index: int
     name: str

@@ -5,6 +5,8 @@ from PySide2.QtWidgets import (QLineEdit, QMessageBox, QVBoxLayout,
                                QWidget, QAction)
 from PySide2.QtGui import QIcon
 
+from .dialogs import ConfirmationDialog
+
 
 class Track(Observation, QWidget):
     def __init__(self, subject, index, name):
@@ -32,6 +34,7 @@ class Track(Observation, QWidget):
         self.setName(name)
 
         self.add_responder(events.view.main.RowAdd, self.rowAddResponder)
+        self.add_responder(events.view.main.RowRemove, self.rowRemoveResponder)
         self.add_responder(events.view.main.RowSelectUp,
                            self.rowSelectUpResponder)
         self.add_responder(events.view.main.RowSelectDown,
@@ -39,6 +42,24 @@ class Track(Observation, QWidget):
 
     def rowAddResponder(self, e):
         self.addCell()
+
+    def rowRemoveResponder(self, e):
+        if not self.isThereSelectedCell():
+            return
+
+        cell = self.cells[self.selectedCellIndex]
+        question = f"Do you really want to delete row?"
+        confirmation = ConfirmationDialog("Row Delete", question)
+        reply = confirmation.exec_()
+
+        if reply == QMessageBox.Yes:
+            cell.setParent(None)
+            # self.notify(events.view.track.Remove(self.selectedTrackIndex))
+            self.selectRowAt(self.selectedCellIndex-1)
+            # update indices
+            for n in range(self.selectedTrackIndex+1, self.numOfTracks()):
+                track = self.innerLayout.itemAt(n).widget()
+                track.setIndex(track.index - 1)
 
     def rowSelectUpResponder(self, e):
         if not self.selected or len(self.cells) < 1:

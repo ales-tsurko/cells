@@ -4,7 +4,8 @@ from PySide2.QtWidgets import QFrame, QHBoxLayout, QScrollArea, QWidget, QMessag
 from cells import events
 from cells.observation import Observation
 
-from .track import Track, Header, Cell
+from .track import Track
+from .dialogs import ConfirmationDialog
 
 
 class Editor(Observation, QScrollArea):
@@ -28,7 +29,7 @@ class Editor(Observation, QScrollArea):
         self.setWidgetResizable(True)
 
         self.add_responder(events.document.Open, self.documentOpenResponder)
-        self.add_responder(events.track.New, self.trackNewResponder)
+        self.add_responder(events.view.main.TrackNew, self.trackNewResponder)
         self.add_responder(events.view.track.Clicked,
                            self.trackClickedResponder)
         self.add_responder(events.view.main.TrackSelectLeft,
@@ -79,12 +80,14 @@ class Editor(Observation, QScrollArea):
         length = self.innerLayout.count()
         name = "Track " + str(length + 1)
         track = Track(self.subject, length, name)
+        self.innerLayout.addWidget(track)
+        self.notify(events.view.track.New(name))
+
         if self.numOfTracks() > 0:
             firstTrack = self.innerLayout.itemAt(0).widget()
             for cell in firstTrack.cells:
                 new_cell = track.addCell()
                 new_cell.setSelected(cell.selected)
-        self.innerLayout.addWidget(track)
 
     def trackMoveLeftResponder(self, e):
         self.moveSelectedTrackTo(self.selectedTrackIndex - 1)
@@ -115,8 +118,9 @@ class Editor(Observation, QScrollArea):
             return
 
         track = self.innerLayout.itemAt(self.selectedTrackIndex).widget()
-        msgBox = self.initConfirmDelete(track.name())
-        reply = msgBox.exec_()
+        question = f'Do you really want to delete track {track.name()}?'
+        confirmation = ConfirmationDialog("Delete Track", question)
+        reply = confirmation.exec_()
 
         if reply == QMessageBox.Yes:
             track.setParent(None)
@@ -168,13 +172,3 @@ class Editor(Observation, QScrollArea):
     def clear(self):
         for i in reversed(range(self.numOfTracks())):
             self.innerLayout.itemAt(i).widget().setParent(None)
-
-    def initConfirmDelete(self, name):
-        question = f'Do you really want to delete track {name}?'
-        msgBox = QMessageBox()
-        msgBox.setWindowTitle("Delete Track")
-        msgBox.setText(question)
-        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        msgBox.setDefaultButton(QMessageBox.Yes)
-
-        return msgBox
