@@ -105,7 +105,7 @@ class Track(Observation, QWidget):
     def selectRowAt(self, index):
         if self.selectedCellIndex == index:
             return
-
+        
         self.selectedCellIndex = min(max(-1, index), len(self.cells))
         self.notify(events.view.track.RowSelect(self.selectedCellIndex))
 
@@ -235,6 +235,7 @@ class Cell(CellBase):
             self.setSelected(True)
         else:
             self.setSelected(False)
+        self.track.selectedCellIndex = e.index
             
     def setSelected(self, value):
         if value:

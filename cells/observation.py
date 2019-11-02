@@ -16,5 +16,4 @@ class Observation:
         self.subject.on_next(event)
 
     def unregister(self):
-        for unreg in self._disposables:
-            unreg.dispose()
+        [unreg.dispose() for unreg in self._disposables]
