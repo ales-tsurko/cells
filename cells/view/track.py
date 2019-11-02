@@ -9,7 +9,7 @@ from .dialogs import ConfirmationDialog
 
 
 class Track(Observation, QWidget):
-    def __init__(self, subject, index, name):
+    def __init__(self, editor, subject, index, name):
         Observation.__init__(self, subject)
         QWidget.__init__(self)
 
@@ -17,6 +17,8 @@ class Track(Observation, QWidget):
         self.selected = False
         self.selectedCellIndex = -1
         self.cells = []
+        self._pasteBuffer = []
+        self.editor = editor
 
         self.setAttribute(Qt.WA_StyledBackground)
         self.setStyleSheet("background-color: rgba(0, 0, 0, 0.5);")
@@ -84,9 +86,10 @@ class Track(Observation, QWidget):
     
     def moveSelectedRowTo(self, index):
         if len(self.cells) < 2 or \
+                self.selectedCellIndex == index or \
                 not self.isThereSelectedCell() or \
                 not index in range(len(self.cells)) or \
-                self.selectedCellIndex == index:
+                not self.editor.hasSelectedTrack():
             return
 
         cell = self.cells.pop(self.selectedCellIndex)

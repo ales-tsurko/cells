@@ -51,7 +51,7 @@ class Editor(Observation, QScrollArea):
         self.clear()
 
         for (n, track) in enumerate(e.document.tracks):
-            trackView = Track(self.subject, n, track.name)
+            trackView = Track(self, self.subject, n, track.name)
             for cell in track.cells:
                 newCell = trackView.addCell(False)
                 newCell.setName(cell.name)
@@ -64,7 +64,7 @@ class Editor(Observation, QScrollArea):
         if self.numOfTracks() < 1:
             return
 
-        if not self.isThereSelectedTrack():
+        if not self.hasSelectedTrack():
             self.selectTrackAt(self.numOfTracks() - 1)
         else:
             self.selectTrackAt(self.selectedTrackIndex - 1)
@@ -73,7 +73,7 @@ class Editor(Observation, QScrollArea):
         if self.numOfTracks() < 1:
             return
 
-        if not self.isThereSelectedTrack():
+        if not self.hasSelectedTrack():
             self.selectTrackAt(0)
         else:
             self.selectTrackAt(self.selectedTrackIndex + 1)
@@ -81,7 +81,7 @@ class Editor(Observation, QScrollArea):
     def trackNewResponder(self, e):
         length = self.innerLayout.count()
         name = "Track " + str(length + 1)
-        track = Track(self.subject, length, name)
+        track = Track(self, self.subject, length, name)
         self.innerLayout.addWidget(track)
         self.notify(events.view.track.New(name))
 
@@ -99,7 +99,7 @@ class Editor(Observation, QScrollArea):
 
     def moveSelectedTrackTo(self, index):
         if self.numOfTracks() < 2 or \
-                not self.isThereSelectedTrack() or \
+                not self.hasSelectedTrack() or \
                 not index in range(self.numOfTracks()) or \
                 self.selectedTrackIndex == index:
             return
@@ -116,7 +116,7 @@ class Editor(Observation, QScrollArea):
         self.selectTrackAt(index)
 
     def trackRemoveResponder(self, e):
-        if not self.isThereSelectedTrack():
+        if not self.hasSelectedTrack():
             return
 
         track = self.trackAt(self.selectedTrackIndex)
@@ -134,7 +134,7 @@ class Editor(Observation, QScrollArea):
             track.setIndex(track.index - 1)
 
     def rowRemoveResponder(self, e):
-        if not self.isThereSelectedTrack():
+        if not self.hasSelectedTrack():
             return
 
         track = self.trackAt(self.selectedTrackIndex)
@@ -157,7 +157,7 @@ class Editor(Observation, QScrollArea):
         if self.selectedTrackIndex == index:
             return
 
-        if self.isThereSelectedTrack():
+        if self.hasSelectedTrack():
             track = self.trackAt(self.selectedTrackIndex)
             track.setSelected(False)
 
@@ -183,7 +183,7 @@ class Editor(Observation, QScrollArea):
             self.ensureWidgetVisible(
                 track, track.header.width(), track.header.height())
 
-    def isThereSelectedTrack(self):
+    def hasSelectedTrack(self):
         return self.selectedTrackIndex in range(self.numOfTracks())
 
     def numOfTracks(self):
