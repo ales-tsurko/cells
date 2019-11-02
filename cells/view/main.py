@@ -155,9 +155,6 @@ class Main(QMainWindow, Observation):
         dialog.exec_()
 
     def onFileNew(self, e):
-        if self.checkSave(e) == QMessageBox.Cancel:
-            return
-
         self.notify(events.view.main.FileNew())
         self.saved = True
 
