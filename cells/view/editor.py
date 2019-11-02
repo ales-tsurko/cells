@@ -98,7 +98,7 @@ class Editor(Observation, QScrollArea):
         self.moveSelectedTrackTo(self.selectedTrackIndex + 1)
 
     def moveSelectedTrackTo(self, index):
-        if self.numOfTracks() < 1 or \
+        if self.numOfTracks() < 2 or \
                 not self.isThereSelectedTrack() or \
                 not index in range(self.numOfTracks()) or \
                 self.selectedTrackIndex == index:

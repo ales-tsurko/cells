@@ -38,7 +38,11 @@ class Track(Observation, QWidget):
                            self.rowSelectUpResponder)
         self.add_responder(events.view.main.RowSelectDown,
                            self.rowSelectDownResponder)
-        self.add_responder(events.view.track.RowRemove, self.rowRemoveResponder)
+        self.add_responder(events.view.track.RowRemove,
+                           self.rowRemoveResponder)
+        self.add_responder(events.view.main.RowMoveUp, self.rowMoveUpResponder)
+        self.add_responder(events.view.main.RowMoveDown,
+                           self.rowMoveDownResponder)
 
     def rowAddResponder(self, e):
         self.addCell()
@@ -64,13 +68,37 @@ class Track(Observation, QWidget):
     def rowRemoveResponder(self, e):
         if self.selectedCellIndex != e.index:
             return
-        
+
         cell = self.cells.pop(e.index)
-        
+
         cell.setParent(None)
         self.notify(events.view.track.CellRemove(self.index, e.index))
         for cell in self.cells[e.index:]:
             cell.index -= 1
+            
+    def rowMoveUpResponder(self, e):
+        self.moveSelectedRowTo(self.selectedCellIndex - 1)
+    
+    def rowMoveDownResponder(self, e):
+        self.moveSelectedRowTo(self.selectedCellIndex + 1)
+    
+    def moveSelectedRowTo(self, index):
+        if len(self.cells) < 2 or \
+                not self.isThereSelectedCell() or \
+                not index in range(len(self.cells)) or \
+                self.selectedCellIndex == index:
+            return
+
+        cell = self.cells.pop(self.selectedCellIndex)
+        self.cells.insert(index, cell)
+        self.layout().insertWidget(index + 1, cell)
+        cell.index = index
+
+        previous = self.cells[self.selectedCellIndex]
+        previous.index = self.selectedCellIndex
+
+        self.notify(events.view.track.RowMove(self.index, self.selectedCellIndex, index))
+        self.selectedCellIndex = index
 
     def addCell(self, notify=True):
         index = len(self.cells)
@@ -105,13 +133,13 @@ class Track(Observation, QWidget):
     def selectRowAt(self, index):
         if self.selectedCellIndex == index:
             return
-        
+
         self.selectedCellIndex = min(max(-1, index), len(self.cells))
         self.notify(events.view.track.RowSelect(self.selectedCellIndex))
 
     def isThereSelectedCell(self):
         return self.selectedCellIndex in range(len(self.cells))
-    
+
     def delete(self):
         self.unregister()
         self.header.unregister()
@@ -236,7 +264,7 @@ class Cell(CellBase):
         else:
             self.setSelected(False)
         self.track.selectedCellIndex = e.index
-            
+
     def setSelected(self, value):
         if value:
             self.track.selectedCellIndex = self.index

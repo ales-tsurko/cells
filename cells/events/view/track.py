@@ -45,6 +45,12 @@ class RowRemove(NamedTuple):
     index: int
 
 
+class RowMove(NamedTuple):
+    track_index: int
+    index: int
+    new_index: int
+
+
 class CellRemove(NamedTuple):
     track_index: int
     index: int
