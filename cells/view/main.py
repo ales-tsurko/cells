@@ -263,7 +263,8 @@ class Main(QMainWindow, Observation):
             return
 
         self.notify(events.view.main.Close())
-        super().closeEvent(e)
+        self.unregister()
+        return super().closeEvent(e)
 
     def checkSave(self, e):
         confirmation = ConfirmationDialog(

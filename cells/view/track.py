@@ -111,6 +111,13 @@ class Track(Observation, QWidget):
 
     def isThereSelectedCell(self):
         return self.selectedCellIndex in range(len(self.cells))
+    
+    def delete(self):
+        self.unregister()
+        self.header.unregister()
+        [cell.unregister() for cell in self.cells]
+        self.setParent(None)
+        self.deleteLater()
 
 
 class CellBase(Observation, QWidget):

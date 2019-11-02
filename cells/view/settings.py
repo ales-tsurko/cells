@@ -12,3 +12,7 @@ class Settings(Observation, QDialog):
         self.setFixedSize(600, 400)
         
         self.settings = SettingsModel(subject)
+        
+    def closeEvent(self, arg__1):
+        self.unregister()
+        return super().closeEvent(arg__1)

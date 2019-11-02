@@ -126,7 +126,7 @@ class Editor(Observation, QScrollArea):
         if confirmation.exec_() == QMessageBox.No:
             return
 
-        track.setParent(None)
+        track.delete()
         self.notify(events.view.track.Remove(self.selectedTrackIndex))
         self.selectTrackAt(self.selectedTrackIndex-1)
         for n in range(self.selectedTrackIndex+1, self.numOfTracks()):
@@ -195,3 +195,7 @@ class Editor(Observation, QScrollArea):
 
     def trackAt(self, index):
         return self.innerLayout.itemAt(index).widget()
+    
+    def closeEvent(self, e):
+        self.unregister()
+        return super().closeEvent(e)

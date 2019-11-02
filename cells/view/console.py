@@ -16,3 +16,7 @@ class Console(Observation, QTextEdit):
         font = QFont("Fira Code", 12)
         font.setWeight(QFont.Thin)
         self.setFont(font)
+
+    def closeEvent(self, e):
+        self.unregister()
+        return super().closeEvent(e)
