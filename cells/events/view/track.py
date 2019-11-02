@@ -37,15 +37,11 @@ class CellSelected(NamedTuple):
     index: int
 
 
-class RowSelect(NamedTuple):
-    index: int
-
-
 class RowRemove(NamedTuple):
     index: int
 
 
-class RowMove(NamedTuple):
+class CellMove(NamedTuple):
     track_index: int
     index: int
     new_index: int

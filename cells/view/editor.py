@@ -52,9 +52,7 @@ class Editor(Observation, QScrollArea):
 
         for (n, track) in enumerate(e.document.tracks):
             trackView = Track(self, self.subject, n, track.name)
-            for cell in track.cells:
-                newCell = trackView.addCell(False)
-                newCell.setName(cell.name)
+            trackView.deserialize(track)
             self.innerLayout.addWidget(trackView)
 
     def trackClickedResponder(self, e):
@@ -139,16 +137,16 @@ class Editor(Observation, QScrollArea):
 
         track = self.trackAt(self.selectedTrackIndex)
 
-        if not track.isThereSelectedCell() or len(track.cells) < 1:
+        if not track.hasSelectedCell() or len(track.cells) < 1:
             return
 
         confirmation = ConfirmationDialog(
-            "Row Deletion", "Do you really want to delete this row?")
+            "Row Deletion", "Do you really want to delete selected row?")
         if confirmation.exec_() == QMessageBox.No:
             return
 
         self.notify(events.view.track.RowRemove(track.selectedCellIndex))
-        track.selectRowAt(track.selectedCellIndex - 1)
+        track.selectCellAt(track.selectedCellIndex - 1)
 
     def cellSelectedResponder(self, e):
         self.ensureTrackVisible(self.selectedTrackIndex)
@@ -195,7 +193,7 @@ class Editor(Observation, QScrollArea):
 
     def trackAt(self, index):
         return self.innerLayout.itemAt(index).widget()
-    
+
     def closeEvent(self, e):
         self.unregister()
         return super().closeEvent(e)

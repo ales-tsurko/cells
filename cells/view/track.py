@@ -6,6 +6,7 @@ from PySide2.QtWidgets import (QLineEdit, QMessageBox, QVBoxLayout,
 from PySide2.QtGui import QIcon
 
 from .dialogs import ConfirmationDialog
+from cells.models.document import CellModel
 
 
 class Track(Observation, QWidget):
@@ -17,7 +18,7 @@ class Track(Observation, QWidget):
         self.selected = False
         self.selectedCellIndex = -1
         self.cells = []
-        self._pasteBuffer = []
+        self._pasteBuffer = None
         self.editor = editor
 
         self.setAttribute(Qt.WA_StyledBackground)
@@ -45,27 +46,33 @@ class Track(Observation, QWidget):
         self.add_responder(events.view.main.RowMoveUp, self.rowMoveUpResponder)
         self.add_responder(events.view.main.RowMoveDown,
                            self.rowMoveDownResponder)
+        self.add_responder(events.view.main.RowCopy,
+                           self.rowCopyResponder)
+        self.add_responder(events.view.main.RowCut,
+                           self.rowCutResponder)
+        self.add_responder(events.view.main.RowPaste,
+                           self.rowPasteResponder)
 
     def rowAddResponder(self, e):
         self.addCell()
 
     def rowSelectUpResponder(self, e):
-        if not self.selected or len(self.cells) < 1:
+        if  len(self.cells) < 1:
             return
 
-        if not self.isThereSelectedCell():
-            self.selectRowAt(len(self.cells) - 1)
+        if not self.hasSelectedCell():
+            self.selectCellAt(len(self.cells) - 1)
         else:
-            self.selectRowAt(self.selectedCellIndex - 1)
+            self.selectCellAt(self.selectedCellIndex - 1)
 
     def rowSelectDownResponder(self, e):
-        if not self.selected or len(self.cells) < 1:
+        if  len(self.cells) < 1:
             return
 
-        if not self.isThereSelectedCell():
-            self.selectRowAt(0)
+        if not self.hasSelectedCell():
+            self.selectCellAt(0)
         else:
-            self.selectRowAt(self.selectedCellIndex + 1)
+            self.selectCellAt(self.selectedCellIndex + 1)
 
     def rowRemoveResponder(self, e):
         if self.selectedCellIndex != e.index:
@@ -77,31 +84,34 @@ class Track(Observation, QWidget):
         self.notify(events.view.track.CellRemove(self.index, e.index))
         for cell in self.cells[e.index:]:
             cell.index -= 1
-            
+
     def rowMoveUpResponder(self, e):
-        self.moveSelectedRowTo(self.selectedCellIndex - 1)
-    
+        self.moveSelectedCellTo(self.selectedCellIndex - 1)
+
     def rowMoveDownResponder(self, e):
-        self.moveSelectedRowTo(self.selectedCellIndex + 1)
-    
-    def moveSelectedRowTo(self, index):
-        if len(self.cells) < 2 or \
-                self.selectedCellIndex == index or \
-                not self.isThereSelectedCell() or \
-                not index in range(len(self.cells)) or \
-                not self.editor.hasSelectedTrack():
+        self.moveSelectedCellTo(self.selectedCellIndex + 1)
+
+    def rowCopyResponder(self, e):
+        if not self.hasSelectedCell():
             return
 
-        cell = self.cells.pop(self.selectedCellIndex)
-        self.cells.insert(index, cell)
-        self.layout().insertWidget(index + 1, cell)
-        cell.index = index
+        self._pasteBuffer = None
+        original = self.cells[self.selectedCellIndex]
+        self._pasteBuffer = original.serialize()
 
-        previous = self.cells[self.selectedCellIndex]
-        previous.index = self.selectedCellIndex
+    def rowCutResponder(self, e):
+        pass
 
-        self.notify(events.view.track.RowMove(self.index, self.selectedCellIndex, index))
-        self.selectedCellIndex = index
+    def rowPasteResponder(self, e):
+        if not self.editor.hasSelectedTrack() or \
+                self._pasteBuffer is None:
+            return
+
+        cell = self.addCell()
+        cell.deserialize(self._pasteBuffer)
+        pasteIndex = self.selectedCellIndex+1
+        self.selectCellAt(cell.index)
+        self.moveSelectedCellTo(pasteIndex)
 
     def addCell(self, notify=True):
         index = len(self.cells)
@@ -114,6 +124,25 @@ class Track(Observation, QWidget):
             self.notify(events.view.track.CellAdd(self.index, cell.name()))
 
         return cell
+
+    def moveSelectedCellTo(self, index):
+        if len(self.cells) < 2 or \
+                self.selectedCellIndex == index or \
+                not self.hasSelectedCell() or \
+                not index in range(len(self.cells)) or \
+                not self.editor.hasSelectedTrack():
+            return
+        cell = self.cells.pop(self.selectedCellIndex)
+        self.cells.insert(index, cell)
+        self.layout().insertWidget(index + 1, cell)
+        cell.index = index
+
+        previous = self.cells[self.selectedCellIndex]
+        previous.index = self.selectedCellIndex
+
+        self.notify(events.view.track.CellMove(
+            self.index, self.selectedCellIndex, index))
+        self.selectedCellIndex = index
 
     def setName(self, name):
         self.header.setName(name)
@@ -133,14 +162,19 @@ class Track(Observation, QWidget):
         self.selected = value
         self.header.setSelected(value)
 
-    def selectRowAt(self, index):
+    def selectCellAt(self, index):
         if self.selectedCellIndex == index:
             return
+        
+        if self.hasSelectedCell():
+            self.cells[self.selectedCellIndex].setSelected(False)
 
         self.selectedCellIndex = min(max(-1, index), len(self.cells))
-        self.notify(events.view.track.RowSelect(self.selectedCellIndex))
+        
+        if self.hasSelectedCell():
+            self.cells[self.selectedCellIndex].setSelected(True)
 
-    def isThereSelectedCell(self):
+    def hasSelectedCell(self):
         return self.selectedCellIndex in range(len(self.cells))
 
     def delete(self):
@@ -149,6 +183,11 @@ class Track(Observation, QWidget):
         [cell.unregister() for cell in self.cells]
         self.setParent(None)
         self.deleteLater()
+
+    def deserialize(self, model):
+        for cell in model.cells:
+            newCell = self.addCell(False)
+            newCell.deserialize(cell)
 
 
 class CellBase(Observation, QWidget):
@@ -235,6 +274,7 @@ class Header(CellBase):
 class Cell(CellBase):
     def __init__(self, track, subject, index):
         self.track = track
+        self._code = ""
 
         super().__init__(subject, index)
 
@@ -244,8 +284,6 @@ class Cell(CellBase):
                            self.editNameResponder)
         self.add_responder(events.view.track.Select,
                            self.trackSelectResponder)
-        self.add_responder(events.view.track.RowSelect,
-                           self.rowSelectResponder)
 
     def _initNameLabel(self):
         super()._initNameLabel()
@@ -261,22 +299,14 @@ class Cell(CellBase):
     def trackSelectResponder(self, e):
         self.updateStyle()
 
-    def rowSelectResponder(self, e):
-        if self.index == e.index:
-            self.setSelected(True)
-        else:
-            self.setSelected(False)
-        self.track.selectedCellIndex = e.index
-
     def setSelected(self, value):
         if value:
-            self.track.selectedCellIndex = self.index
             self.notify(events.view.track.CellSelected(
                 self.track.index, self.index))
         super().setSelected(value)
 
     def mousePressEvent(self, event):
-        self.track.selectRowAt(self.index)
+        self.track.selectCellAt(self.index)
         return super().mousePressEvent(event)
 
     def onEditingNameFinished(self):
@@ -303,3 +333,16 @@ class Cell(CellBase):
 
     def setEvaluatedStyle(self):
         self.setStyleSheet("background-color: #49967d")
+
+    def serialize(self):
+        return CellModel(self.name(), self.code())
+
+    def deserialize(self, model):
+        self.setName(model.name)
+        self.setCode(model.code)
+
+    def setCode(self, code):
+        self._code = code
+
+    def code(self):
+        return self._code

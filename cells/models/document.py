@@ -62,7 +62,7 @@ class Document(Observation, dict):
         self.add_responder(events.view.track.Remove,
                            self.track_remove_responder)
         self.add_responder(events.view.track.Move, self.track_move_responder)
-        self.add_responder(events.view.track.RowMove, self.row_move_responder)
+        self.add_responder(events.view.track.CellMove, self.cell_move_responder)
 
     def main_open_responder(self, e):
         self.open(e.path)
@@ -99,7 +99,7 @@ class Document(Observation, dict):
         self.model.tracks.insert(e.new_index, track)
         
     @notify_update
-    def row_move_responder(self, e):
+    def cell_move_responder(self, e):
         track = self.model.tracks[e.track_index]
         cell = track.cells.pop(e.index)
         track.cells.insert(e.new_index, cell)
