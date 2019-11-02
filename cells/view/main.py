@@ -83,7 +83,7 @@ class Main(QMainWindow, Observation):
         self._addMenuAction(rowSub, "Add", self.tr('Alt+Return'),
                             self.onRowAdd)
         self._addMenuAction(rowSub, "Remove",
-                            self.tr('Shift+Backspace'),
+                            self.tr('Alt+Backspace'),
                             self.onRowRemove)
         rowSub.addSeparator()
         self._addMenuAction(rowSub, "Select Up",

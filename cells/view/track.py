@@ -34,32 +34,14 @@ class Track(Observation, QWidget):
         self.setName(name)
 
         self.add_responder(events.view.main.RowAdd, self.rowAddResponder)
-        self.add_responder(events.view.main.RowRemove, self.rowRemoveResponder)
         self.add_responder(events.view.main.RowSelectUp,
                            self.rowSelectUpResponder)
         self.add_responder(events.view.main.RowSelectDown,
                            self.rowSelectDownResponder)
+        self.add_responder(events.view.track.RowRemove, self.rowRemoveResponder)
 
     def rowAddResponder(self, e):
         self.addCell()
-
-    def rowRemoveResponder(self, e):
-        if not self.isThereSelectedCell():
-            return
-
-        cell = self.cells[self.selectedCellIndex]
-        question = f"Do you really want to delete row?"
-        confirmation = ConfirmationDialog("Row Delete", question)
-        reply = confirmation.exec_()
-
-        if reply == QMessageBox.Yes:
-            cell.setParent(None)
-            # self.notify(events.view.track.Remove(self.selectedTrackIndex))
-            self.selectRowAt(self.selectedCellIndex-1)
-            # update indices
-            for n in range(self.selectedTrackIndex+1, self.numOfTracks()):
-                track = self.innerLayout.itemAt(n).widget()
-                track.setIndex(track.index - 1)
 
     def rowSelectUpResponder(self, e):
         if not self.selected or len(self.cells) < 1:
@@ -78,6 +60,17 @@ class Track(Observation, QWidget):
             self.selectRowAt(0)
         else:
             self.selectRowAt(self.selectedCellIndex + 1)
+
+    def rowRemoveResponder(self, e):
+        if self.selectedCellIndex != e.index:
+            return
+        
+        cell = self.cells.pop(e.index)
+        
+        cell.setParent(None)
+        self.notify(events.view.track.CellRemove(self.index, e.index))
+        for cell in self.cells[e.index:]:
+            cell.index -= 1
 
     def addCell(self, notify=True):
         index = len(self.cells)
@@ -235,7 +228,7 @@ class Cell(CellBase):
             self.setSelected(True)
         else:
             self.setSelected(False)
-
+            
     def setSelected(self, value):
         if value:
             self.track.selectedCellIndex = self.index
