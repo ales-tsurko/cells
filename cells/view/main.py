@@ -117,6 +117,11 @@ class Main(QMainWindow, Observation):
 
         editMenu.addSeparator()
 
+        self._addMenuAction(editMenu, "Clear Console",
+                            self.tr("Ctrl+k"), self.onConsoleClear)
+
+        editMenu.addSeparator()
+
         self._addMenuAction(editMenu, "Settings", QKeySequence.Preferences,
                             self.onSettings)
 
@@ -249,6 +254,9 @@ class Main(QMainWindow, Observation):
     def onCellClear(self, e):
         self.notify(events.view.main.CellClear())
 
+    def onConsoleClear(self, e):
+        self.notify(events.view.main.ConsoleClear())
+
     def onCellEdit(self, e):
         self.notify(events.view.main.CellEdit())
 
@@ -269,7 +277,7 @@ class Main(QMainWindow, Observation):
     def checkSave(self, e):
         if self.saved:
             return
-        
+
         confirmation = ConfirmationDialog(
             "Closing Document", "Do you want to save changes?",  True)
         reply = confirmation.exec_()

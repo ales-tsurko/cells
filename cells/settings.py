@@ -10,6 +10,7 @@ from cells.observation import Observation
 class ApplicationInfo:
     name = "Cells"
     author = "Ales Tsurko"
+    version = "0.1.0"
 
 
 class Settings(Observation, dict):

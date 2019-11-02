@@ -101,5 +101,9 @@ class CellEditName(NamedTuple):
     pass
 
 
+class ConsoleClear(NamedTuple):
+    pass
+
+
 class Close(NamedTuple):
     pass
