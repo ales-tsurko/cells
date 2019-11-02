@@ -267,6 +267,9 @@ class Main(QMainWindow, Observation):
         return super().closeEvent(e)
 
     def checkSave(self, e):
+        if self.saved:
+            return
+        
         confirmation = ConfirmationDialog(
             "Closing Document", "Do you want to save changes?",  True)
         reply = confirmation.exec_()
