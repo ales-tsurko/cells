@@ -39,7 +39,13 @@ class CellAdd(NamedTuple):
 class CellSelected(NamedTuple):
     track_index: int
     index: int
-    
+
+
+class CellEvaluate(NamedTuple):
+    track_index: int
+    index: int
+
+
 class CellClicked(NamedTuple):
     index: int
 

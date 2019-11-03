@@ -37,6 +37,8 @@ class Track(Observation, QWidget):
         self.setName(name)
 
         self.add_responder(events.view.main.RowAdd, self.rowAddResponder)
+        self.add_responder(events.view.main.RowEvaluate,
+                           self.rowEvaluateResponder)
         self.add_responder(events.view.main.RowSelectUp,
                            self.rowSelectUpResponder)
         self.add_responder(events.view.main.RowSelectDown,
@@ -57,6 +59,12 @@ class Track(Observation, QWidget):
 
     def rowAddResponder(self, e):
         self.addCell()
+
+    def rowEvaluateResponder(self, e):
+        if not self.hasSelectedCell():
+            return
+
+        self.cells[self.selectedCellIndex].evaluate()
 
     def rowSelectUpResponder(self, e):
         if len(self.cells) < 1:
@@ -328,6 +336,12 @@ class Cell(CellBase):
         self.notify(events.view.track.CellNameChanged(
             self.track.index, self.index, self.name()))
         return super().onEditingNameFinished()
+
+    def evaluate(self):
+        print("evaluate cell at track",
+              self.track.index, "with index", self.index)
+        self.notify(events.view.track.CellEvaluate(
+            self.track.index, self.index))
 
     def updateStyle(self):
         if self.track.selected and self.selected:
