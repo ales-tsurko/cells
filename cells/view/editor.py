@@ -150,7 +150,6 @@ class Editor(Observation, QScrollArea):
             return
 
         self.notify(events.view.track.RowRemove(track.selectedCellIndex))
-        track.selectCellAt(track.selectedCellIndex - 1)
 
     def cellSelectedResponder(self, e):
         self.ensureTrackVisible(self.selectedTrackIndex)

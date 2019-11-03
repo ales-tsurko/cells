@@ -176,6 +176,7 @@ class Track(Observation, QWidget):
         self.notify(events.view.track.CellRemove(self.index, index))
         for cell in self.cells[index:]:
             cell.index -= 1
+        self.selectCellAt(self.selectedCellIndex)
 
     def moveSelectedCellTo(self, index):
         if len(self.cells) < 2 or \
