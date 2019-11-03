@@ -85,9 +85,8 @@ class Editor(Observation, QScrollArea):
 
         if self.numOfTracks() > 0:
             firstTrack = self.trackAt(0)
-            for cell in firstTrack.cells:
-                new_cell = track.addCell()
-                new_cell.setSelected(cell.selected)
+            [track.addCell() for _ in firstTrack.cells]
+            track.selectCellAt(firstTrack.selectedCellIndex)
 
     def trackMoveLeftResponder(self, e):
         self.moveSelectedTrackTo(self.selectedTrackIndex - 1)
