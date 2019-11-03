@@ -413,3 +413,17 @@ class Cell(CellBase):
 
     def code(self):
         return self._code
+
+    def clear(self):
+        confirmation = ConfirmationDialog(
+            "Cell Clearing", "Do you really want to clear the selected cell?")
+        if confirmation.exec_() == QMessageBox.No:
+            return
+        
+        self.setName(str(self.index + 1))
+        self.setCode("")
+
+        self.notify(events.view.track.CellNameChanged(
+            self.track.index, self.index, self.name()))
+        self.notify(events.view.track.CellCodeChanged(
+            self.track.index, self.index, self.code()))

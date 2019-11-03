@@ -119,9 +119,10 @@ class Main(QMainWindow, Observation):
             "Alt+Shift+c"), self.onCellCopy)
         self._addMenuAction(cellSub, "Cut", self.tr(
             "Alt+Shift+x"), self.onCellCut)
-        self._addMenuAction(cellSub, "Cut", self.tr(
+        self._addMenuAction(cellSub, "Paste", self.tr(
             "Alt+Shift+v"), self.onCellPaste)
-
+        
+        editMenu.addSeparator()
         self._addMenuAction(editMenu, "Clear Console",
                             self.tr("Ctrl+k"), self.onConsoleClear)
 
