@@ -54,6 +54,12 @@ class Track(Observation, QWidget):
                            self.rowCutResponder)
         self.add_responder(events.view.main.RowPaste,
                            self.rowPasteResponder)
+        self.add_responder(events.view.main.CellCopy,
+                           self.cellCopyResponder)
+        self.add_responder(events.view.main.CellCut,
+                           self.cellCutResponder)
+        self.add_responder(events.view.main.CellPaste,
+                           self.cellPasteResponder)
         self.add_responder(events.view.track.CellClicked,
                            self.cellClickedResponder)
 
@@ -94,12 +100,8 @@ class Track(Observation, QWidget):
         self.moveSelectedCellTo(self.selectedCellIndex + 1)
 
     def rowCopyResponder(self, e):
-        if not self.hasSelectedCell():
-            return
-
-        self._pasteBuffer = None
-        source = self.cells[self.selectedCellIndex]
-        self._pasteBuffer = source.serialize()
+        if self.editor.hasSelectedTrack():
+            self.copySelectedCellIntoBuffer()
 
     def rowCutResponder(self, e):
         if not self.hasSelectedCell():
@@ -115,10 +117,32 @@ class Track(Observation, QWidget):
             return
 
         cell = self.addCell()
-        cell.deserialize(self._pasteBuffer)
+        cell.deserialize(self._pasteBuffer, True)
         pasteIndex = self.selectedCellIndex+1
         self.selectCellAt(cell.index)
         self.moveSelectedCellTo(pasteIndex)
+
+    def cellCopyResponder(self, e):
+        if not self.editor.hasSelectedTrack():
+            return
+
+        if (not self.selected and self._pasteBuffer is None) or \
+                self.selected:
+            self.copySelectedCellIntoBuffer()
+
+    def cellCutResponder(self, e):
+        if not self.hasSelectedCell():
+            return
+
+    def cellPasteResponder(self, e):
+        if not self.hasSelectedCell() or \
+                not self.editor.hasSelectedTrack() or \
+                not self.selected or \
+                self._pasteBuffer is None:
+            return
+
+        cell = self.cells[self.selectedCellIndex]
+        cell.deserialize(self._pasteBuffer, True)
 
     def cellClickedResponder(self, e):
         self.selectCellAt(e.index)
@@ -164,6 +188,14 @@ class Track(Observation, QWidget):
         self.notify(events.view.track.CellMove(
             self.index, self.selectedCellIndex, index))
         self.selectedCellIndex = index
+
+    def copySelectedCellIntoBuffer(self):
+        if not self.hasSelectedCell():
+            return
+
+        self._pasteBuffer = None
+        source = self.cells[self.selectedCellIndex]
+        self._pasteBuffer = source.serialize()
 
     def setName(self, name):
         self.header.setName(name)
@@ -366,9 +398,15 @@ class Cell(CellBase):
     def serialize(self):
         return CellModel(self.name(), self.code())
 
-    def deserialize(self, model):
+    def deserialize(self, model, notify=False):
         self.setName(model.name)
         self.setCode(model.code)
+
+        if notify:
+            self.notify(events.view.track.CellNameChanged(
+                self.track.index, self.index, model.name))
+            self.notify(events.view.track.CellCodeChanged(
+                self.track.index, self.index, model.code))
 
     def setCode(self, code):
         self._code = code

@@ -162,7 +162,7 @@ class Editor(Observation, QScrollArea):
             return
 
         track.cells[track.selectedCellIndex].evaluate()
-
+        
     def selectTrackAt(self, index):
         if self.selectedTrackIndex == index:
             return

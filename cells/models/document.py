@@ -59,6 +59,8 @@ class Document(Observation, dict):
                            self.track_name_changed_responder)
         self.add_responder(events.view.track.CellNameChanged,
                            self.cell_name_changed_responder)
+        self.add_responder(events.view.track.CellCodeChanged,
+                           self.cell_code_changed_responder)
         self.add_responder(events.view.track.Remove,
                            self.track_remove_responder)
         self.add_responder(events.view.track.Move, self.track_move_responder)
@@ -92,6 +94,12 @@ class Document(Observation, dict):
     @notify_update
     def cell_name_changed_responder(self, e):
         self.model.tracks[e.track_index].cells[e.index].name = e.name
+        
+    @notify_update
+    def cell_code_changed_responder(self, e):
+        track = self.model.tracks[e.track_index]
+        cell = track.cells[e.index]
+        cell.code = e.code
 
     @notify_update
     def track_move_responder(self, e):

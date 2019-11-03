@@ -114,8 +114,13 @@ class Main(QMainWindow, Observation):
                             self.onCellEvaluate)
         self._addMenuAction(cellSub, "Clear", self.tr('Backspace'),
                             self.onCellClear)
-
-        editMenu.addSeparator()
+        cellSub.addSeparator()
+        self._addMenuAction(cellSub, "Copy", self.tr(
+            "Alt+Shift+c"), self.onCellCopy)
+        self._addMenuAction(cellSub, "Cut", self.tr(
+            "Alt+Shift+x"), self.onCellCut)
+        self._addMenuAction(cellSub, "Cut", self.tr(
+            "Alt+Shift+v"), self.onCellPaste)
 
         self._addMenuAction(editMenu, "Clear Console",
                             self.tr("Ctrl+k"), self.onConsoleClear)
@@ -253,6 +258,15 @@ class Main(QMainWindow, Observation):
 
     def onCellClear(self, e):
         self.notify(events.view.main.CellClear())
+
+    def onCellCopy(self, e):
+        self.notify(events.view.main.CellCopy())
+        
+    def onCellCut(self, e):
+        self.notify(events.view.main.CellCut())
+        
+    def onCellPaste(self, e):
+        self.notify(events.view.main.CellPaste())
 
     def onConsoleClear(self, e):
         self.notify(events.view.main.ConsoleClear())

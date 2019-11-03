@@ -101,6 +101,18 @@ class CellEditName(NamedTuple):
     pass
 
 
+class CellCopy(NamedTuple):
+    pass
+
+
+class CellCut(NamedTuple):
+    pass
+
+
+class CellPaste(NamedTuple):
+    pass
+
+
 class ConsoleClear(NamedTuple):
     pass
 

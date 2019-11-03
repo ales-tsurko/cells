@@ -65,3 +65,9 @@ class CellNameChanged(NamedTuple):
     track_index: int
     index: int
     name: str
+
+
+class CellCodeChanged(NamedTuple):
+    track_index: int
+    index: int
+    code: str
