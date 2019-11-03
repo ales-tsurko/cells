@@ -10,9 +10,12 @@ class Settings(Observation, QDialog):
 
         self.setWindowTitle("Settings")
         self.setFixedSize(600, 400)
+        self.setModal(True)
         
         self.settings = SettingsModel(subject)
         
     def closeEvent(self, arg__1):
         self.unregister()
+        self.setParent(None)
+        self.deleteLater()
         return super().closeEvent(arg__1)

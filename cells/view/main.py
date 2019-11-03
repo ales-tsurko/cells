@@ -1,6 +1,7 @@
 from PySide2.QtGui import QKeySequence
 from PySide2.QtWidgets import (QFileDialog, QMainWindow, QMessageBox,
-                               QVBoxLayout, QWidget)
+                               QBoxLayout, QWidget)
+from PySide2.QtCore import Qt
 
 from cells import events
 from cells.observation import Observation
@@ -36,6 +37,7 @@ class Main(QMainWindow, Observation):
     def _createMenu(self):
         self._createFileMenu()
         self._createEditMenu()
+        self._createViewMenu()
 
     def _createFileMenu(self):
         fileMenu = self.menuBar().addMenu("File")
@@ -121,15 +123,29 @@ class Main(QMainWindow, Observation):
             "Alt+Shift+x"), self.onCellCut)
         self._addMenuAction(cellSub, "Paste", self.tr(
             "Alt+Shift+v"), self.onCellPaste)
-        
-        editMenu.addSeparator()
-        self._addMenuAction(editMenu, "Clear Console",
-                            self.tr("Ctrl+k"), self.onConsoleClear)
 
         editMenu.addSeparator()
 
         self._addMenuAction(editMenu, "Settings", QKeySequence.Preferences,
                             self.onSettings)
+
+    def _createViewMenu(self):
+        viewMenu = self.menuBar().addMenu("View")
+
+        consoleSub = viewMenu.addMenu("Console")
+
+        self._addMenuAction(consoleSub, "Clear",
+                            self.tr("Ctrl+k"), self.onConsoleClear)
+
+        consoleSub.addSeparator()
+        self._addMenuAction(consoleSub, "To Bottom",
+                            self.tr("Ctrl+1"), self.onConsoleToBottom)
+        self._addMenuAction(consoleSub, "To Right",
+                            self.tr("Ctrl+2"), self.onConsoleToRight)
+        self._addMenuAction(consoleSub, "To Top",
+                            self.tr("Ctrl+3"), self.onConsoleToTop)
+        self._addMenuAction(consoleSub, "To Left",
+                            self.tr("Ctrl+4"), self.onConsoleToLeft)
 
     def _addMenuAction(self, menu, name, shortcut, callback):
         newAct = menu.addAction(name)
@@ -138,13 +154,15 @@ class Main(QMainWindow, Observation):
 
     def _initCentralWidget(self):
         centralView = QWidget()
-        layout = QVBoxLayout()
-        editor = Editor(self.subject)
-        console = Console(self.subject)
+        layout = QBoxLayout(QBoxLayout.TopToBottom)
+        self.editor = Editor(self.subject)
+        self.console = Console(self.subject)
 
         layout.setSpacing(0)
-        layout.addWidget(editor)
-        layout.addWidget(console)
+        layout.addWidget(self.editor)
+        layout.addWidget(self.console)
+        layout.setStretchFactor(self.editor, 3)
+        layout.setStretchFactor(self.console, 1)
 
         centralView.setLayout(layout)
         centralView.layout().setContentsMargins(0, 0, 0, 0)
@@ -262,15 +280,35 @@ class Main(QMainWindow, Observation):
 
     def onCellCopy(self, e):
         self.notify(events.view.main.CellCopy())
-        
+
     def onCellCut(self, e):
         self.notify(events.view.main.CellCut())
-        
+
     def onCellPaste(self, e):
         self.notify(events.view.main.CellPaste())
 
     def onConsoleClear(self, e):
         self.notify(events.view.main.ConsoleClear())
+
+    def onConsoleToBottom(self, e):
+        self.centralWidget().layout().setDirection(QBoxLayout.TopToBottom)
+        self.centralWidget().layout().setStretchFactor(self.editor, 3)
+        self.centralWidget().layout().setStretchFactor(self.console, 1)
+
+    def onConsoleToLeft(self, e):
+        self.centralWidget().layout().setDirection(QBoxLayout.RightToLeft)
+        self.centralWidget().layout().setStretchFactor(self.editor, 5)
+        self.centralWidget().layout().setStretchFactor(self.console, 3)
+
+    def onConsoleToRight(self, e):
+        self.centralWidget().layout().setDirection(QBoxLayout.LeftToRight)
+        self.centralWidget().layout().setStretchFactor(self.editor, 5)
+        self.centralWidget().layout().setStretchFactor(self.console, 3)
+
+    def onConsoleToTop(self, e):
+        self.centralWidget().layout().setDirection(QBoxLayout.BottomToTop)
+        self.centralWidget().layout().setStretchFactor(self.editor, 3)
+        self.centralWidget().layout().setStretchFactor(self.console, 1)
 
     def onCellEdit(self, e):
         self.notify(events.view.main.CellEdit())

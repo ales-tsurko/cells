@@ -7,6 +7,7 @@ from PySide2.QtGui import QFontDatabase
 from cells.settings import ApplicationInfo
 
 from .main import Main
+from .code import Code
 from cells import events
 from cells.observation import Observation
 
@@ -37,6 +38,7 @@ class App(Observation):
         self.main.deleteLater()
         self.main = Main(self.subject)
         self.main.show()
+        Code(self.subject).exec_()
 
     def _init_responders(self):
         self.add_responder(events.view.main.FileNew,
