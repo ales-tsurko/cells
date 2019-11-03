@@ -77,15 +77,7 @@ class Track(Observation, QWidget):
             self.selectCellAt(self.selectedCellIndex + 1)
 
     def rowRemoveResponder(self, e):
-        if self.selectedCellIndex != e.index:
-            return
-
-        cell = self.cells.pop(e.index)
-
-        cell.setParent(None)
-        self.notify(events.view.track.CellRemove(self.index, e.index))
-        for cell in self.cells[e.index:]:
-            cell.index -= 1
+        self.removeCellAt(e.index)
 
     def rowMoveUpResponder(self, e):
         self.moveSelectedCellTo(self.selectedCellIndex - 1)
@@ -98,11 +90,16 @@ class Track(Observation, QWidget):
             return
 
         self._pasteBuffer = None
-        original = self.cells[self.selectedCellIndex]
-        self._pasteBuffer = original.serialize()
+        source = self.cells[self.selectedCellIndex]
+        self._pasteBuffer = source.serialize()
 
     def rowCutResponder(self, e):
-        pass
+        if not self.hasSelectedCell():
+            return
+
+        self.rowCopyResponder(e)
+        self.removeCellAt(self.selectedCellIndex)
+        self.selectCellAt(self.selectedCellIndex)
 
     def rowPasteResponder(self, e):
         if not self.editor.hasSelectedTrack() or \
@@ -129,6 +126,17 @@ class Track(Observation, QWidget):
             self.notify(events.view.track.CellAdd(self.index, cell.name()))
 
         return cell
+
+    def removeCellAt(self, index):
+        if self.selectedCellIndex != index:
+            return
+
+        cell = self.cells.pop(index)
+
+        cell.delete()
+        self.notify(events.view.track.CellRemove(self.index, index))
+        for cell in self.cells[index:]:
+            cell.index -= 1
 
     def moveSelectedCellTo(self, index):
         if len(self.cells) < 2 or \
@@ -168,9 +176,6 @@ class Track(Observation, QWidget):
         self.header.setSelected(value)
 
     def selectCellAt(self, index):
-        if self.selectedCellIndex == index:
-            return
-
         if self.hasSelectedCell():
             self.cells[self.selectedCellIndex].setSelected(False)
 
@@ -183,9 +188,9 @@ class Track(Observation, QWidget):
         return self.selectedCellIndex in range(len(self.cells))
 
     def delete(self):
+        [cell.delete() for cell in self.cells]
+        self.header.delete()
         self.unregister()
-        self.header.unregister()
-        [cell.unregister() for cell in self.cells]
         self.setParent(None)
         self.deleteLater()
 
@@ -250,6 +255,11 @@ class CellBase(Observation, QWidget):
 
     def name(self):
         return self.nameLabel.text()
+
+    def delete(self):
+        self.unregister()
+        self.setParent(None)
+        self.deleteLater()
 
 
 class Header(CellBase):
