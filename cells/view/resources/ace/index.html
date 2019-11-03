@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>ACE</title>
+    <style type="text/css" media="screen">
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+    @font-face {
+        font-family: 'fira_mono_regular';
+        src: url('fonts/firamono-regular-webfont.woff2') format('woff2'),
+             url('fonts/firamono-regular-webfont.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    .ace_tooltip {
+      font-family: 'fira_mono_regular';
+      font-size: 12px;
+      opacity: 0.7;
+      line-height: 16px;
+    }
+
+    #ace_settingsmenu, #kbshortcutmenu {
+      font-family: 'fira_mono_regular';
+      opacity: 0.8;
+      background-color: #000 !important;
+      box-shadow: none !important;
+      color: white !important;
+      font-size: 12px !important;
+      font-weight: normal !important;
+    }
+
+    #editor { 
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      font-family: 'fira_mono_regular'; 
+      line-height: 16px;
+      overflow: auto;
+    }
+    </style>
+  </head>
+  <body>
+
+    <div id="editor"></div>
+
+    <script src="ace-builds/src/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="ace-builds/src/ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+      ace.require("ace/ext/language_tools");
+      // don't change this variable name, it's exposed to Python
+      // or change it in code.py too
+      var editor = ace.edit("editor");
+      editor.getSession().setMode("ace/mode/supercollider");
+      editor.setTheme("ace/theme/tomorrow");
+      editor.getSession().setTabSize(2);
+      editor.setBehavioursEnabled(true);
+      editor.getSession().setUseSoftTabs(true);
+
+      // enable autocompletion and snippets
+      editor.setOptions({
+          enableBasicAutocompletion: true,
+          enableSnippets: true,
+          enableLiveAutocompletion: true
+      });
+
+      // switch edit mode
+      editor.commands.addCommand({
+        name: 'switchEditMode',
+        bindKey: {win: 'Ctrl-`', mac: 'Command-`'},
+        exec: function(editor) {
+          if (!editor.getKeyboardHandler().$id) {
+            editor.setKeyboardHandler("ace/keyboard/vim");
+          } else {
+            editor.setKeyboardHandler();
+          }
+        },
+        readOnly: true
+      });
+
+      // evaluation interface
+      // evaluate all
+      editor.commands.addCommand({
+        name: 'evaluateAll',
+        bindKey: {win: 'Ctrl-R', mac: 'Command-R'},
+        exec: function(editor) {
+          console.log("<-!code_evaluation_triggered!->"+editor.getValue());
+        },
+        readOnly: true
+      });
+
+      // evaluate selection or line
+      editor.commands.addCommand({
+        name: 'evaluateSelection',
+        bindKey: {win: 'Shift-Enter', mac: 'Shift-Enter'},
+        exec: function(editor) {
+          var selectedText = editor.session.getTextRange(editor.getSelectionRange());
+          if (selectedText.length > 0) {
+            // return selection
+            console.log("<-!selection_evaluation_triggered!->"+selectedText);
+          } else {
+            var currentLineNumber = editor.selection.getCursor().row;
+            var currentLineText = editor.session.getLine(currentLineNumber);
+            // return current line
+            console.log("<-!selection_evaluation_triggered!->"+currentLineText);
+          }
+        },
+        readOnly: true
+      });
+
+      // hard stop (Cmd-.)
+      editor.commands.addCommand({
+        name: 'hardStop',
+        bindKey: {win: 'Ctrl-.', mac: 'Command-.'},
+        exec: function(editor) {
+          console.log("<-!hard_stop_triggered!->");
+        },
+        readOnly: true
+      });
+
+      // show keyboard shortcuts
+      editor.commands.addCommand({
+        name: "showKeyboardShortcuts",
+        bindKey: {win: "Ctrl-Alt-H", mac: "Command-Alt-H"},
+        exec: function(editor) {
+          ace.config.loadModule("ace/ext/keybinding_menu", function(module) {
+            module.init(editor);
+            editor.showKeyboardShortcuts()
+          })
+        }
+      });
+    </script>
+  </body>
+</html>

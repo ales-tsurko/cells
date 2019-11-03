@@ -1,7 +1,7 @@
-import sys
 import os
+import sys
 
-from PySide2 import QtWidgets
+from PySide2.QtWidgets import QApplication
 from PySide2.QtGui import QFontDatabase
 
 from cells.settings import ApplicationInfo
@@ -12,6 +12,7 @@ from cells import events
 from cells.observation import Observation
 
 from rx.subject import Subject
+import cells.utility as utility
 
 
 class App(Observation):
@@ -19,11 +20,11 @@ class App(Observation):
         super().__init__(subject)
         self.subject = subject
 
-        self.app = QtWidgets.QApplication([])
+        self.app = QApplication(sys.argv)
         self.app.setApplicationName(ApplicationInfo.name)
         self.app.setApplicationDisplayName(ApplicationInfo.name)
 
-        font_path = os.path.join(get_resources_path(),
+        font_path = os.path.join(utility.viewResourcesDir(),
                                  "fonts", "FiraCode_2", "FiraCode-VF.ttf")
         QFontDatabase.addApplicationFont(font_path)
         self.main = Main(subject)
@@ -38,7 +39,6 @@ class App(Observation):
         self.main.deleteLater()
         self.main = Main(self.subject)
         self.main.show()
-        Code(self.subject).exec_()
 
     def _init_responders(self):
         self.add_responder(events.view.main.FileNew,
@@ -51,7 +51,3 @@ class App(Observation):
         self.subject.on_next(events.app.Quit())
 
         sys.exit(res)
-
-
-def get_resources_path():
-    return os.path.join(os.path.dirname(__file__), "resources")

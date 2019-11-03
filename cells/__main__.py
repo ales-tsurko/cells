@@ -1,5 +1,7 @@
+import sys
+
 from rx.subject import Subject
-from .view.app import App
+from cells.view.app import App
 
 
 def main():

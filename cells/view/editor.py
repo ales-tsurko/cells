@@ -50,6 +50,8 @@ class Editor(Observation, QScrollArea):
                           self.cellEvaluateResponder)
         self.add_responder(events.view.main.CellClear,
                            self.cellClearResponder)
+        self.add_responder(events.view.main.CellEdit,
+                           self.cellEditResponder)
 
     def documentOpenResponder(self, e):
         self.clear()
@@ -175,6 +177,17 @@ class Editor(Observation, QScrollArea):
             return
         
         track.cells[track.selectedCellIndex].clear()
+
+    def cellEditResponder(self, e):
+        if not self.hasSelectedTrack():
+            return
+        
+        track = self.trackAt(self.selectedTrackIndex)
+        
+        if not track.hasSelectedCell():
+            return
+        
+        track.cells[track.selectedCellIndex].edit()
         
     def selectTrackAt(self, index):
         if self.selectedTrackIndex == index:
