@@ -87,10 +87,11 @@ class Editor(Observation, QScrollArea):
         self.innerLayout.addWidget(track)
         self.notify(events.view.track.New(name))
 
-        if self.numOfTracks() > 0:
+        if self.numOfTracks() > 1:
             firstTrack = self.trackAt(0)
             [track.addCell() for _ in firstTrack.cells]
             track.selectCellAt(firstTrack.selectedCellIndex)
+            not firstTrack.isPasteBufferEmpty() and track.fillPasteBuffer()
 
     def trackMoveLeftResponder(self, e):
         self.moveSelectedTrackTo(self.selectedTrackIndex - 1)
