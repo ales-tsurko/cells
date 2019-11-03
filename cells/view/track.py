@@ -52,12 +52,14 @@ class Track(Observation, QWidget):
                            self.rowCutResponder)
         self.add_responder(events.view.main.RowPaste,
                            self.rowPasteResponder)
+        self.add_responder(events.view.track.CellClicked,
+                           self.cellClickedResponder)
 
     def rowAddResponder(self, e):
         self.addCell()
 
     def rowSelectUpResponder(self, e):
-        if  len(self.cells) < 1:
+        if len(self.cells) < 1:
             return
 
         if not self.hasSelectedCell():
@@ -66,7 +68,7 @@ class Track(Observation, QWidget):
             self.selectCellAt(self.selectedCellIndex - 1)
 
     def rowSelectDownResponder(self, e):
-        if  len(self.cells) < 1:
+        if len(self.cells) < 1:
             return
 
         if not self.hasSelectedCell():
@@ -112,6 +114,9 @@ class Track(Observation, QWidget):
         pasteIndex = self.selectedCellIndex+1
         self.selectCellAt(cell.index)
         self.moveSelectedCellTo(pasteIndex)
+
+    def cellClickedResponder(self, e):
+        self.selectCellAt(e.index)
 
     def addCell(self, notify=True):
         index = len(self.cells)
@@ -165,12 +170,12 @@ class Track(Observation, QWidget):
     def selectCellAt(self, index):
         if self.selectedCellIndex == index:
             return
-        
+
         if self.hasSelectedCell():
             self.cells[self.selectedCellIndex].setSelected(False)
 
         self.selectedCellIndex = min(max(-1, index), len(self.cells))
-        
+
         if self.hasSelectedCell():
             self.cells[self.selectedCellIndex].setSelected(True)
 
@@ -306,7 +311,7 @@ class Cell(CellBase):
         super().setSelected(value)
 
     def mousePressEvent(self, event):
-        self.track.selectCellAt(self.index)
+        self.notify(events.view.track.CellClicked(self.index))
         return super().mousePressEvent(event)
 
     def onEditingNameFinished(self):

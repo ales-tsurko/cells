@@ -27,6 +27,10 @@ class Move(NamedTuple):
     new_index: int
 
 
+class RowRemove(NamedTuple):
+    index: int
+
+
 class CellAdd(NamedTuple):
     track_index: int
     name: str
@@ -35,9 +39,8 @@ class CellAdd(NamedTuple):
 class CellSelected(NamedTuple):
     track_index: int
     index: int
-
-
-class RowRemove(NamedTuple):
+    
+class CellClicked(NamedTuple):
     index: int
 
 
