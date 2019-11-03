@@ -134,6 +134,11 @@ class Track(Observation, QWidget):
         if not self.hasSelectedCell():
             return
 
+        self.cellCopyResponder(e)
+
+        if self.selected:
+            self.cells[self.selectedCellIndex].clear(False)
+
     def cellPasteResponder(self, e):
         if not self.hasSelectedCell() or \
                 not self.editor.hasSelectedTrack() or \
@@ -414,12 +419,14 @@ class Cell(CellBase):
     def code(self):
         return self._code
 
-    def clear(self):
-        confirmation = ConfirmationDialog(
-            "Cell Clearing", "Do you really want to clear the selected cell?")
-        if confirmation.exec_() == QMessageBox.No:
-            return
-        
+    def clear(self, confirm=True):
+        if confirm:
+            confirmation = ConfirmationDialog(
+                "Cell Clearing",
+                "Do you really want to clear the selected cell?")
+            if confirmation.exec_() == QMessageBox.No:
+                return
+
         self.setName(str(self.index + 1))
         self.setCode("")
 
