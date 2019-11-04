@@ -52,7 +52,7 @@
     <script src="ace-builds/src/ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
     <script>
       ace.require("ace/ext/language_tools");
-      // don't change this variable name, it's exposed to Python
+      // IMPORTANT: don't change this variable name, it's exposed to Python
       // or change it in code.py too
       var editor = ace.edit("editor");
       editor.getSession().setMode("ace/mode/supercollider");
@@ -66,20 +66,6 @@
           enableBasicAutocompletion: true,
           enableSnippets: true,
           enableLiveAutocompletion: true
-      });
-
-      // switch edit mode
-      editor.commands.addCommand({
-        name: 'switchEditMode',
-        bindKey: {win: 'Ctrl-`', mac: 'Command-`'},
-        exec: (editor) => {
-          if (!editor.getKeyboardHandler().$id) {
-            editor.setKeyboardHandler("ace/keyboard/vim");
-          } else {
-            editor.setKeyboardHandler();
-          }
-        },
-        readOnly: true
       });
 
       // evaluation interface
@@ -96,18 +82,18 @@
       // evaluate selection or line
       editor.commands.addCommand({
         name: 'evaluateSelection',
-        bindKey: {win: 'Shift-Enter', mac: 'Shift-Enter'},
+        bindKey: {win: 'Shift-Return', mac: 'Shift-Return'},
         exec: (editor) => {
-          var selectedText = editor.session.getTextRange(editor.getSelectionRange());
+          let selectedText = editor.session.getTextRange(editor.getSelectionRange());
           if (selectedText.length > 0) {
             // return selection
-            console.log("<-!selection_evaluation_triggered!->"+selectedText);
-          } else {
-            var currentLineNumber = editor.selection.getCursor().row;
-            var currentLineText = editor.session.getLine(currentLineNumber);
-            // return current line
-            console.log("<-!selection_evaluation_triggered!->"+currentLineText);
+            console.log("<-!code_evaluation_triggered!->"+selectedText);
+            return;
           }
+          let currentLineNumber = editor.selection.getCursor().row;
+          let currentLineText = editor.session.getLine(currentLineNumber);
+          // return current line
+          console.log("<-!code_evaluation_triggered!->"+currentLineText);
         },
         readOnly: true
       });
@@ -123,6 +109,10 @@
           })
         }
       });
+
+      // a hack to disable settings
+      delete editor.commands.byName['showSettingsMenu'];
+      delete editor.commands.commandKeyBinding['cmd-,']
     </script>
   </body>
 </html>

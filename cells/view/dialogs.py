@@ -3,8 +3,8 @@ from PySide2.QtWidgets import QMessageBox
 class ConfirmationDialog(QMessageBox):
     def __init__(self, title, message, hasCancel=False):
         super().__init__()
-        self.setWindowTitle(title)
-        self.setText(message)
+        self.setText(title)
+        self.setInformativeText(message)
         buttons = QMessageBox.Yes | QMessageBox.No
         if hasCancel:
             buttons |= QMessageBox.Cancel

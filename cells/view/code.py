@@ -6,6 +6,7 @@ from PySide2.QtWidgets import QDialog, QBoxLayout, QShortcut
 from PySide2.QtCore import Qt, QUrl
 from PySide2.QtGui import QKeySequence
 from cells.observation import Observation
+from cells import events
 import cells.utility as utility
 
 
@@ -22,7 +23,7 @@ class Code(Observation, QDialog):
         self.webView = QWebEngineView()
         self.webView.setContextMenuPolicy(Qt.NoContextMenu)
 
-        page = Ace(cell)
+        page = Ace(cell, subject)
         self.webView.setPage(page)
 
         layout = QBoxLayout(QBoxLayout.TopToBottom)
@@ -44,9 +45,10 @@ class Code(Observation, QDialog):
         else:
             self.setCodeAsync(self.cell.code())
         self.webView.page().runJavaScript("editor.focus();")
+        self.webView.page().runJavaScript("console.log(editor.commands);")
 
     def setCodeAsync(self, code):
-        self.webView.page().runJavaScript(f"editor.getSession().getDocument().setValue('{code}');")
+        self.webView.page().runJavaScript(f"editor.session.setValue('{code}');")
 
     def reject(self):
         self.close()
@@ -63,10 +65,13 @@ class Code(Observation, QDialog):
         self.deleteLater()
 
 
-class Ace(QWebEnginePage):
-    def __init__(self, cell):
+class Ace(Observation, QWebEnginePage):
+    def __init__(self, cell, subject):
         self.cell = cell
-        super().__init__()
+        
+        QWebEnginePage.__init__(self)
+        Observation.__init__(self, subject)
+        
         aceUrl = QUrl.fromLocalFile(os.path.join(
             utility.viewResourcesDir(), "ace", "index.html"))
         self.load(aceUrl)
@@ -77,4 +82,18 @@ class Ace(QWebEnginePage):
         # so here is implementations of callbacks only
 
     def javaScriptConsoleMessage(self, level, message, lineNumber, sourceID):
-        print(level, message, lineNumber, sourceID)
+        self.parseConsoleOutput(message)
+    
+    def parseConsoleOutput(self, message):
+        print(message)
+        if message.startswith(Token.evaluate):
+            self.evaluate(message[len(Token.evaluate):])
+    
+    def evaluate(self, code):
+        print("send evaluate")
+        print(code)
+        self.notify(events.view.code.Evaluate(code))
+        
+
+class Token:
+    evaluate = "<-!code_evaluation_triggered!->"

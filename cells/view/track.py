@@ -425,7 +425,7 @@ class Cell(CellBase):
 
     def edit(self):
         code = Code(self, self.subject)
-        self.setCode(code.exec_())
+        code.exec_()
 
     def setCode(self, code):
         print("set code", code)
