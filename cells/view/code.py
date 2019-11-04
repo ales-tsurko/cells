@@ -2,8 +2,9 @@ import os
 import time
 
 from PySide2.QtWebEngineWidgets import QWebEngineView, QWebEnginePage
-from PySide2.QtWidgets import QDialog, QBoxLayout
+from PySide2.QtWidgets import QDialog, QBoxLayout, QShortcut
 from PySide2.QtCore import Qt, QUrl
+from PySide2.QtGui import QKeySequence
 from cells.observation import Observation
 import cells.utility as utility
 
@@ -20,10 +21,8 @@ class Code(Observation, QDialog):
 
         self.webView = QWebEngineView()
         self.webView.setContextMenuPolicy(Qt.NoContextMenu)
-        aceUrl = QUrl.fromLocalFile(os.path.join(
-            utility.viewResourcesDir(), "ace", "index.html"))
+
         page = Ace(cell)
-        page.load(aceUrl)
         self.webView.setPage(page)
 
         layout = QBoxLayout(QBoxLayout.TopToBottom)
@@ -31,18 +30,23 @@ class Code(Observation, QDialog):
         layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
+        QShortcut(QKeySequence("Alt+Esc"), self, self.close)
 
         self.setMinimumSize(500, 300)
 
         self.webView.page().loadFinished.connect(self.onLoadFinished)
 
     def onLoadFinished(self, ok):
-        self.setCodeAsync(self.cell.code())
+        tip = "Press Alt+Esc to close the editor.\\nPress Ctrl/Cmd+Alt+H to view all shortcuts."
+        if len(self.cell.code()) < 1:
+            self.setCodeAsync(tip)
+            self.webView.page().runJavaScript("editor.selectAll();")
+        else:
+            self.setCodeAsync(self.cell.code())
+        self.webView.page().runJavaScript("editor.focus();")
 
     def setCodeAsync(self, code):
-        self.webView.page().runJavaScript(f"""
-                             editor.getSession().getDocument().setValue("{code}");
-                             """)
+        self.webView.page().runJavaScript(f"editor.getSession().getDocument().setValue('{code}');")
 
     def reject(self):
         self.close()
@@ -63,7 +67,10 @@ class Ace(QWebEnginePage):
     def __init__(self, cell):
         self.cell = cell
         super().__init__()
-        # I'd like to move all the work python<->js communication here
+        aceUrl = QUrl.fromLocalFile(os.path.join(
+            utility.viewResourcesDir(), "ace", "index.html"))
+        self.load(aceUrl)
+        # I'd like to move all the python<->js communication here
         # but when I'm starting to implement something more than just
         # virtual functions, I get:
         # ERROR:mach_port_broker.mm(193)] Unknown process  is sending Mach IPC messages!

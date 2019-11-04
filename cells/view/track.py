@@ -75,7 +75,7 @@ class Track(Observation, QWidget):
 
     def rowSelectUpResponder(self, e):
         if len(self.cells) < 1 or \
-            not self.editor.hasSelectedTrack():
+                not self.editor.hasSelectedTrack():
             return
 
         if not self.hasSelectedCell():
@@ -85,7 +85,7 @@ class Track(Observation, QWidget):
 
     def rowSelectDownResponder(self, e):
         if len(self.cells) < 1 or \
-            not self.editor.hasSelectedTrack():
+                not self.editor.hasSelectedTrack():
             return
 
         if not self.hasSelectedCell():
@@ -247,10 +247,10 @@ class Track(Observation, QWidget):
         for cell in model.cells:
             newCell = self.addCell(False)
             newCell.deserialize(cell)
-            
+
     def isPasteBufferEmpty(self):
         return self._pasteBuffer is None
-    
+
     def fillPasteBuffer(self):
         self._pasteBuffer = CellModel(str(len(self.cells) + 1), "")
 

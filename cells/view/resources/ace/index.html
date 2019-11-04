@@ -72,7 +72,7 @@
       editor.commands.addCommand({
         name: 'switchEditMode',
         bindKey: {win: 'Ctrl-`', mac: 'Command-`'},
-        exec: function(editor) {
+        exec: (editor) => {
           if (!editor.getKeyboardHandler().$id) {
             editor.setKeyboardHandler("ace/keyboard/vim");
           } else {
@@ -86,8 +86,8 @@
       // evaluate all
       editor.commands.addCommand({
         name: 'evaluateAll',
-        bindKey: {win: 'Ctrl-R', mac: 'Command-R'},
-        exec: function(editor) {
+        bindKey: {win: 'Ctrl-Return', mac: 'Command-Return'},
+        exec: (editor) => {
           console.log("<-!code_evaluation_triggered!->"+editor.getValue());
         },
         readOnly: true
@@ -97,7 +97,7 @@
       editor.commands.addCommand({
         name: 'evaluateSelection',
         bindKey: {win: 'Shift-Enter', mac: 'Shift-Enter'},
-        exec: function(editor) {
+        exec: (editor) => {
           var selectedText = editor.session.getTextRange(editor.getSelectionRange());
           if (selectedText.length > 0) {
             // return selection
@@ -112,21 +112,11 @@
         readOnly: true
       });
 
-      // hard stop (Cmd-.)
-      editor.commands.addCommand({
-        name: 'hardStop',
-        bindKey: {win: 'Ctrl-.', mac: 'Command-.'},
-        exec: function(editor) {
-          console.log("<-!hard_stop_triggered!->");
-        },
-        readOnly: true
-      });
-
       // show keyboard shortcuts
       editor.commands.addCommand({
         name: "showKeyboardShortcuts",
         bindKey: {win: "Ctrl-Alt-H", mac: "Command-Alt-H"},
-        exec: function(editor) {
+        exec: (editor) => {
           ace.config.loadModule("ace/ext/keybinding_menu", function(module) {
             module.init(editor);
             editor.showKeyboardShortcuts()
