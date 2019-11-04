@@ -38,17 +38,22 @@ class Code(Observation, QDialog):
         self.webView.page().loadFinished.connect(self.onLoadFinished)
 
     def onLoadFinished(self, ok):
-        tip = "Press Alt+Esc to close the editor.\\nPress Ctrl/Cmd+Alt+H to view all shortcuts."
         if len(self.cell.code()) < 1:
-            self.setCodeAsync(tip)
+            self.setCodeAsync(self.tip())
             self.webView.page().runJavaScript("editor.selectAll();")
         else:
             self.setCodeAsync(self.cell.code())
         self.webView.page().runJavaScript("editor.focus();")
-        self.webView.page().runJavaScript("console.log(editor.commands);")
+
+    def tip(self):
+        return "Shift+Enter    - evaluate line or selection\\n" +\
+               "Ctrl/Cmd+Enter - evaluate the whole buffer\\n" +\
+               "Alt+Esc        - close the editor\\n" +\
+               "Ctrl/Cmd+Alt+H - view all shortcuts"
 
     def setCodeAsync(self, code):
-        self.webView.page().runJavaScript(f"editor.session.setValue('{code}');")
+        self.webView.page().runJavaScript(
+            f"editor.session.setValue('{code}');")
 
     def reject(self):
         self.close()
@@ -68,10 +73,10 @@ class Code(Observation, QDialog):
 class Ace(Observation, QWebEnginePage):
     def __init__(self, cell, subject):
         self.cell = cell
-        
+
         QWebEnginePage.__init__(self)
         Observation.__init__(self, subject)
-        
+
         aceUrl = QUrl.fromLocalFile(os.path.join(
             utility.viewResourcesDir(), "ace", "index.html"))
         self.load(aceUrl)
@@ -83,17 +88,17 @@ class Ace(Observation, QWebEnginePage):
 
     def javaScriptConsoleMessage(self, level, message, lineNumber, sourceID):
         self.parseConsoleOutput(message)
-    
+
     def parseConsoleOutput(self, message):
         print(message)
         if message.startswith(Token.evaluate):
             self.evaluate(message[len(Token.evaluate):])
-    
+
     def evaluate(self, code):
         print("send evaluate")
         print(code)
         self.notify(events.view.code.Evaluate(code))
-        
+
 
 class Token:
     evaluate = "<-!code_evaluation_triggered!->"
