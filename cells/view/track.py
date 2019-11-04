@@ -6,7 +6,6 @@ from PySide2.QtWidgets import (QLineEdit, QMessageBox, QVBoxLayout,
 from PySide2.QtGui import QIcon
 
 from .dialogs import ConfirmationDialog
-from .code import Code
 from cells.models.document import CellModel
 
 
@@ -424,12 +423,15 @@ class Cell(CellBase):
                 self.track.index, self.index, model.code))
 
     def edit(self):
-        code = Code(self, self.subject)
-        code.exec_()
+        view = self.track.editor.codeView
+        view.setCell(self)
+        view.show()
 
-    def setCode(self, code):
-        print("set code", code)
+    def setCode(self, code, notify=False):
         self._code = code
+        if notify:
+            self.notify(events.view.track.CellCodeChanged(
+                self.track.index, self.index, self.code()))
 
     def code(self):
         return self._code

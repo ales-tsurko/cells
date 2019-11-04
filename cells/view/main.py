@@ -322,6 +322,9 @@ class Main(QMainWindow, Observation):
         if reply == QMessageBox.Cancel:
             e.ignore()
             return
+        
+        self.editor.close()
+        self.console.close()
 
         self.notify(events.view.main.Close())
         self.unregister()

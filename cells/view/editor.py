@@ -6,6 +6,7 @@ from cells.observation import Observation
 
 from .track import Track
 from .dialogs import ConfirmationDialog
+from .code import CodeView
 
 
 class Editor(Observation, QScrollArea):
@@ -14,6 +15,8 @@ class Editor(Observation, QScrollArea):
         QScrollArea.__init__(self)
 
         self.setFrameShape(QFrame.NoFrame)
+        
+        self.codeView = CodeView(subject)
 
         self.selectedTrackIndex = -1
 
@@ -233,5 +236,6 @@ class Editor(Observation, QScrollArea):
         return self.innerLayout.itemAt(index).widget()
 
     def closeEvent(self, e):
+        self.codeView.delete()
         self.unregister()
         return super().closeEvent(e)

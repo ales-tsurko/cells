@@ -7,7 +7,6 @@ from PySide2.QtGui import QFontDatabase
 from cells.settings import ApplicationInfo
 
 from .main import Main
-from .code import Code
 from cells import events
 from cells.observation import Observation
 
