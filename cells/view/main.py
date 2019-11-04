@@ -193,7 +193,7 @@ class Main(QMainWindow, Observation):
 
         fname = QFileDialog.getOpenFileName(self,
                                             "Open Project",
-                                            filter="Cells Files (*.cells)")
+                                            filter="Cells Document (*.cells)")
 
         if fname[0]:
             self.notify(events.view.main.FileOpen(fname[0]))
@@ -210,7 +210,7 @@ class Main(QMainWindow, Observation):
     def onFileSaveAs(self, e):
         fname = QFileDialog.getSaveFileName(self,
                                             "Save Project",
-                                            filter="Cells Files (*.cells)")
+                                            filter="Cells Document (*.cells)")
 
         if fname[0]:
             self.notify(events.view.main.FileSaveAs(fname[0]))

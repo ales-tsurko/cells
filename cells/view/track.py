@@ -2,8 +2,8 @@ from cells.observation import Observation
 from cells import events
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (QLineEdit, QMessageBox, QVBoxLayout,
-                               QWidget, QAction)
-from PySide2.QtGui import QIcon
+                               QWidget, QAction, QLabel)
+from PySide2.QtGui import QFont
 
 from .dialogs import ConfirmationDialog
 from cells.models.document import CellModel
@@ -346,6 +346,7 @@ class Cell(CellBase):
         self._code = ""
 
         super().__init__(subject, index)
+        self._initContentPreview()
 
         self.layout().setAlignment(Qt.AlignTop)
 
@@ -359,6 +360,19 @@ class Cell(CellBase):
         self.nameLabel.setAlignment(Qt.AlignLeft)
         self.nameLabel.setStyleSheet(
             "background-color: rgba(255, 255, 255, 0.1); border: none;")
+
+    def _initContentPreview(self):
+        self.preview = QLabel()
+
+        font = QFont("Fira Code", 12)
+        font.setWeight(QFont.Normal)
+        self.preview.setFont(font)
+        self.preview.setFocusPolicy(Qt.NoFocus)
+        self.preview.setWindowFlags(Qt.FramelessWindowHint)
+        self.preview.setStyleSheet("margin: 10;")
+        self.preview.setContextMenuPolicy(Qt.NoContextMenu)
+        
+        self.layout().addWidget(self.preview)
 
     def editNameResponder(self, e):
         if self.selected and self.track.selected:
@@ -384,8 +398,6 @@ class Cell(CellBase):
         return super().onEditingNameFinished()
 
     def evaluate(self):
-        print("evaluate cell at track",
-              self.track.index, "with index", self.index)
         self.notify(events.view.track.CellEvaluate(
             self.track.index, self.index))
 
@@ -429,6 +441,7 @@ class Cell(CellBase):
 
     def setCode(self, code, notify=False):
         self._code = code
+        self.preview.setText(code)
         if notify:
             self.notify(events.view.track.CellCodeChanged(
                 self.track.index, self.index, self.code()))
@@ -445,9 +458,19 @@ class Cell(CellBase):
                 return
 
         self.setName(str(self.index + 1))
-        self.setCode("")
+        self.setCode("", True)
 
         self.notify(events.view.track.CellNameChanged(
             self.track.index, self.index, self.name()))
-        self.notify(events.view.track.CellCodeChanged(
-            self.track.index, self.index, self.code()))
+
+    def mouseDoubleClickEvent(self, event):
+        self.edit()
+        return super().mouseDoubleClickEvent(event)
+
+    def delete(self):
+        self.track.editor.codeView.close()
+        return super().delete()
+
+    def closeEvent(self, event):
+        self.track.editor.codeView.close()
+        return super().closeEvent(event)

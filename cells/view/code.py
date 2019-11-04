@@ -24,8 +24,11 @@ class CodeView(Observation, QWebEngineView):
         self.setWindowModality(Qt.ApplicationModal)
 
         self.page().loadFinished.connect(self.onLoadFinished)
+        self.setWindowFlags(Qt.Tool | Qt.WindowTitleHint | Qt.CustomizeWindowHint |
+                            Qt.WindowCloseButtonHint | Qt.WindowMaximizeButtonHint)
+        self.setWindowFlag(Qt.WindowMinimizeButtonHint, False)
 
-        QShortcut(QKeySequence("Alt+Esc"), self, self.close)
+        QShortcut(QKeySequence("Ctrl+w"), self, self.close)
 
     def onLoadFinished(self, ok):
         self.loadCell()
@@ -33,6 +36,7 @@ class CodeView(Observation, QWebEngineView):
     def setCell(self, cell):
         self.cell = cell
         self.page().cell = cell
+        self.setWindowTitle(self.cell.track.name() + " | " + self.cell.name())
         self.loadCell()
 
     def loadCell(self):
@@ -57,7 +61,7 @@ class CodeView(Observation, QWebEngineView):
     def tip(self):
         return "Shift+Enter    - evaluate line or selection\n" +\
                "Ctrl/Cmd+Enter - evaluate the whole buffer\n" +\
-               "Alt+Esc        - close the editor\n" +\
+               "Ctrl/Cmd+W     - close the editor\n" +\
                "Ctrl/Cmd+Alt+H - view all shortcuts"
 
     def paintEvent(self, event):
@@ -96,6 +100,9 @@ class Ace(Observation, QWebEnginePage):
         self.parseConsoleOutput(message)
 
     def parseConsoleOutput(self, message):
+        if self.cell is None:
+            return
+
         if message.startswith(Token.evaluate):
             self.evaluate(message[len(Token.evaluate):])
         elif message.startswith(Token.getContent):

@@ -1,4 +1,4 @@
-from PySide2.QtWidgets import QFrame, QTextEdit
+from PySide2.QtWidgets import QFrame, QPlainTextEdit
 from PySide2.QtGui import QFont
 
 from cells.observation import Observation
@@ -6,10 +6,10 @@ from cells.settings import ApplicationInfo
 from cells import events
 
 
-class Console(Observation, QTextEdit):
+class Console(Observation, QPlainTextEdit):
     def __init__(self, subject):
         Observation.__init__(self, subject)
-        QTextEdit.__init__(self)
+        QPlainTextEdit.__init__(self)
         self.setReadOnly(True)
         self.setMinimumHeight(200)
         self.setFrameShape(QFrame.NoFrame)
@@ -23,13 +23,13 @@ class Console(Observation, QTextEdit):
 
     def sayHello(self):
         hello = ApplicationInfo.name + " v" + str(ApplicationInfo.version)
-        self.append(hello)
+        self.appendPlainText(hello)
 
     def consoleClearResponder(self, e):
         self.clear()
-
+        
     def clear(self):
-        self.setText("")
+        self.document().clear()
 
     def closeEvent(self, e):
         self.unregister()
