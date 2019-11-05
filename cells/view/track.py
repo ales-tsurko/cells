@@ -6,7 +6,7 @@ from PySide2.QtWidgets import (QLineEdit, QMessageBox, QVBoxLayout,
 from PySide2.QtGui import QFont
 
 from .dialogs import ConfirmationDialog
-from cells.models.document import CellModel
+from cells.model import CellModel
 from .code import CodeDelegate
 
 
@@ -278,7 +278,7 @@ class Track(Observation, QWidget, metaclass=FinalMeta):
 
     def deserialize(self, model):
         self.setName(model.name)
-        self.setCode(model.setup_code)
+        self.setCode(model.template.setup_code)
         for cell in model.cells:
             newCell = self.addCell(False)
             newCell.deserialize(cell)

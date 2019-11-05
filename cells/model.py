@@ -1,10 +1,18 @@
 import os
+import glob
+from uuid import uuid4
+from time import time
 from dataclasses import dataclass, field
 from typing import List
 
+from appdirs import user_data_dir
 from dataclasses_json import dataclass_json
+
 from cells import events
 from cells.observation import Observation
+from cells.settings import ApplicationInfo
+
+TRACK_TEMPLATE_EXT = ".ctt"
 
 
 @dataclass_json
@@ -16,10 +24,21 @@ class CellModel:
 
 @dataclass_json
 @dataclass
+class TrackTemplateModel:
+    backend_name: str = field(default="")
+    icon_path: str = field(default="")
+    setup_code: str = field(default="")
+    run_command: str = field(default="")
+    input_idicator: str = field(default="")
+    description: str = field(default="")
+
+
+@dataclass_json
+@dataclass
 class TrackModel:
     name: str
     cells: List[CellModel]
-    setup_code: str = field(default = "")
+    template: TrackTemplateModel = field(default=TrackTemplateModel())
 
 
 @dataclass_json
@@ -43,6 +62,7 @@ class Document(Observation, dict):
         Observation.__init__(self, subject)
 
         self.model = DocumentModel("New Document", [], None)
+        self.track_template_manager = TrackTemplateManager(self, subject)
         self.notify(events.document.New)
 
         # main view events
@@ -98,7 +118,7 @@ class Document(Observation, dict):
     @notify_update
     def track_setup_code_changed_responder(self, e):
         track = self.model.tracks[e.index]
-        track.setup_code = e.code
+        track.template.setup_code = e.code
 
     @notify_update
     def cell_name_changed_responder(self, e):
@@ -128,9 +148,9 @@ class Document(Observation, dict):
     def open(self, path):
         with open(path, "r") as f:
             try:
-                self.model.path = path
-                self.update_name()
+                self.update_name_from_path(path)
                 self.model = DocumentModel.from_json(f.read())
+                self.model.path = path
                 self.notify(events.document.Open(self.model))
             except TypeError as e:
                 print(e)
@@ -141,13 +161,58 @@ class Document(Observation, dict):
         with open(path, "w+") as f:
             try:
                 self.model.path = path
-                self.update_name()
+                self.update_name_from_path(path)
                 f.write(self.model.to_json())
             except TypeError as e:
                 print(e)
                 self.notify(events.document.Error(self.model,
                                                   "Can't save file"))
 
-    def update_name(self):
-        base = os.path.basename(self.model.path)
+    def update_name_from_path(self, path):
+        base = os.path.basename(path)
         self.model.name, _ = os.path.splitext(base)
+
+
+class TrackTemplateManager(Observation):
+    def __init__(self, document, subject):
+        super().__init__(subject)
+
+        self.templates = []
+        self.document = document
+
+        self.read_dir(standard_track_template_dir())
+
+    def read_dir(self, path):
+        self.templates = [self.read(p) for p in sorted(glob.glob(
+            os.path.join(path, "*" + TRACK_TEMPLATE_EXT)))]
+
+    def read(self, path):
+        with open(path, "r") as f:
+            try:
+                return TrackTemplateModel.from_json(f.read())
+            except TypeError as e:
+                print(e)
+                self.notify(events.document.Error(self.document.model,
+                                                  f"Can't read track template {path}."))
+
+    def save_new(self, template):
+        with open(self.new_template_path(), "w+") as f:
+            try:
+                f.write(template.to_json())
+            except TypeError as e:
+                print(e)
+                self.notify(events.document.Error(self.document.model,
+                                                  "Can't save track template file."))
+
+    def new_template_path(self):
+        file_name = str(int(time() * 10)) + "-" + \
+            str(uuid4()) + TRACK_TEMPLATE_EXT
+        return os.path.join(standard_track_template_dir(), file_name)
+
+
+def standard_track_template_dir():
+    data_dir = user_data_dir(ApplicationInfo.name, ApplicationInfo.author)
+    templates_dir = os.path.join(data_dir, "track_templates")
+    not os.path.exists(templates_dir) and os.makedirs(templates_dir)
+
+    return templates_dir

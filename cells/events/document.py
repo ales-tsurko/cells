@@ -1,6 +1,6 @@
 from typing import NamedTuple
 
-from cells.models.document import DocumentModel
+from cells.model import DocumentModel
 
 
 class New(NamedTuple):

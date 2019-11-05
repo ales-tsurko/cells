@@ -51,7 +51,7 @@ I'm going to finish the v1.0.0-beta until November, 19.
 For the next version I'm going to rewrite it in Rust with all the good 
 development practice applied (testing, code quality, low coupled design etc.)
 
-I'm also thinking of next features:
+I'm also thinking of the next features:
 
 - more color themes, maybe user color themes support
 - project templates

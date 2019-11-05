@@ -10,7 +10,7 @@ from .console import Console
 from .editor import Editor
 from .settings import Settings
 from .dialogs import ConfirmationDialog
-from cells.models.document import Document
+from cells.model import Document
 
 
 class Main(QMainWindow, Observation):
@@ -78,7 +78,7 @@ class Main(QMainWindow, Observation):
                             self.tr('Shift+l'),
                             self.onTrackMoveRight)
         trackSub.addSeparator()
-        self._addMenuAction(trackSub, "Edit Setup Code", self.tr('Shift+e'),
+        self._addMenuAction(trackSub, "Setup", self.tr('Shift+e'),
                             self.onEditSetupCode)
 
         rowSub = editMenu.addMenu("Row")
