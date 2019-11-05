@@ -15,7 +15,7 @@ class Editor(Observation, QScrollArea):
         QScrollArea.__init__(self)
 
         self.setFrameShape(QFrame.NoFrame)
-        
+
         self.codeView = CodeView(subject)
 
         self.selectedTrackIndex = -1
@@ -50,11 +50,13 @@ class Editor(Observation, QScrollArea):
         self.add_responder(events.view.track.CellSelected,
                            self.cellSelectedResponder)
         self.add_responder(events.view.main.CellEvaluate,
-                          self.cellEvaluateResponder)
+                           self.cellEvaluateResponder)
         self.add_responder(events.view.main.CellClear,
                            self.cellClearResponder)
         self.add_responder(events.view.main.CellEdit,
                            self.cellEditResponder)
+        self.add_responder(events.view.main.TrackEditSetupCode,
+                           self.trackEditSetupCodeResponder)
 
     def documentOpenResponder(self, e):
         self.clear()
@@ -150,7 +152,7 @@ class Editor(Observation, QScrollArea):
             return
 
         confirmation = ConfirmationDialog(
-            "Row Deletion", "Do you really want to delete selected row?")
+            "Delete Row", "Do you really want to delete selected row?")
         if confirmation.exec_() == QMessageBox.No:
             return
 
@@ -169,29 +171,36 @@ class Editor(Observation, QScrollArea):
             return
 
         track.cells[track.selectedCellIndex].evaluate()
-        
+
     def cellClearResponder(self, e):
         if not self.hasSelectedTrack():
             return
-        
+
         track = self.trackAt(self.selectedTrackIndex)
-        
+
         if not track.hasSelectedCell():
             return
-        
+
         track.cells[track.selectedCellIndex].clear()
 
     def cellEditResponder(self, e):
         if not self.hasSelectedTrack():
             return
-        
+
         track = self.trackAt(self.selectedTrackIndex)
-        
+
         if not track.hasSelectedCell():
             return
-        
+
         track.cells[track.selectedCellIndex].edit()
+            
+    def trackEditSetupCodeResponder(self, e):
+        if not self.hasSelectedTrack():
+            return
         
+        track = self.trackAt(self.selectedTrackIndex)
+        track.editSetupCode()
+
     def selectTrackAt(self, index):
         if self.selectedTrackIndex == index:
             return

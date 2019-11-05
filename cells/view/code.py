@@ -1,4 +1,5 @@
 import os
+from abc import ABC, abstractmethod
 
 from PySide2.QtWebEngineWidgets import QWebEngineView, QWebEnginePage
 from PySide2.QtWidgets import QShortcut
@@ -10,13 +11,13 @@ import cells.utility as utility
 
 
 class CodeView(Observation, QWebEngineView):
-    def __init__(self, subject, cell=None):
-        self.cell = cell
+    def __init__(self, subject, delegate=None):
+        self.delegate = delegate
 
         Observation.__init__(self, subject)
         QWebEngineView.__init__(self)
 
-        page = Ace(cell, subject)
+        page = Ace(delegate, subject)
         self.setPage(page)
         self.setMinimumSize(500, 300)
 
@@ -31,23 +32,23 @@ class CodeView(Observation, QWebEngineView):
         QShortcut(QKeySequence("Ctrl+w"), self, self.close)
 
     def onLoadFinished(self, ok):
-        self.loadCell()
+        self.loadDelegate()
 
-    def setCell(self, cell):
-        self.cell = cell
-        self.page().cell = cell
-        self.setWindowTitle(self.cell.track.name() + " | " + self.cell.name())
-        self.loadCell()
+    def setDelegate(self, delegate):
+        self.delegate = delegate
+        self.page().delegate = delegate
+        self.setWindowTitle(self.delegate.codeWindowTitle())
+        self.loadDelegate()
 
-    def loadCell(self):
-        if self.cell is None:
+    def loadDelegate(self):
+        if self.delegate is None:
             return
 
-        if len(self.cell.code()) < 1:
+        if len(self.delegate.code()) < 1:
             self.setCodeAsync(self.tip())
             self.page().runJavaScript("editor.selectAll();")
         else:
-            self.setCodeAsync(self.cell.code())
+            self.setCodeAsync(self.delegate.code())
         self.page().runJavaScript("editor.focus();")
 
     def setCodeAsync(self, code):
@@ -81,8 +82,8 @@ class CodeView(Observation, QWebEngineView):
 
 
 class Ace(Observation, QWebEnginePage):
-    def __init__(self, cell, subject):
-        self.cell = cell
+    def __init__(self, delegate, subject):
+        self.delegate = delegate
 
         QWebEnginePage.__init__(self)
         Observation.__init__(self, subject)
@@ -100,7 +101,7 @@ class Ace(Observation, QWebEnginePage):
         self.parseConsoleOutput(message)
 
     def parseConsoleOutput(self, message):
-        if self.cell is None:
+        if self.delegate is None:
             return
 
         if message.startswith(Token.evaluate):
@@ -112,9 +113,24 @@ class Ace(Observation, QWebEnginePage):
         self.notify(events.view.code.Evaluate(code))
 
     def getContent(self, content):
-        self.cell is not None and self.cell.setCode(content, True)
+        self.delegate is not None and self.delegate.setCode(content, True)
 
 
 class Token:
     evaluate = "<-!code_evaluation_triggered!->"
     getContent = "<-!get_content_triggered!->"
+
+
+class CodeDelegate(ABC):
+    
+    @abstractmethod
+    def setCode(self, code, notify):
+        pass
+    
+    @abstractmethod
+    def code(self):
+        return ""
+    
+    @abstractmethod
+    def codeWindowTitle(self):
+        return ""

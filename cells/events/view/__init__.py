@@ -1,3 +1,3 @@
-__all__ = ['code', 'main', 'editor', 'track']
+__all__ = ['code', 'main', 'track']
 
 from . import *

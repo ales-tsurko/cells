@@ -19,6 +19,7 @@ class CellModel:
 class TrackModel:
     name: str
     cells: List[CellModel]
+    setup_code: str = field(default = "")
 
 
 @dataclass_json
@@ -57,6 +58,8 @@ class Document(Observation, dict):
                            self.cell_remove_responder)
         self.add_responder(events.view.track.NameChanged,
                            self.track_name_changed_responder)
+        self.add_responder(events.view.track.SetupCodeChanged,
+                           self.track_setup_code_changed_responder)
         self.add_responder(events.view.track.CellNameChanged,
                            self.cell_name_changed_responder)
         self.add_responder(events.view.track.CellCodeChanged,
@@ -64,14 +67,15 @@ class Document(Observation, dict):
         self.add_responder(events.view.track.Remove,
                            self.track_remove_responder)
         self.add_responder(events.view.track.Move, self.track_move_responder)
-        self.add_responder(events.view.track.CellMove, self.cell_move_responder)
+        self.add_responder(events.view.track.CellMove,
+                           self.cell_move_responder)
 
     def main_open_responder(self, e):
         self.open(e.path)
 
     def main_save_responder(self, e):
         self.save(e.path)
-        
+
     @notify_update
     def track_new_responder(self, e):
         track = TrackModel(e.name, [])
@@ -82,7 +86,7 @@ class Document(Observation, dict):
     def cell_add_responder(self, e):
         cell = CellModel(e.name, "")
         self.model.tracks[e.track_index].cells.append(cell)
-        
+
     @notify_update
     def cell_remove_responder(self, e):
         del self.model.tracks[e.track_index].cells[e.index]
@@ -92,9 +96,14 @@ class Document(Observation, dict):
         self.model.tracks[e.index].name = e.name
 
     @notify_update
+    def track_setup_code_changed_responder(self, e):
+        track = self.model.tracks[e.index]
+        track.setup_code = e.code
+
+    @notify_update
     def cell_name_changed_responder(self, e):
         self.model.tracks[e.track_index].cells[e.index].name = e.name
-        
+
     @notify_update
     def cell_code_changed_responder(self, e):
         track = self.model.tracks[e.track_index]
@@ -105,7 +114,7 @@ class Document(Observation, dict):
     def track_move_responder(self, e):
         track = self.model.tracks.pop(e.index)
         self.model.tracks.insert(e.new_index, track)
-        
+
     @notify_update
     def cell_move_responder(self, e):
         track = self.model.tracks[e.track_index]

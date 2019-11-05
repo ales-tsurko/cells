@@ -7,9 +7,14 @@ from PySide2.QtGui import QFont
 
 from .dialogs import ConfirmationDialog
 from cells.models.document import CellModel
+from .code import CodeDelegate
 
 
-class Track(Observation, QWidget):
+class FinalMeta(type(QWidget), type(CodeDelegate)):
+    pass
+
+
+class Track(Observation, QWidget, metaclass=FinalMeta):
     def __init__(self, editor, subject, index, name):
         Observation.__init__(self, subject)
         QWidget.__init__(self)
@@ -20,6 +25,7 @@ class Track(Observation, QWidget):
         self.cells = []
         self._pasteBuffer = None
         self.editor = editor
+        self._setupCode = ""
 
         self.setAttribute(Qt.WA_StyledBackground)
         self.setStyleSheet("background-color: rgba(0, 0, 0, 0.5);")
@@ -205,6 +211,34 @@ class Track(Observation, QWidget):
         source = self.cells[self.selectedCellIndex]
         self._pasteBuffer = source.serialize()
 
+    def editSetupCode(self):
+        view = self.editor.codeView
+        view.setDelegate(self)
+        view.show()
+
+    def setCode(self, code, notify=False):
+        self._setupCode = code
+        if not notify:
+            return
+
+        self.notify(events.view.track.SetupCodeChanged(
+            self.index, self.code()))
+
+        confirmation = ConfirmationDialog(
+            "Restart Interpreter",
+            "Do you want to restart track's " +
+                "interpreter to evaluate the " +
+                "setup code?")
+        if confirmation.exec_() == QMessageBox.Yes:
+            self.notify(events.view.track.InterpreterRestart(
+                self.index, self.code()))
+
+    def code(self):
+        return self._setupCode
+
+    def codeWindowTitle(self):
+        return self.name() + " | Setup"
+
     def setName(self, name):
         self.header.setName(name)
 
@@ -243,6 +277,8 @@ class Track(Observation, QWidget):
         self.deleteLater()
 
     def deserialize(self, model):
+        self.setName(model.name)
+        self.setCode(model.setup_code)
         for cell in model.cells:
             newCell = self.addCell(False)
             newCell.deserialize(cell)
@@ -340,7 +376,7 @@ class Header(CellBase):
         self.setStyleSheet("background-color: grey;")
 
 
-class Cell(CellBase):
+class Cell(CellBase, metaclass=FinalMeta):
     def __init__(self, track, subject, index):
         self.track = track
         self._code = ""
@@ -371,7 +407,7 @@ class Cell(CellBase):
         self.preview.setWindowFlags(Qt.FramelessWindowHint)
         self.preview.setStyleSheet("margin: 10;")
         self.preview.setContextMenuPolicy(Qt.NoContextMenu)
-        
+
         self.layout().addWidget(self.preview)
 
     def editNameResponder(self, e):
@@ -436,7 +472,7 @@ class Cell(CellBase):
 
     def edit(self):
         view = self.track.editor.codeView
-        view.setCell(self)
+        view.setDelegate(self)
         view.show()
 
     def setCode(self, code, notify=False):
@@ -449,10 +485,13 @@ class Cell(CellBase):
     def code(self):
         return self._code
 
+    def codeWindowTitle(self):
+        return self.track.name() + " | " + self.name()
+
     def clear(self, confirm=True):
         if confirm:
             confirmation = ConfirmationDialog(
-                "Cell Clearing",
+                "Clear Cell",
                 "Do you really want to clear the selected cell?")
             if confirmation.exec_() == QMessageBox.No:
                 return

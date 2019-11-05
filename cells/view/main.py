@@ -77,6 +77,9 @@ class Main(QMainWindow, Observation):
         self._addMenuAction(trackSub, "Move Right",
                             self.tr('Shift+l'),
                             self.onTrackMoveRight)
+        trackSub.addSeparator()
+        self._addMenuAction(trackSub, "Edit Setup Code", self.tr('Shift+e'),
+                            self.onEditSetupCode)
 
         rowSub = editMenu.addMenu("Row")
         self._addMenuAction(rowSub, "Evaluate", self.tr('Ctrl+Return'),
@@ -221,6 +224,9 @@ class Main(QMainWindow, Observation):
         settings = Settings(self.subject)
         settings.exec_()
 
+    def onEditSetupCode(self, e):
+        self.notify(events.view.main.TrackEditSetupCode())
+
     def onTrackAdd(self, e):
         self.notify(events.view.main.TrackNew())
 
@@ -322,7 +328,7 @@ class Main(QMainWindow, Observation):
         if reply == QMessageBox.Cancel:
             e.ignore()
             return
-        
+
         self.editor.close()
         self.console.close()
 
@@ -335,7 +341,7 @@ class Main(QMainWindow, Observation):
             return
 
         confirmation = ConfirmationDialog(
-            "Closing Document", "Do you want to save changes?",  True)
+            "Close Document", "Do you want to save changes?",  True)
         reply = confirmation.exec_()
 
         if reply == QMessageBox.Cancel:

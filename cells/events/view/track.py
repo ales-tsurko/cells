@@ -10,6 +10,16 @@ class NameChanged(NamedTuple):
     name: str
 
 
+class SetupCodeChanged(NamedTuple):
+    index: int
+    code: str
+
+
+class InterpreterRestart(NamedTuple):
+    track_index: int
+    setup_code: str
+
+
 class Remove(NamedTuple):
     index: int
 
