@@ -36,12 +36,12 @@ working prototype though, developed with live performance stability in mind.
 
 After I'll finish the programm, these things still have to be done for the v1.0.0:
 
-* [ ] website
-* [ ] documentation
 * [ ] theming
 * [ ] packaging/deployment configuration
+* [ ] documentation
+* [ ] website
 
-I'm going to finish the v1.0-beta until November, 19.
+I'm going to finish the v1.0.0-beta until November, 19.
 
 
 
