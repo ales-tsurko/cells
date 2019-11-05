@@ -10,7 +10,7 @@ Live coder's editor/IDE. Use SuperCollider, Python, Tidal Cycles, Node.js etc. i
 
 You need Python and [poetry](https://github.com/sdispater/poetry).
 
-First, you need to install the dependencies:
+First, you need to install dependencies:
 ```
 poetry install
 ```
