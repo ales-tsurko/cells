@@ -8,6 +8,7 @@ from PySide2.QtGui import QKeySequence
 from cells.observation import Observation
 from cells import events
 import cells.utility as utility
+from cells.settings import Settings
 
 
 class CodeView(Observation, QWebEngineView):
@@ -16,6 +17,8 @@ class CodeView(Observation, QWebEngineView):
 
         Observation.__init__(self, subject)
         QWebEngineView.__init__(self)
+        self.settings = Settings(subject)
+        self.settings.open()
 
         page = Ace(delegate, subject)
         self.setPage(page)
@@ -30,9 +33,16 @@ class CodeView(Observation, QWebEngineView):
         self.setWindowFlag(Qt.WindowMinimizeButtonHint, False)
 
         QShortcut(QKeySequence("Ctrl+w"), self, self.close)
+        
+        self.add_responder(events.settings.Save, self.settingsSaveResponder)
 
     def onLoadFinished(self, ok):
         self.loadDelegate()
+        self.loadSettings()
+    
+    def settingsSaveResponder(self, e):
+        self.settings = e.settings
+        self.loadSettings()
 
     def setDelegate(self, delegate):
         self.delegate = delegate
@@ -51,6 +61,21 @@ class CodeView(Observation, QWebEngineView):
             self.setCodeAsync(self.delegate.code())
         self.page().runJavaScript("editor.focus();")
 
+    def setTheme(self, name):
+        aceName = self.asAceProperty(name)
+        self.page().runJavaScript(f"editor.setTheme('ace/theme/{aceName}');")
+    
+    def setKeybindings(self, name):
+        aceName = self.asAceProperty(name)
+        self.page().runJavaScript(f"editor.setKeyboardHandler('ace/keyboard/{aceName}');")
+    
+    def setMode(self, name):
+        aceName = self.asAceProperty(name)
+        self.page().runJavaScript(f"editor.session.setMode('ace/mode/{aceName}');")
+    
+    def asAceProperty(self, name):
+        return name.lower().replace(" ", "_")
+
     def setCodeAsync(self, code):
         self.page().runJavaScript(
             f"editor.session.setValue({repr(code)});")
@@ -64,9 +89,10 @@ class CodeView(Observation, QWebEngineView):
                "Ctrl/Cmd+Enter - evaluate the whole buffer\n" +\
                "Ctrl/Cmd+W     - close the editor\n" +\
                "Ctrl/Cmd+Alt+H - view all shortcuts"
-
-    def paintEvent(self, event):
-        return super().paintEvent(event)
+    
+    def loadSettings(self):
+        self.setTheme(self.settings['editor'].get('theme'))
+        self.setKeybindings(self.settings['editor'].get('keybindings'))
 
     def delete(self):
         self.page().unregister()
@@ -79,6 +105,7 @@ class CodeView(Observation, QWebEngineView):
     def closeEvent(self, event):
         self.postContent()
         return super().closeEvent(event)
+    
 
 
 class Ace(Observation, QWebEnginePage):

@@ -21,9 +21,11 @@ class Settings(Observation, dict):
         self.path = self._init_path()
         self.open()
 
-        self.add_responder(events.app.Quit, self.app_quit_responder)
+        # self.add_responder(events.app.Quit, self.app_quit_responder)
 
-        #  self.setdefault("foo", 12)
+        self.setdefault("editor", {})
+        self['editor'].setdefault("theme", "Gruvbox")
+        self['editor'].setdefault("keybindings", "Sublime")
 
         self.notify(events.settings.Load(self))
 
@@ -40,11 +42,11 @@ class Settings(Observation, dict):
         super().__setattr__(name, value)
         self.notify(events.settings.Update(self))
 
-    def app_quit_responder(self, e):
-        self.save()
+    # def app_quit_responder(self, e):
+    #     self.save()
 
     def open(self):
-        with open(self.path, "w+") as f:
+        with open(self.path, "r") as f:
             self.update(toml.load(f))
 
     def save(self):
