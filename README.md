@@ -1,6 +1,6 @@
 # Cells
 
-Live coder's editor/IDE. Use SuperCollider, Python, Tidal Cycles etc. in
+Live coder's editor/IDE. Use SuperCollider, Python, Tidal Cycles, Node.js etc. in
  the same project.
 
 
