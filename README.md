@@ -8,7 +8,7 @@ Live coder's editor/IDE. Use SuperCollider, Python, Tidal Cycles etc. in
 
 ## Build
 
-You need Python 3.7> and [poetry](https://github.com/sdispater/poetry).
+You need Python and [poetry](https://github.com/sdispater/poetry).
 
 First, you need to install the dependencies:
 ```
