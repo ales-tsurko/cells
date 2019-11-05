@@ -25,7 +25,7 @@ poetry run cells
 
 ## Status
 
-### Version 1.0
+### Version 1.0.0
 
 It's ~90% ready for alpha. But there are some important points:
 
@@ -34,7 +34,7 @@ at a high level, without going deep into details. And without tests. And with
 imperfect code quality... So the first version is going to be more like a prototype. But ready-to-use
 working prototype though, developed with live performance stability in mind.
 
-After I'll finish the programm, these things still have to be done for the v1.0:
+After I'll finish the programm, these things still have to be done for the v1.0.0:
 
 * [ ] website
 * [ ] documentation
