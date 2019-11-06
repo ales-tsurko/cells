@@ -1,7 +1,8 @@
 # Cells
 
-Live coder's editor/IDE. Use SuperCollider, Python, Tidal Cycles, Node.js etc. in
- the same project.
+Cells is a live coding environment. It allows you to organize and run
+code snippets for interpretted programming languages. That means SuperCollider,
+Python, Tidal Cycles, Node.js etc. can be mixed in the same project.
 
 
 
