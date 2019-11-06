@@ -63,6 +63,10 @@ class Editor(Observation, QScrollArea):
                            self.cellEditResponder)
         self.add_responder(events.view.main.TrackSetup,
                            self.trackSetupResponder)
+        self.add_responder(events.view.main.TrackSaveAsTemplate,
+                           self.trackSaveAsTemplateResponder)
+        self.add_responder(events.track.TrackTemplateSaved,
+                           self.trackTemplateSavedResponder)
 
     def documentOpenResponder(self, e):
         self.clear()
@@ -208,6 +212,18 @@ class Editor(Observation, QScrollArea):
         track = self.trackAt(self.selectedTrackIndex)
         track.edit()
 
+    def trackSaveAsTemplateResponder(self, e):
+        if not self.hasSelectedTrack():
+            return
+
+        self.trackAt(self.selectedTrackIndex).saveAsTemplate()
+
+    def trackTemplateSavedResponder(self, e):
+        msgBox = QMessageBox()
+        msgBox.setText("Track Template Saved Succesfully")
+        msgBox.setDetailedText(f"Path: {e.path}\n" + repr(e.template))
+        msgBox.exec()
+
     def selectTrackAt(self, index):
         if self.selectedTrackIndex == index:
             return
@@ -268,6 +284,7 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         QWidget.__init__(self)
 
         self.delegate = None
+        self.descriptionMaxLen = 500
 
         layout = QVBoxLayout()
         self.setLayout(layout)
@@ -398,7 +415,8 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
 
     def closeEvent(self, event):
         if self.delegate is not None:
-            self.delegate.template.description = self.description.toPlainText()
+            self.delegate.template.description = self.description.toPlainText()[
+                :self.descriptionMaxLen]
 
         self.codeView.close()
 

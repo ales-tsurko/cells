@@ -85,6 +85,9 @@ class Main(QMainWindow, Observation):
                             self.onTrackSetup)
         self._addMenuAction(trackSub, "Save as Template", self.tr(""),
                             self.onTrackSaveAsTemplate)
+        trackSub.addSeparator() 
+        self._addMenuAction(trackSub, "Restart Interpreter", self.tr("Ctrl+Shift+R"),
+                            self.onTrackRestartInterpreter)
 
         rowSub = editMenu.addMenu("Row")
         self._addMenuAction(rowSub, "Evaluate", self.tr('Ctrl+Return'),
@@ -258,6 +261,9 @@ class Main(QMainWindow, Observation):
         
     def onTrackSaveAsTemplate(self, e):
         self.notify(events.view.main.TrackSaveAsTemplate())
+        
+    def onTrackRestartInterpreter(self, e):
+        self.notify(events.view.main.TrackRestartInterpreter())
 
     def onRowEvaluate(self, e):
         self.notify(events.view.main.RowEvaluate())

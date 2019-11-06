@@ -32,6 +32,14 @@ class TrackTemplateModel:
     description: str = field(default="")
     editor_mode: str = field(default="plain text")
 
+    def __repr__(self):
+        return f"Backend Name: {self.backend_name}\n" +\
+               f"Run Command: {self.run_command}\n" +\
+               f"Prompt Indicator: {self.prompt_indicator}\n" +\
+               f"Editor Mode: {self.editor_mode}\n" +\
+               f"Description: {self.description}\n" +\
+               f"Setup Code: {self.setup_code}"
+
 
 @dataclass_json
 @dataclass
@@ -65,7 +73,6 @@ class Document(Observation, dict):
         self.track_template_manager = TrackTemplateManager(self, subject)
         self.notify(events.document.New)
 
-        # main view events
         self.add_responder(events.view.main.FileOpen, self.main_open_responder)
         self.add_responder(events.view.main.FileSave, self.main_save_responder)
         self.add_responder(events.view.main.FileSaveAs,
@@ -80,6 +87,8 @@ class Document(Observation, dict):
                            self.track_name_changed_responder)
         self.add_responder(events.view.track.TemplateUpdated,
                            self.track_template_updated_responder)
+        self.add_responder(events.view.track.SaveAsTemplate,
+                           self.track_save_as_template_responder)
         self.add_responder(events.view.track.CellNameChanged,
                            self.cell_name_changed_responder)
         self.add_responder(events.view.track.CellCodeChanged,
@@ -119,6 +128,10 @@ class Document(Observation, dict):
     def track_template_updated_responder(self, e):
         track = self.model.tracks[e.index]
         track.template = e.template
+
+    @notify_update
+    def track_save_as_template_responder(self, e):
+        self.track_template_manager.save_new(e.template)
 
     @notify_update
     def cell_name_changed_responder(self, e):
@@ -199,6 +212,7 @@ class TrackTemplateManager(Observation):
         with open(self.new_template_path(), "w+") as f:
             try:
                 f.write(template.to_json())
+                self.notify(events.track.TrackTemplateSaved(f.name, template))
             except TypeError as e:
                 print(e)
                 self.notify(events.document.Error(self.document.model,

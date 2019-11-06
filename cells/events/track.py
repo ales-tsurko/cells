@@ -1,7 +1,12 @@
 from typing import NamedTuple
 
-from cells.model import TrackModel
+from cells.model import TrackModel, TrackTemplateModel
 
 
 class New(NamedTuple):
     track: TrackModel
+
+
+class TrackTemplateSaved(NamedTuple):
+    path: str
+    template: TrackTemplateModel

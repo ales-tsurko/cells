@@ -225,6 +225,9 @@ class Track(Observation, QWidget):
             self.notify(events.view.track.InterpreterRestart(
                 self.index, self.template))
 
+    def saveAsTemplate(self):
+        self.notify(events.view.track.SaveAsTemplate(self.template))
+
     def setName(self, name):
         self.header.setName(name)
 

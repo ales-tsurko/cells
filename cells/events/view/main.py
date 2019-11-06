@@ -57,6 +57,10 @@ class TrackSaveAsTemplate(NamedTuple):
     pass
 
 
+class TrackRestartInterpreter(NamedTuple):
+    pass
+
+
 class RowAdd(NamedTuple):
     pass
 
