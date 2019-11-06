@@ -55,8 +55,11 @@ class Main(QMainWindow, Observation):
         editMenu = self.menuBar().addMenu("Edit")
 
         trackSub = editMenu.addMenu("Track")
-        self._addMenuAction(trackSub, "Add", self.tr('Ctrl+t'),
-                            self.onTrackAdd)
+        self._addMenuAction(trackSub, "New", self.tr('Ctrl+t'),
+                            self.onTrackNew)
+        self._addMenuAction(trackSub, "New From Template",
+                            self.tr("Ctrl+Shift+t"),
+                            self.onTrackFromTemplate)
         self._addMenuAction(trackSub, "Edit Name", self.tr('Shift+n'),
                             self.onTrackRename)
         self._addMenuAction(trackSub, "Remove",
@@ -79,7 +82,9 @@ class Main(QMainWindow, Observation):
                             self.onTrackMoveRight)
         trackSub.addSeparator()
         self._addMenuAction(trackSub, "Setup", self.tr('Shift+e'),
-                            self.onEditSetupCode)
+                            self.onTrackSetup)
+        self._addMenuAction(trackSub, "Save as Template", self.tr(""),
+                            self.onTrackSaveAsTemplate)
 
         rowSub = editMenu.addMenu("Row")
         self._addMenuAction(rowSub, "Evaluate", self.tr('Ctrl+Return'),
@@ -224,11 +229,11 @@ class Main(QMainWindow, Observation):
         settings = Settings(self.subject)
         settings.exec_()
 
-    def onEditSetupCode(self, e):
-        self.notify(events.view.main.TrackSetup())
-
-    def onTrackAdd(self, e):
+    def onTrackNew(self, e):
         self.notify(events.view.main.TrackNew())
+    
+    def onTrackFromTemplate(self, e):
+        self.notify(events.view.main.TrackNewFromTemplate())
 
     def onTrackRemove(self, e):
         self.notify(events.view.main.TrackRemove())
@@ -247,6 +252,12 @@ class Main(QMainWindow, Observation):
 
     def onTrackMoveRight(self, e):
         self.notify(events.view.main.TrackMoveRight())
+        
+    def onTrackSetup(self, e):
+        self.notify(events.view.main.TrackSetup())
+        
+    def onTrackSaveAsTemplate(self, e):
+        self.notify(events.view.main.TrackSaveAsTemplate())
 
     def onRowEvaluate(self, e):
         self.notify(events.view.main.RowEvaluate())

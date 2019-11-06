@@ -25,6 +25,10 @@ class TrackNew(NamedTuple):
     pass
 
 
+class TrackNewFromTemplate(NamedTuple):
+    pass
+
+
 class TrackEditName(NamedTuple):
     pass
 
@@ -46,6 +50,10 @@ class TrackMoveLeft(NamedTuple):
 
 
 class TrackMoveRight(NamedTuple):
+    pass
+
+
+class TrackSaveAsTemplate(NamedTuple):
     pass
 
 

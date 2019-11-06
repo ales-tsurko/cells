@@ -62,7 +62,7 @@ class Editor(Observation, QScrollArea):
         self.add_responder(events.view.main.CellEdit,
                            self.cellEditResponder)
         self.add_responder(events.view.main.TrackSetup,
-                           self.trackEditResponder)
+                           self.trackSetupResponder)
 
     def documentOpenResponder(self, e):
         self.clear()
@@ -201,7 +201,7 @@ class Editor(Observation, QScrollArea):
 
         track.cells[track.selectedCellIndex].edit()
 
-    def trackEditResponder(self, e):
+    def trackSetupResponder(self, e):
         if not self.hasSelectedTrack():
             return
 
@@ -294,11 +294,11 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
     def _initForm(self):
 
         layout = QFormLayout()
-        self.backendName = QLineEdit(self, maxLength=30)
+        self.backendName = QLineEdit(self, maxLength=20)
         self.backendName.textChanged.connect(self.onBackendNameChanged)
         self.runCommand = QLineEdit(self, maxLength=200)
         self.runCommand.textChanged.connect(self.onRunCommandChanged)
-        self.promptIndicator = QLineEdit(self, maxLength=30)
+        self.promptIndicator = QLineEdit(self, maxLength=20)
         self.promptIndicator.textChanged.connect(self.onPromptIndicatorChanged)
 
         self.editorMode = QComboBox()

@@ -468,6 +468,7 @@ class Cell(CellBase, metaclass=FinalMeta):
     def edit(self):
         view = self.track.editor.codeView
         view.setDelegate(self)
+        view.setMode(self.track.template.editor_mode)
         view.show()
 
     def setCode(self, code, notify=False):
