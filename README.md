@@ -1,8 +1,8 @@
 # Cells
 
 Cells is a live coding environment. It allows you to organize and run
-code snippets for interpreted programming languages. That means SuperCollider,
-Python, Tidal Cycles, Node.js etc. can be mixed in the same project.
+code snippets for interpreted programming languages. Cells also allows you to 
+mix SuperCollider, Python, Tidal Cycles, Node.js etc. in the same project.
 
 
 
