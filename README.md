@@ -29,7 +29,7 @@ poetry run cells
 
 It's ~90% ready for alpha. But there are some important points:
 
-I chose Python to get the first version quick and to look at the design
+I chose Python to get the first version quickly and to look at the design
 at a high level, without going deep into details. And without tests. And with
 imperfect code quality... So the first version is going to be more like a prototype. But ready-to-use
 working prototype though, developed with live performance stability in mind.
