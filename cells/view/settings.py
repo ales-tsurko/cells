@@ -8,6 +8,7 @@ from PySide2.QtCore import Qt
 from cells.observation import Observation
 from cells.settings import Settings as SettingsModel
 import cells.utility as utility
+from .code import acePropertyNames
 
 
 class Settings(Observation, QDialog):
@@ -90,26 +91,10 @@ class EditorPage(QWidget):
         self.layout().addRow(self.tr("Keybindings:"), self.kb)
 
     def _themes(self):
-        return self._acePropertyNames("theme-", ".js")
+        return acePropertyNames("theme-", ".js")
 
     def _keybindings(self):
-        return self._acePropertyNames("keybinding-", ".js")
-
-    def _acePropertyNames(self, prefix, postfix, title=True):
-        themesDir = self._aceSrcDir()
-        names = sorted(glob.glob(os.path.join(
-            themesDir, prefix + "*" + postfix)))
-        names = [os.path.basename(name) for name in names]
-        names = [name[len(prefix):-len(postfix)].replace("_", " ")
-                 for name in names]
-        if title:
-            names = [name.title() for name in names]
-
-        return names
-
-    def _aceSrcDir(self):
-        return os.path.join(
-            utility.viewResourcesDir(), "ace", "ace-builds", "src")
+        return acePropertyNames("keybinding-", ".js")
 
     def deserialize(self, model):
         self.theme.setCurrentText(model.get("theme"))

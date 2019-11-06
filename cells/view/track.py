@@ -2,7 +2,7 @@ from cells.observation import Observation
 from cells import events
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (QLineEdit, QMessageBox, QVBoxLayout,
-                               QWidget, QAction, QLabel)
+                               QWidget, QAction, QLabel) 
 from PySide2.QtGui import QFont
 
 from .dialogs import ConfirmationDialog
@@ -32,7 +32,7 @@ class Track(Observation, QWidget, metaclass=FinalMeta):
 
         self.setFixedWidth(200)
 
-        self.header = Header(subject, index)
+        self.header = Header(self, subject)
 
         self.setLayout(QVBoxLayout())
         self.layout().addWidget(self.header)
@@ -211,8 +211,8 @@ class Track(Observation, QWidget, metaclass=FinalMeta):
         source = self.cells[self.selectedCellIndex]
         self._pasteBuffer = source.serialize()
 
-    def editSetupCode(self):
-        view = self.editor.codeView
+    def edit(self):
+        view = self.editor.trackEditor
         view.setDelegate(self)
         view.show()
 
@@ -227,8 +227,8 @@ class Track(Observation, QWidget, metaclass=FinalMeta):
         confirmation = ConfirmationDialog(
             "Restart Interpreter",
             "Do you want to restart track's " +
-                "interpreter to evaluate the " +
-                "setup code?")
+            "interpreter to evaluate the " +
+            "setup code?")
         if confirmation.exec_() == QMessageBox.Yes:
             self.notify(events.view.track.InterpreterRestart(
                 self.index, self.code()))
@@ -353,8 +353,9 @@ class CellBase(Observation, QWidget):
 
 
 class Header(CellBase):
-    def __init__(self, subject, index):
-        super().__init__(subject, index)
+    def __init__(self, track, subject):
+        super().__init__(subject, track.index)
+        self.track = track
 
         self.add_responder(events.view.main.TrackEditName,
                            self.editNameResponder)
@@ -362,6 +363,11 @@ class Header(CellBase):
     def onEditingNameFinished(self):
         self.notify(events.view.track.NameChanged(self.index, self.name()))
         return super().onEditingNameFinished()
+
+    
+    def mouseDoubleClickEvent(self, event):
+        self.track.edit()
+        return super().mouseDoubleClickEvent(event)
 
     def updateStyle(self):
         if self.selected:

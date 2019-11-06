@@ -1,12 +1,16 @@
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QFrame, QHBoxLayout, QScrollArea, QWidget, QMessageBox
+from PySide2.QtWidgets import (QFrame, QHBoxLayout, QScrollArea,
+                               QWidget, QMessageBox, QShortcut,
+                               QFormLayout, QVBoxLayout, QLineEdit,
+                               QPlainTextEdit, QLabel, QComboBox)
+from PySide2.QtGui import QKeySequence
 
 from cells import events
 from cells.observation import Observation
 
 from .track import Track
 from .dialogs import ConfirmationDialog
-from .code import CodeView
+from .code import CodeView, acePropertyNames
 
 
 class Editor(Observation, QScrollArea):
@@ -17,6 +21,7 @@ class Editor(Observation, QScrollArea):
         self.setFrameShape(QFrame.NoFrame)
 
         self.codeView = CodeView(subject)
+        self.trackEditor = TrackEditor(self.subject)
 
         self.selectedTrackIndex = -1
 
@@ -56,7 +61,7 @@ class Editor(Observation, QScrollArea):
         self.add_responder(events.view.main.CellEdit,
                            self.cellEditResponder)
         self.add_responder(events.view.main.TrackEditSetupCode,
-                           self.trackEditSetupCodeResponder)
+                           self.trackEditResponder)
 
     def documentOpenResponder(self, e):
         self.clear()
@@ -193,13 +198,13 @@ class Editor(Observation, QScrollArea):
             return
 
         track.cells[track.selectedCellIndex].edit()
-            
-    def trackEditSetupCodeResponder(self, e):
+
+    def trackEditResponder(self, e):
         if not self.hasSelectedTrack():
             return
-        
+
         track = self.trackAt(self.selectedTrackIndex)
-        track.editSetupCode()
+        track.edit()
 
     def selectTrackAt(self, index):
         if self.selectedTrackIndex == index:
@@ -246,5 +251,86 @@ class Editor(Observation, QScrollArea):
 
     def closeEvent(self, e):
         self.codeView.delete()
+        self.trackEditor.delete()
         self.unregister()
         return super().closeEvent(e)
+
+
+class TrackEditor(Observation, QWidget):
+    def __init__(self, subject):
+        Observation.__init__(self, subject)
+        QWidget.__init__(self)
+
+        self.codeView = CodeView(subject)
+
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+
+        self.layout().setSpacing(0)
+        self.layout().setContentsMargins(0, 0, 0, 0)
+
+        self._initForm()
+        self._initCodeEditor()
+
+        self.setFixedSize(630, 500)
+
+        self.setContextMenuPolicy(Qt.NoContextMenu)
+        self.setWindowModality(Qt.ApplicationModal)
+
+        self.setWindowFlags(Qt.Tool | Qt.WindowTitleHint | Qt.CustomizeWindowHint |
+                            Qt.WindowCloseButtonHint | Qt.WindowMaximizeButtonHint)
+        self.setWindowFlag(Qt.WindowMinimizeButtonHint, False)
+
+        self.codeView.closeShortcut.setEnabled(False)
+
+        QShortcut(QKeySequence(self.tr("Ctrl+w")), self, self.close)
+
+    def _initForm(self):
+
+        layout = QFormLayout()
+        self.backendName = QLineEdit(self, maxLength=30)
+        self.runCommand = QLineEdit(self, maxLength=200)
+        self.promptIndicator = QLineEdit(self, maxLength=30)
+        
+        self.editorMode = QComboBox()
+        [self.editorMode.addItem(mode) for mode in self._availableModes()]
+        self.editorMode.currentIndexChanged.connect(self.onEditorModeChanged)
+        
+        self.description = QPlainTextEdit(self, minimumHeight=100)
+        
+        layout.addRow(self.tr("Backend Name:"), self.backendName)
+        layout.addRow(self.tr("Run Command:"), self.runCommand)
+        layout.addRow(self.tr("Prompt Indicator:"), self.promptIndicator)
+        layout.addRow(self.tr("Editor Mode:"), self.editorMode)
+        layout.addRow(self.tr("Description:"), self.description)
+
+        layout.setSpacing(10)
+        layout.setContentsMargins(10, 10, 10, 10)
+        self.layout().addLayout(layout)
+
+    def _initCodeEditor(self):
+        self.layout().addWidget(QLabel("Setup Code:", margin=10))
+        self.layout().addWidget(self.codeView)
+        
+    def _availableModes(self):
+        return acePropertyNames("mode-", ".js", False)
+    
+    def onEditorModeChanged(self, e):
+        self.codeView.setMode(self.editorMode.itemText(e))
+
+    def setDelegate(self, delegate):
+        self.codeView.setDelegate(delegate)
+
+    def delete(self):
+        self.codeView.delete()
+        self.unregister()
+        self.setParent(None)
+        self.deleteLater()
+
+    def showEvent(self, event):
+        self.codeView.show()
+        return super().showEvent(event)
+
+    def closeEvent(self, event):
+        self.codeView.close()
+        return super().closeEvent(event)

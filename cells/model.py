@@ -29,8 +29,9 @@ class TrackTemplateModel:
     icon_path: str = field(default="")
     setup_code: str = field(default="")
     run_command: str = field(default="")
-    input_idicator: str = field(default="")
+    prompt_indicator: str = field(default="")
     description: str = field(default="")
+    editor_mode: str = field(default="")
 
 
 @dataclass_json
