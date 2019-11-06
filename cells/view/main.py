@@ -225,7 +225,7 @@ class Main(QMainWindow, Observation):
         settings.exec_()
 
     def onEditSetupCode(self, e):
-        self.notify(events.view.main.TrackEditSetupCode())
+        self.notify(events.view.main.TrackSetup())
 
     def onTrackAdd(self, e):
         self.notify(events.view.main.TrackNew())

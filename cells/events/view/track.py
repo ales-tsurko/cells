@@ -1,4 +1,5 @@
 from typing import NamedTuple
+from cells.model import TrackTemplateModel
 
 
 class New(NamedTuple):
@@ -10,9 +11,9 @@ class NameChanged(NamedTuple):
     name: str
 
 
-class SetupCodeChanged(NamedTuple):
+class TemplateUpdated(NamedTuple):
     index: int
-    code: str
+    template: TrackTemplateModel
 
 
 class InterpreterRestart(NamedTuple):

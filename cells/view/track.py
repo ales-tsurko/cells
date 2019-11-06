@@ -2,7 +2,7 @@ from cells.observation import Observation
 from cells import events
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (QLineEdit, QMessageBox, QVBoxLayout,
-                               QWidget, QAction, QLabel) 
+                               QWidget, QAction, QLabel)
 from PySide2.QtGui import QFont
 
 from .dialogs import ConfirmationDialog
@@ -10,12 +10,8 @@ from cells.model import CellModel
 from .code import CodeDelegate
 
 
-class FinalMeta(type(QWidget), type(CodeDelegate)):
-    pass
-
-
-class Track(Observation, QWidget, metaclass=FinalMeta):
-    def __init__(self, editor, subject, index, name):
+class Track(Observation, QWidget):
+    def __init__(self, editor, subject, index, name, template):
         Observation.__init__(self, subject)
         QWidget.__init__(self)
 
@@ -25,7 +21,7 @@ class Track(Observation, QWidget, metaclass=FinalMeta):
         self.cells = []
         self._pasteBuffer = None
         self.editor = editor
-        self._setupCode = ""
+        self.template = template
 
         self.setAttribute(Qt.WA_StyledBackground)
         self.setStyleSheet("background-color: rgba(0, 0, 0, 0.5);")
@@ -216,28 +212,18 @@ class Track(Observation, QWidget, metaclass=FinalMeta):
         view.setDelegate(self)
         view.show()
 
-    def setCode(self, code, notify=False):
-        self._setupCode = code
-        if not notify:
-            return
-
-        self.notify(events.view.track.SetupCodeChanged(
-            self.index, self.code()))
+    def onTemplateUpdate(self):
+        self.notify(events.view.track.TemplateUpdated(
+            self.index, self.template))
 
         confirmation = ConfirmationDialog(
             "Restart Interpreter",
             "Do you want to restart track's " +
-            "interpreter to evaluate the " +
-            "setup code?")
+            "interpreter for the changes to " +
+            "take effect?")
         if confirmation.exec_() == QMessageBox.Yes:
             self.notify(events.view.track.InterpreterRestart(
-                self.index, self.code()))
-
-    def code(self):
-        return self._setupCode
-
-    def codeWindowTitle(self):
-        return self.name() + " | Setup"
+                self.index, self.template))
 
     def setName(self, name):
         self.header.setName(name)
@@ -278,7 +264,7 @@ class Track(Observation, QWidget, metaclass=FinalMeta):
 
     def deserialize(self, model):
         self.setName(model.name)
-        self.setCode(model.template.setup_code)
+        self.template = model.template
         for cell in model.cells:
             newCell = self.addCell(False)
             newCell.deserialize(cell)
@@ -364,7 +350,6 @@ class Header(CellBase):
         self.notify(events.view.track.NameChanged(self.index, self.name()))
         return super().onEditingNameFinished()
 
-    
     def mouseDoubleClickEvent(self, event):
         self.track.edit()
         return super().mouseDoubleClickEvent(event)
@@ -380,6 +365,10 @@ class Header(CellBase):
 
     def setNormalStyle(self):
         self.setStyleSheet("background-color: grey;")
+
+
+class FinalMeta(type(QWidget), type(CodeDelegate)):
+    pass
 
 
 class Cell(CellBase, metaclass=FinalMeta):

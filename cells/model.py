@@ -25,13 +25,12 @@ class CellModel:
 @dataclass_json
 @dataclass
 class TrackTemplateModel:
-    backend_name: str = field(default="")
-    icon_path: str = field(default="")
+    backend_name: str = field(default="Default")
     setup_code: str = field(default="")
     run_command: str = field(default="")
     prompt_indicator: str = field(default="")
     description: str = field(default="")
-    editor_mode: str = field(default="")
+    editor_mode: str = field(default="plain text")
 
 
 @dataclass_json
@@ -79,8 +78,8 @@ class Document(Observation, dict):
                            self.cell_remove_responder)
         self.add_responder(events.view.track.NameChanged,
                            self.track_name_changed_responder)
-        self.add_responder(events.view.track.SetupCodeChanged,
-                           self.track_setup_code_changed_responder)
+        self.add_responder(events.view.track.TemplateUpdated,
+                           self.track_template_updated_responder)
         self.add_responder(events.view.track.CellNameChanged,
                            self.cell_name_changed_responder)
         self.add_responder(events.view.track.CellCodeChanged,
@@ -117,9 +116,9 @@ class Document(Observation, dict):
         self.model.tracks[e.index].name = e.name
 
     @notify_update
-    def track_setup_code_changed_responder(self, e):
+    def track_template_updated_responder(self, e):
         track = self.model.tracks[e.index]
-        track.template.setup_code = e.code
+        track.template = e.template
 
     @notify_update
     def cell_name_changed_responder(self, e):

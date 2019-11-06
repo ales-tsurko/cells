@@ -17,7 +17,7 @@ class FileNew(NamedTuple):
     pass
 
 
-class TrackEditSetupCode(NamedTuple):
+class TrackSetup(NamedTuple):
     pass
 
 

@@ -7,10 +7,11 @@ from PySide2.QtGui import QKeySequence
 
 from cells import events
 from cells.observation import Observation
+from cells.model import TrackTemplateModel
 
 from .track import Track
 from .dialogs import ConfirmationDialog
-from .code import CodeView, acePropertyNames
+from .code import CodeView, CodeDelegate, acePropertyNames
 
 
 class Editor(Observation, QScrollArea):
@@ -60,14 +61,15 @@ class Editor(Observation, QScrollArea):
                            self.cellClearResponder)
         self.add_responder(events.view.main.CellEdit,
                            self.cellEditResponder)
-        self.add_responder(events.view.main.TrackEditSetupCode,
+        self.add_responder(events.view.main.TrackSetup,
                            self.trackEditResponder)
 
     def documentOpenResponder(self, e):
         self.clear()
 
         for (n, track) in enumerate(e.document.tracks):
-            trackView = Track(self, self.subject, n, track.name)
+            trackView = Track(self, self.subject, n,
+                              track.name, track.template)
             trackView.deserialize(track)
             self.innerLayout.addWidget(trackView)
 
@@ -95,7 +97,7 @@ class Editor(Observation, QScrollArea):
     def trackNewResponder(self, e):
         length = self.innerLayout.count()
         name = "Track " + str(length + 1)
-        track = Track(self, self.subject, length, name)
+        track = Track(self, self.subject, length, name, TrackTemplateModel())
         self.innerLayout.addWidget(track)
         self.notify(events.view.track.New(name))
 
@@ -256,12 +258,16 @@ class Editor(Observation, QScrollArea):
         return super().closeEvent(e)
 
 
-class TrackEditor(Observation, QWidget):
+class FinalMeta(type(QWidget), type(CodeDelegate)):
+    pass
+
+
+class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
     def __init__(self, subject):
         Observation.__init__(self, subject)
         QWidget.__init__(self)
 
-        self.codeView = CodeView(subject)
+        self.delegate = None
 
         layout = QVBoxLayout()
         self.setLayout(layout)
@@ -289,15 +295,18 @@ class TrackEditor(Observation, QWidget):
 
         layout = QFormLayout()
         self.backendName = QLineEdit(self, maxLength=30)
+        self.backendName.textChanged.connect(self.onBackendNameChanged)
         self.runCommand = QLineEdit(self, maxLength=200)
+        self.runCommand.textChanged.connect(self.onRunCommandChanged)
         self.promptIndicator = QLineEdit(self, maxLength=30)
-        
+        self.promptIndicator.textChanged.connect(self.onPromptIndicatorChanged)
+
         self.editorMode = QComboBox()
         [self.editorMode.addItem(mode) for mode in self._availableModes()]
         self.editorMode.currentIndexChanged.connect(self.onEditorModeChanged)
-        
-        self.description = QPlainTextEdit(self, minimumHeight=100)
-        
+
+        self.description = QPlainTextEdit(self, fixedHeight=100)
+
         layout.addRow(self.tr("Backend Name:"), self.backendName)
         layout.addRow(self.tr("Run Command:"), self.runCommand)
         layout.addRow(self.tr("Prompt Indicator:"), self.promptIndicator)
@@ -309,17 +318,73 @@ class TrackEditor(Observation, QWidget):
         self.layout().addLayout(layout)
 
     def _initCodeEditor(self):
+        self.codeView = CodeView(self.subject)
+        self.codeView.setFixedHeight(210)
         self.layout().addWidget(QLabel("Setup Code:", margin=10))
         self.layout().addWidget(self.codeView)
-        
+        self.codeView.setDelegate(self)
+
     def _availableModes(self):
         return acePropertyNames("mode-", ".js", False)
-    
+
+    def onBackendNameChanged(self, e):
+        if self.delegate is None:
+            return
+
+        self.delegate.template.backend_name = e
+
+    def onRunCommandChanged(self, e):
+        if self.delegate is None:
+            return
+
+        self.delegate.template.run_command = e
+
+    def onPromptIndicatorChanged(self, e):
+        if self.delegate is None:
+            return
+
+        self.delegate.template.prompt_indicator = e
+
     def onEditorModeChanged(self, e):
-        self.codeView.setMode(self.editorMode.itemText(e))
+        mode = self.editorMode.itemText(e)
+        self.codeView.setMode(mode)
+        if self.delegate is not None:
+            self.delegate.template.editor_mode = mode
 
     def setDelegate(self, delegate):
-        self.codeView.setDelegate(delegate)
+        self.delegate = delegate
+        self.codeView.setDelegate(self)
+        self.deserialize()
+
+    def setCode(self, code, notify):
+        if self.delegate is None:
+            return
+
+        self.delegate.template.setup_code = code
+        self.delegate.onTemplateUpdate()
+
+    def code(self):
+        if self.delegate is None:
+            return ""
+
+        return self.delegate.template.setup_code
+
+    def codeWindowTitle(self):
+        if self.delegate is None:
+            return ""
+
+        return self.delegate.name() + " | Setup"
+
+    def deserialize(self):
+        if self.delegate is None:
+            return
+
+        self.backendName.setText(self.delegate.template.backend_name)
+        self.runCommand.setText(self.delegate.template.run_command)
+        self.promptIndicator.setText(self.delegate.template.prompt_indicator)
+        self.editorMode.setCurrentText(self.delegate.template.editor_mode)
+        self.description.document().setPlainText(self.delegate.template.description)
+        self.setWindowTitle(self.codeWindowTitle())
 
     def delete(self):
         self.codeView.delete()
@@ -332,5 +397,9 @@ class TrackEditor(Observation, QWidget):
         return super().showEvent(event)
 
     def closeEvent(self, event):
+        if self.delegate is not None:
+            self.delegate.template.description = self.description.toPlainText()
+
         self.codeView.close()
+
         return super().closeEvent(event)
