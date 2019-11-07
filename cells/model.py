@@ -31,9 +31,11 @@ class TrackTemplateModel:
     prompt_indicator: str = field(default="")
     description: str = field(default="")
     editor_mode: str = field(default="plain text")
+    path: str = field(default="")
 
     def __repr__(self):
-        return f"Backend Name: {self.backend_name}\n" +\
+        return f"Path: {self.path}\n" +\
+               f"Backend Name: {self.backend_name}\n" +\
                f"Run Command: {self.run_command}\n" +\
                f"Prompt Indicator: {self.prompt_indicator}\n" +\
                f"Editor Mode: {self.editor_mode}\n" +\
@@ -201,22 +203,35 @@ class TrackTemplateManager(Observation):
     def read(self, path):
         with open(path, "r") as f:
             try:
-                return TrackTemplateModel.from_json(f.read())
+                template = TrackTemplateModel.from_json(f.read())
+                template.path = path
+                return template
             except TypeError as e:
                 print(e)
                 self.notify(events.document.Error(self.document,
                                                   f"Can't read track template {path}."))
 
     def save_new(self, template):
-        with open(self.new_template_path(), "w+") as f:
+        path = self.new_template_path()
+        with open(path, "w+") as f:
             try:
+                template.path = path
                 f.write(template.to_json())
                 self.templates.append(template)
-                self.notify(events.track.TrackTemplateSaved(f.name, template))
+                self.notify(events.track.TrackTemplateSaved(template))
             except TypeError as e:
                 print(e)
                 self.notify(events.document.Error(self.document,
                                                   "Can't save track template file."))
+
+    def delete_at(self, index):
+        template = self.templates.pop(index)
+        try:
+            os.remove(template.path)
+        except FileNotFoundError as e:
+            print(e)
+            self.notify(events.document.Error(self.document,
+                                              f"Can't find track template file at path {template.path}."))
 
     def new_template_path(self):
         file_name = str(int(time() * 10)) + "-" + \

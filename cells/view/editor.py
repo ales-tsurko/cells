@@ -224,7 +224,7 @@ class Editor(Observation, QScrollArea):
     def trackTemplateSavedResponder(self, e):
         msgBox = QMessageBox()
         msgBox.setText("Track Template Saved Succesfully")
-        msgBox.setDetailedText(f"Path: {e.path}\n" + repr(e.template))
+        msgBox.setDetailedText(repr(e.template))
         msgBox.exec()
         
     def trackRestartInterpreterResponder(self, e):

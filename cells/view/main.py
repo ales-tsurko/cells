@@ -323,6 +323,8 @@ class Main(QMainWindow, Observation):
     def onBrowserToggle(self, e):
         browser = self.centralWidget().widget(0)
         browser.setVisible(not browser.isVisible())
+        if browser.isVisible():
+            browser.setFocus()
 
     def onConsoleToggle(self, e):
         console = self.centralWidget().widget(1).widget(1)

@@ -8,5 +8,4 @@ class New(NamedTuple):
 
 
 class TrackTemplateSaved(NamedTuple):
-    path: str
     template: TrackTemplateModel
