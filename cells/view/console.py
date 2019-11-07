@@ -11,7 +11,8 @@ class Console(Observation, QPlainTextEdit):
         Observation.__init__(self, subject)
         QPlainTextEdit.__init__(self)
         self.setReadOnly(True)
-        self.setMinimumHeight(200)
+        self.setMinimumHeight(150)
+        self.setMinimumWidth(250)
         self.setFrameShape(QFrame.NoFrame)
         self.sayHello()
 

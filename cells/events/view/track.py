@@ -20,6 +20,10 @@ class SaveAsTemplate(NamedTuple):
     template: TrackTemplateModel
 
 
+class WillRestart(NamedTuple):
+    template: TrackTemplateModel
+
+
 class InterpreterRestart(NamedTuple):
     track_index: int
     setup_code: str

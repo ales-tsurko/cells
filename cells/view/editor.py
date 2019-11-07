@@ -20,6 +20,7 @@ class Editor(Observation, QScrollArea):
         QScrollArea.__init__(self)
 
         self.setFrameShape(QFrame.NoFrame)
+        self.setMinimumSize(200, 300)
 
         self.codeView = CodeView(subject)
         self.trackEditor = TrackEditor(self.subject)
@@ -67,6 +68,8 @@ class Editor(Observation, QScrollArea):
                            self.trackSaveAsTemplateResponder)
         self.add_responder(events.track.TrackTemplateSaved,
                            self.trackTemplateSavedResponder)
+        self.add_responder(events.view.main.TrackRestartInterpreter,
+                           self.trackRestartInterpreterResponder)
 
     def documentOpenResponder(self, e):
         self.clear()
@@ -223,6 +226,13 @@ class Editor(Observation, QScrollArea):
         msgBox.setText("Track Template Saved Succesfully")
         msgBox.setDetailedText(f"Path: {e.path}\n" + repr(e.template))
         msgBox.exec()
+        
+    def trackRestartInterpreterResponder(self, e):
+        # TODO
+        if not self.hasSelectedTrack():
+            return
+        
+        track = self.trackAt(self.selectedTrackIndex)
 
     def selectTrackAt(self, index):
         if self.selectedTrackIndex == index:

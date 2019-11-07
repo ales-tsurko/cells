@@ -1,11 +1,13 @@
 from PySide2.QtGui import QKeySequence
 from PySide2.QtWidgets import (QFileDialog, QMainWindow, QMessageBox,
-                               QBoxLayout, QWidget)
+                               QBoxLayout, QHBoxLayout, QWidget, QSplitter,
+                               QFrame)
 from PySide2.QtCore import Qt
 
 from cells import events
 from cells.observation import Observation
 
+from .browser import Browser
 from .console import Console
 from .editor import Editor
 from .settings import Settings
@@ -85,7 +87,7 @@ class Main(QMainWindow, Observation):
                             self.onTrackSetup)
         self._addMenuAction(trackSub, "Save as Template", self.tr(""),
                             self.onTrackSaveAsTemplate)
-        trackSub.addSeparator() 
+        trackSub.addSeparator()
         self._addMenuAction(trackSub, "Restart Interpreter", self.tr("Ctrl+Shift+R"),
                             self.onTrackRestartInterpreter)
 
@@ -143,8 +145,13 @@ class Main(QMainWindow, Observation):
     def _createViewMenu(self):
         viewMenu = self.menuBar().addMenu("View")
 
+        self._addMenuAction(viewMenu, "Toggle Browser", self.tr("Ctrl+b"),
+                            self.onBrowserToggle)
+
         consoleSub = viewMenu.addMenu("Console")
 
+        self._addMenuAction(consoleSub, "Toggle", self.tr(
+            "Ctrl+`"), self.onConsoleToggle)
         self._addMenuAction(consoleSub, "Clear",
                             self.tr("Ctrl+k"), self.onConsoleClear)
 
@@ -153,10 +160,6 @@ class Main(QMainWindow, Observation):
                             self.tr("Ctrl+1"), self.onConsoleToBottom)
         self._addMenuAction(consoleSub, "To Right",
                             self.tr("Ctrl+2"), self.onConsoleToRight)
-        self._addMenuAction(consoleSub, "To Top",
-                            self.tr("Ctrl+3"), self.onConsoleToTop)
-        self._addMenuAction(consoleSub, "To Left",
-                            self.tr("Ctrl+4"), self.onConsoleToLeft)
 
     def _addMenuAction(self, menu, name, shortcut, callback):
         newAct = menu.addAction(name)
@@ -164,19 +167,27 @@ class Main(QMainWindow, Observation):
         newAct.setShortcut(shortcut)
 
     def _initCentralWidget(self):
-        centralView = QWidget()
-        layout = QBoxLayout(QBoxLayout.TopToBottom)
+        centralView = QSplitter()
+        centralView.setFrameStyle(QFrame.NoFrame | QFrame.Plain)
+        centralView.setRubberBand(-1)
+
+        self.browser = Browser(self.subject)
+
+        centralView.addWidget(self.browser)
+
+        canvas = QSplitter()
+        canvas.setFrameStyle(QFrame.NoFrame | QFrame.Plain)
+        canvas.setOrientation(Qt.Vertical)
+        canvas.setRubberBand(-1)
         self.editor = Editor(self.subject)
         self.console = Console(self.subject)
 
-        layout.setSpacing(0)
-        layout.addWidget(self.editor)
-        layout.addWidget(self.console)
-        layout.setStretchFactor(self.editor, 3)
-        layout.setStretchFactor(self.console, 1)
+        canvas.addWidget(self.editor)
+        canvas.addWidget(self.console)
 
-        centralView.setLayout(layout)
-        centralView.layout().setContentsMargins(0, 0, 0, 0)
+        centralView.addWidget(canvas)
+        canvas.setSizes([4, 4, 1, 1])
+
         self.setCentralWidget(centralView)
 
     def documentOpenResponder(self, e):
@@ -234,7 +245,7 @@ class Main(QMainWindow, Observation):
 
     def onTrackNew(self, e):
         self.notify(events.view.main.TrackNew())
-    
+
     def onTrackFromTemplate(self, e):
         self.notify(events.view.main.TrackNewFromTemplate())
 
@@ -255,13 +266,13 @@ class Main(QMainWindow, Observation):
 
     def onTrackMoveRight(self, e):
         self.notify(events.view.main.TrackMoveRight())
-        
+
     def onTrackSetup(self, e):
         self.notify(events.view.main.TrackSetup())
-        
+
     def onTrackSaveAsTemplate(self, e):
         self.notify(events.view.main.TrackSaveAsTemplate())
-        
+
     def onTrackRestartInterpreter(self, e):
         self.notify(events.view.main.TrackRestartInterpreter())
 
@@ -312,26 +323,24 @@ class Main(QMainWindow, Observation):
 
     def onConsoleClear(self, e):
         self.notify(events.view.main.ConsoleClear())
+        
+    def onBrowserToggle(self, e):
+        browser = self.centralWidget().widget(0)
+        browser.setVisible(not browser.isVisible())
+        
+    def onConsoleToggle(self, e):
+        console = self.centralWidget().widget(1).widget(1)
+        console.setVisible(not console.isVisible())
 
     def onConsoleToBottom(self, e):
-        self.centralWidget().layout().setDirection(QBoxLayout.TopToBottom)
-        self.centralWidget().layout().setStretchFactor(self.editor, 3)
-        self.centralWidget().layout().setStretchFactor(self.console, 1)
-
-    def onConsoleToLeft(self, e):
-        self.centralWidget().layout().setDirection(QBoxLayout.RightToLeft)
-        self.centralWidget().layout().setStretchFactor(self.editor, 5)
-        self.centralWidget().layout().setStretchFactor(self.console, 3)
+        self.centralWidget().widget(1).setOrientation(Qt.Vertical)
+        self.centralWidget().widget(1).setStretchFactor(0, 3)
+        self.centralWidget().widget(1).setStretchFactor(1, 1)
 
     def onConsoleToRight(self, e):
-        self.centralWidget().layout().setDirection(QBoxLayout.LeftToRight)
-        self.centralWidget().layout().setStretchFactor(self.editor, 5)
-        self.centralWidget().layout().setStretchFactor(self.console, 3)
-
-    def onConsoleToTop(self, e):
-        self.centralWidget().layout().setDirection(QBoxLayout.BottomToTop)
-        self.centralWidget().layout().setStretchFactor(self.editor, 3)
-        self.centralWidget().layout().setStretchFactor(self.console, 1)
+        self.centralWidget().widget(1).setOrientation(Qt.Horizontal)
+        self.centralWidget().widget(1).setStretchFactor(0, 5)
+        self.centralWidget().widget(1).setStretchFactor(1, 3)
 
     def onCellEdit(self, e):
         self.notify(events.view.main.CellEdit())
