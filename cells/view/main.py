@@ -23,11 +23,13 @@ class Main(QMainWindow, Observation):
 
         self.setWindowTitle("Default")
         self.setMinimumSize(800, 600)
-        self._createMenu()
-        self._initCentralWidget()
 
         document = Document(self.subject)
         self.document = document.model
+
+        self._createMenu()
+        self._initCentralWidget()
+
         self.setWindowTitle(self.document.name)
         self.saved = True
 
@@ -59,9 +61,6 @@ class Main(QMainWindow, Observation):
         trackSub = editMenu.addMenu("Track")
         self._addMenuAction(trackSub, "New", self.tr('Ctrl+t'),
                             self.onTrackNew)
-        self._addMenuAction(trackSub, "New From Template",
-                            self.tr("Ctrl+Shift+t"),
-                            self.onTrackFromTemplate)
         self._addMenuAction(trackSub, "Edit Name", self.tr('Shift+n'),
                             self.onTrackRename)
         self._addMenuAction(trackSub, "Remove",
@@ -171,7 +170,7 @@ class Main(QMainWindow, Observation):
         centralView.setFrameStyle(QFrame.NoFrame | QFrame.Plain)
         centralView.setRubberBand(-1)
 
-        self.browser = Browser(self.subject)
+        self.browser = Browser(self.document, self.subject)
 
         centralView.addWidget(self.browser)
 
@@ -245,9 +244,6 @@ class Main(QMainWindow, Observation):
 
     def onTrackNew(self, e):
         self.notify(events.view.main.TrackNew())
-
-    def onTrackFromTemplate(self, e):
-        self.notify(events.view.main.TrackNewFromTemplate())
 
     def onTrackRemove(self, e):
         self.notify(events.view.main.TrackRemove())
@@ -323,11 +319,11 @@ class Main(QMainWindow, Observation):
 
     def onConsoleClear(self, e):
         self.notify(events.view.main.ConsoleClear())
-        
+
     def onBrowserToggle(self, e):
         browser = self.centralWidget().widget(0)
         browser.setVisible(not browser.isVisible())
-        
+
     def onConsoleToggle(self, e):
         console = self.centralWidget().widget(1).widget(1)
         console.setVisible(not console.isVisible())
@@ -357,6 +353,7 @@ class Main(QMainWindow, Observation):
 
         self.editor.close()
         self.console.close()
+        self.browser.close()
 
         self.notify(events.view.main.Close())
         self.unregister()

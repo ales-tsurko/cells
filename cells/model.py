@@ -70,7 +70,6 @@ class Document(Observation, dict):
         Observation.__init__(self, subject)
 
         self.model = DocumentModel("New Document", [], None)
-        self.track_template_manager = TrackTemplateManager(self, subject)
         self.notify(events.document.New)
 
         self.add_responder(events.view.main.FileOpen, self.main_open_responder)
@@ -87,8 +86,6 @@ class Document(Observation, dict):
                            self.track_name_changed_responder)
         self.add_responder(events.view.track.TemplateUpdated,
                            self.track_template_updated_responder)
-        self.add_responder(events.view.track.SaveAsTemplate,
-                           self.track_save_as_template_responder)
         self.add_responder(events.view.track.CellNameChanged,
                            self.cell_name_changed_responder)
         self.add_responder(events.view.track.CellCodeChanged,
@@ -128,10 +125,6 @@ class Document(Observation, dict):
     def track_template_updated_responder(self, e):
         track = self.model.tracks[e.index]
         track.template = e.template
-
-    @notify_update
-    def track_save_as_template_responder(self, e):
-        self.track_template_manager.save_new(e.template)
 
     @notify_update
     def cell_name_changed_responder(self, e):
@@ -195,6 +188,12 @@ class TrackTemplateManager(Observation):
 
         self.read_dir(standard_track_template_dir())
 
+        self.add_responder(events.view.track.SaveAsTemplate,
+                           self.track_save_as_template_responder)
+
+    def track_save_as_template_responder(self, e):
+        self.save_new(e.template)
+
     def read_dir(self, path):
         self.templates = [self.read(p) for p in sorted(glob.glob(
             os.path.join(path, "*" + TRACK_TEMPLATE_EXT)))]
@@ -205,17 +204,18 @@ class TrackTemplateManager(Observation):
                 return TrackTemplateModel.from_json(f.read())
             except TypeError as e:
                 print(e)
-                self.notify(events.document.Error(self.document.model,
+                self.notify(events.document.Error(self.document,
                                                   f"Can't read track template {path}."))
 
     def save_new(self, template):
         with open(self.new_template_path(), "w+") as f:
             try:
                 f.write(template.to_json())
+                self.templates.append(template)
                 self.notify(events.track.TrackTemplateSaved(f.name, template))
             except TypeError as e:
                 print(e)
-                self.notify(events.document.Error(self.document.model,
+                self.notify(events.document.Error(self.document,
                                                   "Can't save track template file."))
 
     def new_template_path(self):
