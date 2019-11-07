@@ -40,6 +40,8 @@ class Editor(Observation, QScrollArea):
 
         self.add_responder(events.document.Open, self.documentOpenResponder)
         self.add_responder(events.view.main.TrackNew, self.trackNewResponder)
+        self.add_responder(events.view.browser.TrackNewFromTemplate,
+                           self.trackNewFromTemplateResponder)
         self.add_responder(events.view.track.Clicked,
                            self.trackClickedResponder)
         self.add_responder(events.view.main.TrackSelectLeft,
@@ -102,17 +104,10 @@ class Editor(Observation, QScrollArea):
             self.selectTrackAt(self.selectedTrackIndex + 1)
 
     def trackNewResponder(self, e):
-        length = self.innerLayout.count()
-        name = "Track " + str(length + 1)
-        track = Track(self, self.subject, length, name, TrackTemplateModel())
-        self.innerLayout.addWidget(track)
-        self.notify(events.view.track.New(name))
-
-        if self.numOfTracks() > 1:
-            firstTrack = self.trackAt(0)
-            [track.addCell() for _ in firstTrack.cells]
-            track.selectCellAt(firstTrack.selectedCellIndex)
-            not firstTrack.isPasteBufferEmpty() and track.fillPasteBuffer()
+        self.newTrack(TrackTemplateModel())
+            
+    def trackNewFromTemplateResponder(self, e):
+        self.newTrack(e.template)
 
     def trackMoveLeftResponder(self, e):
         self.moveSelectedTrackTo(self.selectedTrackIndex - 1)
@@ -226,13 +221,26 @@ class Editor(Observation, QScrollArea):
         msgBox.setText("Track Template Saved Succesfully")
         msgBox.setDetailedText(repr(e.template))
         msgBox.exec()
-        
+
     def trackRestartInterpreterResponder(self, e):
         # TODO
         if not self.hasSelectedTrack():
             return
-        
+
         track = self.trackAt(self.selectedTrackIndex)
+    
+    def newTrack(self, template):
+        length = self.innerLayout.count()
+        name = "Track " + str(length + 1)
+        track = Track(self, self.subject, length, name, template)
+        self.innerLayout.addWidget(track)
+        self.notify(events.view.track.New(name))
+
+        if self.numOfTracks() > 1:
+            firstTrack = self.trackAt(0)
+            [track.addCell() for _ in firstTrack.cells]
+            track.selectCellAt(firstTrack.selectedCellIndex)
+            not firstTrack.isPasteBufferEmpty() and track.fillPasteBuffer()
 
     def selectTrackAt(self, index):
         if self.selectedTrackIndex == index:

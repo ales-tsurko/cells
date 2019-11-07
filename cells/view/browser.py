@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from PySide2.QtWidgets import (QListWidget, QListWidgetItem, QWidget,
                                QFrame, QLabel, QVBoxLayout, QMenu,
                                QAction)
@@ -52,7 +54,11 @@ class Browser(Observation, QListWidget):
         menu.exec_(event.globalPos())
 
     def onTrackNewFromTemplate(self, e):
-        print("new track")
+        if not self.currentItem():
+            return
+        
+        template = self.templateManager.templates[self.currentRow()]
+        self.notify(events.view.browser.TrackNewFromTemplate(deepcopy(template)))
 
     def onTemplateDelete(self, e):
         if not self.currentItem():
