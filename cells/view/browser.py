@@ -3,7 +3,7 @@ from copy import deepcopy
 from PySide2.QtWidgets import (QListWidget, QListWidgetItem, QWidget,
                                QFrame, QLabel, QVBoxLayout, QMenu,
                                QAction)
-from PySide2.QtCore import Qt, QPoint
+from PySide2.QtCore import Qt
 
 from cells.observation import Observation
 
@@ -25,7 +25,7 @@ class Browser(Observation, QListWidget):
         self.setStyleSheet("border: 0;")
         self.setFrameStyle(QFrame.NoFrame | QFrame.Plain)
         self.setMaximumWidth(250)
-        self.setMinimumWidth(150)
+        self.setMinimumWidth(165)
 
         self._initActions()
 
@@ -41,13 +41,16 @@ class Browser(Observation, QListWidget):
         self._newTrackAct = QAction("New Track")
         self._newTrackAct.setShortcut(self.tr("Return"))
         self._newTrackAct.triggered.connect(self.onTrackNewFromTemplate)
+        self._newTrackAct.setShortcutContext(Qt.WidgetShortcut)
 
         self._deleteAct = QAction("Delete")
         self._deleteAct.setShortcut(self.tr("Alt+Backspace"))
         self._deleteAct.triggered.connect(self.onTemplateDelete)
+        self._deleteAct.setShortcutContext(Qt.WidgetShortcut)
 
         self._editAct = QAction("Edit")
         self._editAct.triggered.connect(self.onTemplateEdit)
+        # self._editAct.setShortcutContext(Qt.WidgetShortcut)
 
         self.addActions([self._newTrackAct, self._deleteAct, self._editAct])
 
@@ -130,6 +133,9 @@ class Item(Observation, QWidget):
         self.description = QLabel(description, wordWrap=True)
 
         layout = QVBoxLayout()
+        
+        layout.setSpacing(3)
+        layout.setAlignment(Qt.AlignTop)
         layout.addWidget(self.name)
         layout.addWidget(self.command)
         layout.addWidget(self.description)
