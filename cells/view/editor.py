@@ -301,7 +301,7 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         Observation.__init__(self, subject)
         QWidget.__init__(self)
 
-        self.delegate = None
+        self.template = None
         self.descriptionMaxLen = 500
 
         layout = QVBoxLayout()
@@ -363,63 +363,63 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         return acePropertyNames("mode-", ".js", False)
 
     def onBackendNameChanged(self, e):
-        if self.delegate is None:
+        if self.template is None:
             return
 
-        self.delegate.template.backend_name = e
+        self.template.backend_name = e
 
     def onRunCommandChanged(self, e):
-        if self.delegate is None:
+        if self.template is None:
             return
 
-        self.delegate.template.run_command = e
+        self.template.run_command = e
 
     def onPromptIndicatorChanged(self, e):
-        if self.delegate is None:
+        if self.template is None:
             return
 
-        self.delegate.template.prompt_indicator = e
+        self.template.prompt_indicator = e
 
     def onEditorModeChanged(self, e):
         mode = self.editorMode.itemText(e)
         self.codeView.setMode(mode)
-        if self.delegate is not None:
-            self.delegate.template.editor_mode = mode
+        if self.template is not None:
+            self.template.editor_mode = mode
 
-    def setDelegate(self, delegate):
-        self.delegate = delegate
+    def setTemplate(self, delegate):
+        self.template = delegate
         self.codeView.setDelegate(self)
         self.deserialize()
 
     def setCode(self, code, notify):
-        if self.delegate is None:
+        if self.template is None:
             return
 
-        self.delegate.template.setup_code = code
-        self.delegate.onTemplateUpdate()
+        self.template.setup_code = code
+        self.onTemplateUpdate()
+        
+    def onTemplateUpdate(self):
+        pass
 
     def code(self):
-        if self.delegate is None:
+        if self.template is None:
             return ""
 
-        return self.delegate.template.setup_code
+        return self.template.setup_code
 
     def codeWindowTitle(self):
-        if self.delegate is None:
-            return ""
-
-        return self.delegate.name() + " | Setup"
+        return "Track Editor"
 
     def deserialize(self):
-        if self.delegate is None:
+        if self.template is None:
             return
 
-        self.backendName.setText(self.delegate.template.backend_name)
-        self.runCommand.setText(self.delegate.template.run_command)
-        self.promptIndicator.setText(self.delegate.template.prompt_indicator)
-        self.editorMode.setCurrentText(self.delegate.template.editor_mode)
-        self.description.document().setPlainText(self.delegate.template.description)
-        self.setWindowTitle(self.codeWindowTitle())
+        self.backendName.setText(self.template.backend_name)
+        self.runCommand.setText(self.template.run_command)
+        self.promptIndicator.setText(self.template.prompt_indicator)
+        self.editorMode.setCurrentText(self.template.editor_mode)
+        self.description.document().setPlainText(self.template.description)
+        self.setWindowTitle("Track Editor")
 
     def delete(self):
         self.codeView.delete()
@@ -432,8 +432,8 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         return super().showEvent(event)
 
     def closeEvent(self, event):
-        if self.delegate is not None:
-            self.delegate.template.description = self.description.toPlainText()[
+        if self.template is not None:
+            self.template.description = self.description.toPlainText()[
                 :self.descriptionMaxLen]
 
         self.codeView.close()

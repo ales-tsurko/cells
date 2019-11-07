@@ -209,7 +209,8 @@ class Track(Observation, QWidget):
 
     def edit(self):
         view = self.editor.trackEditor
-        view.setDelegate(self)
+        view.setTemplate(self.template)
+        view.onTemplateUpdate = self.onTemplateUpdate
         view.show()
 
     def onTemplateUpdate(self):

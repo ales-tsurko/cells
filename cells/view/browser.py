@@ -10,6 +10,7 @@ from cells.observation import Observation
 from cells import events
 from cells.model import TrackTemplateManager
 from .dialogs import ConfirmationDialog
+from .editor import TrackEditor
 
 
 class Browser(Observation, QListWidget):
@@ -18,6 +19,8 @@ class Browser(Observation, QListWidget):
 
         Observation.__init__(self, subject)
         QListWidget.__init__(self)
+        self.templateEditor = TrackEditor(self.subject)
+        self.templateEditor.onTemplateUpdate = self.onTemplateUpdate
 
         self.setStyleSheet("border: 0;")
         self.setFrameStyle(QFrame.NoFrame | QFrame.Plain)
@@ -75,7 +78,21 @@ class Browser(Observation, QListWidget):
             self.takeItem(self.currentRow())
 
     def onTemplateEdit(self, e):
-        print("edit template")
+        if not self.currentItem():
+            return
+        
+        template = self.templateManager.templates[self.currentRow()]
+        self.templateEditor.setTemplate(template)
+        self.templateEditor.show()
+        
+    def onTemplateUpdate(self):
+        if not self.currentItem():
+            return
+        
+        template = self.templateManager.templates[self.currentRow()]
+        itemWidget = self.itemWidget(self.currentItem())
+        itemWidget.deserialize(template)
+        self.templateManager.save(template, template.path, False)
 
     def addTemplate(self, template):
         item = QListWidgetItem()
@@ -88,12 +105,13 @@ class Browser(Observation, QListWidget):
         self.addTemplate(e.template)
 
     def delete(self):
+        self.templateEditor.delete()
         self.unregister()
         self.setParent(None)
+        self.deleteLater()
 
     def closeEvent(self, e):
         self.delete()
-        return super().closeEvent(e)
 
 
 class Item(Observation, QWidget):
@@ -122,3 +140,8 @@ class Item(Observation, QWidget):
         if len(value) <= self.maxLineLen:
             return value
         return value[:self.maxLineLen] + "..."
+    
+    def deserialize(self, template):
+        self.name.setText(self.shortenString(template.backend_name))
+        self.command.setText(self.shortenString(template.run_command))
+        self.description.setText(self.shortenString(template.description))

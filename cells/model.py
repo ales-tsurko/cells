@@ -194,7 +194,7 @@ class TrackTemplateManager(Observation):
                            self.track_save_as_template_responder)
 
     def track_save_as_template_responder(self, e):
-        self.save_new(e.template)
+        self.save(e.template, self.new_template_path())
 
     def read_dir(self, path):
         self.templates = [self.read(p) for p in sorted(glob.glob(
@@ -211,14 +211,14 @@ class TrackTemplateManager(Observation):
                 self.notify(events.document.Error(self.document,
                                                   f"Can't read track template {path}."))
 
-    def save_new(self, template):
-        path = self.new_template_path()
+    def save(self, template, path, notify=True):
         with open(path, "w+") as f:
             try:
                 template.path = path
                 f.write(template.to_json())
                 self.templates.append(template)
-                self.notify(events.track.TrackTemplateSaved(template))
+                if notify:
+                    self.notify(events.track.TrackTemplateSaved(template))
             except TypeError as e:
                 print(e)
                 self.notify(events.document.Error(self.document,
