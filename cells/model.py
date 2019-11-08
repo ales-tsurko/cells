@@ -28,7 +28,7 @@ class TrackTemplateModel:
     backend_name: str = field(default="Default")
     setup_code: str = field(default="")
     run_command: str = field(default="")
-    prompt_indicator: str = field(default="")
+    command_prompt: str = field(default="")
     description: str = field(default="")
     editor_mode: str = field(default="plain text")
     path: str = field(default="")
@@ -37,7 +37,7 @@ class TrackTemplateModel:
         return f"Path: {self.path}\n" +\
                f"Backend Name: {self.backend_name}\n" +\
                f"Run Command: {self.run_command}\n" +\
-               f"Prompt Indicator: {self.prompt_indicator}\n" +\
+               f"Command Prompt: {self.command_prompt}\n" +\
                f"Editor Mode: {self.editor_mode}\n" +\
                f"Description: {self.description}\n" +\
                f"Setup Code: {self.setup_code}"

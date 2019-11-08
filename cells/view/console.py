@@ -21,6 +21,8 @@ class Console(Observation, QPlainTextEdit):
         self.setFont(font)
         self.add_responder(events.view.main.ConsoleClear,
                            self.consoleClearResponder)
+        self.add_responder(events.backend.Stdout,
+                           self.backendStdoutResponder)
 
     def sayHello(self):
         hello = ApplicationInfo.name + " v" + str(ApplicationInfo.version)
@@ -28,6 +30,9 @@ class Console(Observation, QPlainTextEdit):
 
     def consoleClearResponder(self, e):
         self.clear()
+        
+    def backendStdoutResponder(self, e):
+        self.appendPlainText(e.output)
         
     def clear(self):
         self.document().clear()

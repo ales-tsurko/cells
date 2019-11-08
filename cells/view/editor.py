@@ -333,8 +333,8 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         self.backendName.textChanged.connect(self.onBackendNameChanged)
         self.runCommand = QLineEdit(self, maxLength=200)
         self.runCommand.textChanged.connect(self.onRunCommandChanged)
-        self.promptIndicator = QLineEdit(self, maxLength=20)
-        self.promptIndicator.textChanged.connect(self.onPromptIndicatorChanged)
+        self.commandPrompt = QLineEdit(self, maxLength=20)
+        self.commandPrompt.textChanged.connect(self.onPromptIndicatorChanged)
 
         self.editorMode = QComboBox()
         [self.editorMode.addItem(mode) for mode in self._availableModes()]
@@ -344,7 +344,7 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
 
         layout.addRow(self.tr("Backend Name:"), self.backendName)
         layout.addRow(self.tr("Run Command:"), self.runCommand)
-        layout.addRow(self.tr("Prompt Indicator:"), self.promptIndicator)
+        layout.addRow(self.tr("Command Prompt (Regex):"), self.commandPrompt)
         layout.addRow(self.tr("Editor Mode:"), self.editorMode)
         layout.addRow(self.tr("Description:"), self.description)
 
@@ -366,19 +366,19 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         if self.template is None:
             return
 
-        self.template.backend_name = e
+        self.template.backend_name = e.strip()
 
     def onRunCommandChanged(self, e):
         if self.template is None:
             return
 
-        self.template.run_command = e
+        self.template.run_command = e.strip()
 
     def onPromptIndicatorChanged(self, e):
         if self.template is None:
             return
 
-        self.template.prompt_indicator = e
+        self.template.command_prompt = e.strip()
 
     def onEditorModeChanged(self, e):
         mode = self.editorMode.itemText(e)
@@ -414,9 +414,9 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         if self.template is None:
             return
 
-        self.backendName.setText(self.template.backend_name)
-        self.runCommand.setText(self.template.run_command)
-        self.promptIndicator.setText(self.template.prompt_indicator)
+        self.backendName.setText(self.template.backend_name.strip())
+        self.runCommand.setText(self.template.run_command.strip())
+        self.commandPrompt.setText(self.template.command_prompt.strip())
         self.editorMode.setCurrentText(self.template.editor_mode)
         self.description.document().setPlainText(self.template.description)
         self.setWindowTitle("Track Editor")

@@ -1,5 +1,8 @@
 import os
 import sys
+import asyncio
+
+from asyncqt import QEventLoop
 
 from PySide2.QtWidgets import QApplication
 from PySide2.QtGui import QFontDatabase
@@ -12,11 +15,12 @@ from cells.observation import Observation
 
 from rx.subject import Subject
 import cells.utility as utility
+from cells.backend import Backend
 
 
 class App(Observation):
     def __init__(self, subject):
-        super().__init__(subject)
+        Observation.__init__(self, subject)
         self.subject = subject
 
         self.app = QApplication(sys.argv)
@@ -44,9 +48,13 @@ class App(Observation):
                            self.document_new_responder)
 
     def run(self):
+        backend = Backend(self.subject)
+        loop = QEventLoop(self.app)
+        asyncio.set_event_loop(loop)
         self.main.show()
-        res = self.app.exec_()
+        loop.create_task(backend.run())
 
         self.subject.on_next(events.app.Quit())
 
-        sys.exit(res)
+        with loop:
+            sys.exit(loop.run_forever())
