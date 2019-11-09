@@ -4,6 +4,7 @@ from cells.model import TrackTemplateModel
 
 class New(NamedTuple):
     name: str
+    template: TrackTemplateModel
 
 
 class NameChanged(NamedTuple):

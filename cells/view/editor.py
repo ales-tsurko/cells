@@ -105,7 +105,7 @@ class Editor(Observation, QScrollArea):
 
     def trackNewResponder(self, e):
         self.newTrack(TrackTemplateModel())
-            
+
     def trackNewFromTemplateResponder(self, e):
         self.newTrack(e.template)
 
@@ -228,13 +228,13 @@ class Editor(Observation, QScrollArea):
             return
 
         track = self.trackAt(self.selectedTrackIndex)
-    
+
     def newTrack(self, template):
         length = self.innerLayout.count()
         name = "Track " + str(length + 1)
         track = Track(self, self.subject, length, name, template)
         self.innerLayout.addWidget(track)
-        self.notify(events.view.track.New(name))
+        self.notify(events.view.track.New(name, template))
 
         if self.numOfTracks() > 1:
             firstTrack = self.trackAt(0)
@@ -397,7 +397,7 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
 
         self.template.setup_code = code
         self.onTemplateUpdate()
-        
+
     def onTemplateUpdate(self):
         pass
 

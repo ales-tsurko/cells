@@ -1,21 +1,19 @@
+import asyncio
 import os
 import sys
-import asyncio
 
-from asyncqt import QEventLoop
-
-from PySide2.QtWidgets import QApplication
 from PySide2.QtGui import QFontDatabase
+from PySide2.QtWidgets import QApplication
 
+import cells.utility as utility
+from asyncqt import QEventLoop
+from cells import events
+from cells.backend import BackendRouter
+from cells.observation import Observation
 from cells.settings import ApplicationInfo
+from rx.subject import Subject
 
 from .main import Main
-from cells import events
-from cells.observation import Observation
-
-from rx.subject import Subject
-import cells.utility as utility
-from cells.backend import Backend
 
 
 class App(Observation):
@@ -27,8 +25,8 @@ class App(Observation):
         self.app.setApplicationName(ApplicationInfo.name)
         self.app.setApplicationDisplayName(ApplicationInfo.name)
 
-        font_path = os.path.join(utility.viewResourcesDir(),
-                                 "fonts", "FiraCode_2", "FiraCode-VF.ttf")
+        font_path = os.path.join(utility.viewResourcesDir(), "fonts",
+                                 "FiraCode_2", "FiraCode-VF.ttf")
         QFontDatabase.addApplicationFont(font_path)
         self.main = Main(subject)
 
@@ -48,11 +46,11 @@ class App(Observation):
                            self.document_new_responder)
 
     def run(self):
-        backend = Backend(self.subject)
         loop = QEventLoop(self.app)
+        BackendRouter(loop, self.subject)
         asyncio.set_event_loop(loop)
         self.main.show()
-        loop.create_task(backend.run())
+        #  loop.create_task(backend.run())
 
         self.subject.on_next(events.app.Quit())
 

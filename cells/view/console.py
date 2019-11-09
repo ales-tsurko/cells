@@ -2,7 +2,7 @@ from PySide2.QtWidgets import QFrame, QPlainTextEdit
 from PySide2.QtGui import QFont
 
 from cells.observation import Observation
-from cells.settings import ApplicationInfo
+from cells.settings import ApplicationInfo, FIGLET_NAME
 from cells import events
 
 
@@ -26,14 +26,15 @@ class Console(Observation, QPlainTextEdit):
 
     def sayHello(self):
         hello = ApplicationInfo.name + " v" + str(ApplicationInfo.version)
+
         self.appendPlainText(hello)
 
     def consoleClearResponder(self, e):
         self.clear()
-        
+
     def backendStdoutResponder(self, e):
         self.appendPlainText(e.output)
-        
+
     def clear(self):
         self.document().clear()
 
