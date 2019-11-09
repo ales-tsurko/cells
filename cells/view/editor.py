@@ -432,7 +432,7 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         self.deleteLater()
 
     def template(self):
-        self._template
+        return self._template
 
     def showEvent(self, event):
         self.codeView.show()

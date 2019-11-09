@@ -88,6 +88,8 @@ class Backend(Observation):
 
     async def evaluate(self, code):
         for line in code.encode("utf-8").splitlines():
+            if len(line) < 1:
+                continue
             self.proc.stdin.write(line)
             self.proc.stdin.write(b"\n")
             await self.proc.stdin.drain()
