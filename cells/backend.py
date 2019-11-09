@@ -1,5 +1,6 @@
 import asyncio
 import re
+import signal
 from asyncio import subprocess
 
 from cells import events
@@ -50,6 +51,7 @@ class BackendRouter(Observation):
 
     def cell_evaluate_responder(self, event):
         template = event.template
+
         if template.run_command not in self.backends:
             return
 
@@ -85,9 +87,9 @@ class Backend(Observation):
         await self.evaluate(self.template.setup_code)
         # self.notify(events.backend.Ready(...))
 
-    async def stop(self):
+    def stop(self):
         if self.proc:
-            self.proc.kill()
+            self.proc.stdin.close()
 
     async def evaluate(self, code):
         for line in code.encode("utf-8").splitlines():

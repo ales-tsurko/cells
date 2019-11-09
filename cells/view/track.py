@@ -411,6 +411,7 @@ class Cell(CellBase, metaclass=FinalMeta):
         self.preview.setWindowFlags(Qt.FramelessWindowHint)
         self.preview.setStyleSheet("margin: 10;")
         self.preview.setContextMenuPolicy(Qt.NoContextMenu)
+        self.preview.setAlignment(Qt.AlignTop)
 
         self.layout().addWidget(self.preview)
 

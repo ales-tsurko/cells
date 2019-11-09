@@ -1,16 +1,15 @@
-import os
 import glob
-from uuid import uuid4
-from time import time
+import os
 from dataclasses import dataclass, field
+from time import time
 from typing import List
+from uuid import uuid4
 
 from appdirs import user_data_dir
-from dataclasses_json import dataclass_json
-
 from cells import events
 from cells.observation import Observation
 from cells.settings import ApplicationInfo
+from dataclasses_json import dataclass_json
 
 TRACK_TEMPLATE_EXT = ".ctt"
 
@@ -63,6 +62,7 @@ def notify_update(method):
     def inner(instance, *args, **kwargs):
         method(instance, *args, **kwargs)
         instance.notify(events.document.Update(instance.model))
+
     return inner
 
 
@@ -78,10 +78,8 @@ class Document(Observation, dict):
         self.add_responder(events.view.main.FileSave, self.main_save_responder)
         self.add_responder(events.view.main.FileSaveAs,
                            self.main_save_responder)
-        self.add_responder(events.view.track.New,
-                           self.track_new_responder)
-        self.add_responder(events.view.track.CellAdd,
-                           self.cell_add_responder)
+        self.add_responder(events.view.track.New, self.track_new_responder)
+        self.add_responder(events.view.track.CellAdd, self.cell_add_responder)
         self.add_responder(events.view.track.CellRemove,
                            self.cell_remove_responder)
         self.add_responder(events.view.track.NameChanged,
@@ -134,6 +132,8 @@ class Document(Observation, dict):
 
     @notify_update
     def cell_code_changed_responder(self, e):
+        if len(self.model.tracks) < e.track_index + 1:
+            return
         track = self.model.tracks[e.track_index]
         cell = track.cells[e.index]
         cell.code = e.code
@@ -162,8 +162,8 @@ class Document(Observation, dict):
                 self.notify(events.document.Open(self.model))
             except TypeError as e:
                 print(e)
-                self.notify(events.document.Error(self.model,
-                                                  "Can't open file"))
+                self.notify(
+                    events.document.Error(self.model, "Can't open file"))
 
     def save(self, path):
         with open(path, "w+") as f:
@@ -173,8 +173,8 @@ class Document(Observation, dict):
                 f.write(self.model.to_json())
             except TypeError as e:
                 print(e)
-                self.notify(events.document.Error(self.model,
-                                                  "Can't save file"))
+                self.notify(
+                    events.document.Error(self.model, "Can't save file"))
 
     def update_name_from_path(self, path):
         base = os.path.basename(path)
@@ -197,19 +197,23 @@ class TrackTemplateManager(Observation):
         self.save(e.template, self.new_template_path())
 
     def read_dir(self, path):
-        self.templates = [self.read(p) for p in sorted(glob.glob(
-            os.path.join(path, "*" + TRACK_TEMPLATE_EXT)))]
+        self.templates = [
+            self.read(p) for p in sorted(
+                glob.glob(os.path.join(path, "*" + TRACK_TEMPLATE_EXT)))
+        ]
 
     def read(self, path):
         with open(path, "r") as f:
             try:
                 template = TrackTemplateModel.from_json(f.read())
                 template.path = path
+
                 return template
             except TypeError as e:
                 print(e)
-                self.notify(events.document.Error(self.document,
-                                                  f"Can't read track template {path}."))
+                self.notify(
+                    events.document.Error(
+                        self.document, f"Can't read track template {path}."))
 
     def save(self, template, path, notify=True):
         with open(path, "w+") as f:
@@ -217,12 +221,14 @@ class TrackTemplateManager(Observation):
                 template.path = path
                 f.write(template.to_json())
                 self.templates.append(template)
+
                 if notify:
                     self.notify(events.track.TrackTemplateSaved(template))
             except TypeError as e:
                 print(e)
-                self.notify(events.document.Error(self.document,
-                                                  "Can't save track template file."))
+                self.notify(
+                    events.document.Error(self.document,
+                                          "Can't save track template file."))
 
     def delete_at(self, index):
         template = self.templates.pop(index)
@@ -230,12 +236,16 @@ class TrackTemplateManager(Observation):
             os.remove(template.path)
         except FileNotFoundError as e:
             print(e)
-            self.notify(events.document.Error(self.document,
-                                              f"Can't find track template file at path {template.path}."))
+            self.notify(
+                events.document.Error(
+                    self.document,
+                    f"Can't find track template file at path {template.path}.")
+            )
 
     def new_template_path(self):
         file_name = str(int(time() * 10)) + "-" + \
             str(uuid4()) + TRACK_TEMPLATE_EXT
+
         return os.path.join(standard_track_template_dir(), file_name)
 
 
