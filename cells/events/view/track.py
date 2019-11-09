@@ -32,6 +32,7 @@ class InterpreterRestart(NamedTuple):
 
 class Remove(NamedTuple):
     index: int
+    template: TrackTemplateModel
 
 
 class Select(NamedTuple):
@@ -62,8 +63,8 @@ class CellSelected(NamedTuple):
 
 
 class CellEvaluate(NamedTuple):
-    track_index: int
-    index: int
+    template: TrackTemplateModel
+    code: str
 
 
 class CellClicked(NamedTuple):

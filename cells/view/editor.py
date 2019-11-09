@@ -1,17 +1,16 @@
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import (QFrame, QHBoxLayout, QScrollArea,
-                               QWidget, QMessageBox, QShortcut,
-                               QFormLayout, QVBoxLayout, QLineEdit,
-                               QPlainTextEdit, QLabel, QComboBox)
 from PySide2.QtGui import QKeySequence
+from PySide2.QtWidgets import (QComboBox, QFormLayout, QFrame, QHBoxLayout,
+                               QLabel, QLineEdit, QMessageBox, QPlainTextEdit,
+                               QScrollArea, QShortcut, QVBoxLayout, QWidget)
 
 from cells import events
-from cells.observation import Observation
 from cells.model import TrackTemplateModel
+from cells.observation import Observation
 
-from .track import Track
+from .code import CodeDelegate, CodeView, acePropertyNames
 from .dialogs import ConfirmationDialog
-from .code import CodeView, CodeDelegate, acePropertyNames
+from .track import Track
 
 
 class Editor(Observation, QScrollArea):
@@ -54,16 +53,13 @@ class Editor(Observation, QScrollArea):
                            self.trackMoveRightResponder)
         self.add_responder(events.view.main.TrackRemove,
                            self.trackRemoveResponder)
-        self.add_responder(events.view.main.RowRemove,
-                           self.rowRemoveResponder)
+        self.add_responder(events.view.main.RowRemove, self.rowRemoveResponder)
         self.add_responder(events.view.track.CellSelected,
                            self.cellSelectedResponder)
         self.add_responder(events.view.main.CellEvaluate,
                            self.cellEvaluateResponder)
-        self.add_responder(events.view.main.CellClear,
-                           self.cellClearResponder)
-        self.add_responder(events.view.main.CellEdit,
-                           self.cellEditResponder)
+        self.add_responder(events.view.main.CellClear, self.cellClearResponder)
+        self.add_responder(events.view.main.CellEdit, self.cellEditResponder)
         self.add_responder(events.view.main.TrackSetup,
                            self.trackSetupResponder)
         self.add_responder(events.view.main.TrackSaveAsTemplate,
@@ -77,8 +73,8 @@ class Editor(Observation, QScrollArea):
         self.clear()
 
         for (n, track) in enumerate(e.document.tracks):
-            trackView = Track(self, self.subject, n,
-                              track.name, track.template)
+            trackView = Track(self, self.subject, n, track.name,
+                              track.template)
             trackView.deserialize(track)
             self.innerLayout.addWidget(trackView)
 
@@ -120,6 +116,7 @@ class Editor(Observation, QScrollArea):
                 not self.hasSelectedTrack() or \
                 not index in range(self.numOfTracks()) or \
                 self.selectedTrackIndex == index:
+
             return
 
         track = self.innerLayout.takeAt(self.selectedTrackIndex)
@@ -144,10 +141,12 @@ class Editor(Observation, QScrollArea):
         if confirmation.exec_() == QMessageBox.No:
             return
 
+        self.notify(
+            events.view.track.Remove(self.selectedTrackIndex, track.template))
         track.delete()
-        self.notify(events.view.track.Remove(self.selectedTrackIndex))
-        self.selectTrackAt(self.selectedTrackIndex-1)
-        for n in range(self.selectedTrackIndex+1, self.numOfTracks()):
+        self.selectTrackAt(self.selectedTrackIndex - 1)
+
+        for n in range(self.selectedTrackIndex + 1, self.numOfTracks()):
             track = self.trackAt(n)
             track.setIndex(track.index - 1)
 
@@ -162,6 +161,7 @@ class Editor(Observation, QScrollArea):
 
         confirmation = ConfirmationDialog(
             "Delete Row", "Do you really want to delete selected row?")
+
         if confirmation.exec_() == QMessageBox.No:
             return
 
@@ -224,6 +224,7 @@ class Editor(Observation, QScrollArea):
 
     def trackRestartInterpreterResponder(self, e):
         # TODO
+
         if not self.hasSelectedTrack():
             return
 
@@ -266,11 +267,11 @@ class Editor(Observation, QScrollArea):
 
         if track.selectedCellIndex in range(len(track.cells)):
             cell = track.cells[track.selectedCellIndex]
-            self.ensureWidgetVisible(
-                cell, track.header.width(), track.header.height())
+            self.ensureWidgetVisible(cell, track.header.width(),
+                                     track.header.height())
         else:
-            self.ensureWidgetVisible(
-                track, track.header.width(), track.header.height())
+            self.ensureWidgetVisible(track, track.header.width(),
+                                     track.header.height())
 
     def hasSelectedTrack(self):
         return self.selectedTrackIndex in range(self.numOfTracks())
@@ -289,6 +290,7 @@ class Editor(Observation, QScrollArea):
         self.codeView.delete()
         self.trackEditor.delete()
         self.unregister()
+
         return super().closeEvent(e)
 
 
@@ -301,7 +303,7 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         Observation.__init__(self, subject)
         QWidget.__init__(self)
 
-        self.template = None
+        self._template = None
         self.descriptionMaxLen = 500
 
         layout = QVBoxLayout()
@@ -318,8 +320,9 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         self.setContextMenuPolicy(Qt.NoContextMenu)
         self.setWindowModality(Qt.ApplicationModal)
 
-        self.setWindowFlags(Qt.Tool | Qt.WindowTitleHint | Qt.CustomizeWindowHint |
-                            Qt.WindowCloseButtonHint | Qt.WindowMaximizeButtonHint)
+        self.setWindowFlags(Qt.Tool | Qt.WindowTitleHint
+                            | Qt.CustomizeWindowHint | Qt.WindowCloseButtonHint
+                            | Qt.WindowMaximizeButtonHint)
         self.setWindowFlag(Qt.WindowMinimizeButtonHint, False)
 
         self.codeView.closeShortcut.setEnabled(False)
@@ -363,62 +366,63 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         return acePropertyNames("mode-", ".js", False)
 
     def onBackendNameChanged(self, e):
-        if self.template is None:
+        if self._template is None:
             return
 
-        self.template.backend_name = e.strip()
+        self._template.backend_name = e.strip()
 
     def onRunCommandChanged(self, e):
-        if self.template is None:
+        if self._template is None:
             return
 
-        self.template.run_command = e.strip()
+        self._template.run_command = e.strip()
 
     def onPromptIndicatorChanged(self, e):
-        if self.template is None:
+        if self._template is None:
             return
 
-        self.template.command_prompt = e.strip()
+        self._template.command_prompt = e.strip()
 
     def onEditorModeChanged(self, e):
         mode = self.editorMode.itemText(e)
         self.codeView.setMode(mode)
-        if self.template is not None:
-            self.template.editor_mode = mode
+
+        if self._template is not None:
+            self._template.editor_mode = mode
 
     def setTemplate(self, delegate):
-        self.template = delegate
+        self._template = delegate
         self.codeView.setDelegate(self)
         self.deserialize()
 
     def setCode(self, code, notify):
-        if self.template is None:
+        if self._template is None:
             return
 
-        self.template.setup_code = code
+        self._template.setup_code = code
         self.onTemplateUpdate()
 
     def onTemplateUpdate(self):
         pass
 
     def code(self):
-        if self.template is None:
+        if self._template is None:
             return ""
 
-        return self.template.setup_code
+        return self._template.setup_code
 
     def codeWindowTitle(self):
         return "Track Editor"
 
     def deserialize(self):
-        if self.template is None:
+        if self._template is None:
             return
 
-        self.backendName.setText(self.template.backend_name.strip())
-        self.runCommand.setText(self.template.run_command.strip())
-        self.commandPrompt.setText(self.template.command_prompt.strip())
-        self.editorMode.setCurrentText(self.template.editor_mode)
-        self.description.document().setPlainText(self.template.description)
+        self.backendName.setText(self._template.backend_name.strip())
+        self.runCommand.setText(self._template.run_command.strip())
+        self.commandPrompt.setText(self._template.command_prompt.strip())
+        self.editorMode.setCurrentText(self._template.editor_mode)
+        self.description.document().setPlainText(self._template.description)
         self.setWindowTitle("Track Editor")
 
     def delete(self):
@@ -427,14 +431,18 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         self.setParent(None)
         self.deleteLater()
 
+    def template(self):
+        self._template
+
     def showEvent(self, event):
         self.codeView.show()
+
         return super().showEvent(event)
 
     def closeEvent(self, event):
-        if self.template is not None:
-            self.template.description = self.description.toPlainText()[
-                :self.descriptionMaxLen]
+        if self._template is not None:
+            self._template.description = self.description.toPlainText(
+            )[:self.descriptionMaxLen]
 
         self.codeView.close()
 

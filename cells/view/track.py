@@ -51,18 +51,12 @@ class Track(Observation, QWidget):
         self.add_responder(events.view.main.RowMoveUp, self.rowMoveUpResponder)
         self.add_responder(events.view.main.RowMoveDown,
                            self.rowMoveDownResponder)
-        self.add_responder(events.view.main.RowCopy,
-                           self.rowCopyResponder)
-        self.add_responder(events.view.main.RowCut,
-                           self.rowCutResponder)
-        self.add_responder(events.view.main.RowPaste,
-                           self.rowPasteResponder)
-        self.add_responder(events.view.main.CellCopy,
-                           self.cellCopyResponder)
-        self.add_responder(events.view.main.CellCut,
-                           self.cellCutResponder)
-        self.add_responder(events.view.main.CellPaste,
-                           self.cellPasteResponder)
+        self.add_responder(events.view.main.RowCopy, self.rowCopyResponder)
+        self.add_responder(events.view.main.RowCut, self.rowCutResponder)
+        self.add_responder(events.view.main.RowPaste, self.rowPasteResponder)
+        self.add_responder(events.view.main.CellCopy, self.cellCopyResponder)
+        self.add_responder(events.view.main.CellCut, self.cellCutResponder)
+        self.add_responder(events.view.main.CellPaste, self.cellPasteResponder)
         self.add_responder(events.view.track.CellClicked,
                            self.cellClickedResponder)
 
@@ -126,7 +120,7 @@ class Track(Observation, QWidget):
 
         cell = self.addCell()
         cell.deserialize(self._pasteBuffer, True)
-        pasteIndex = self.selectedCellIndex+1
+        pasteIndex = self.selectedCellIndex + 1
         self.selectCellAt(cell.index)
         self.moveSelectedCellTo(pasteIndex)
 
@@ -202,8 +196,9 @@ class Track(Observation, QWidget):
         previous = self.cells[self.selectedCellIndex]
         previous.index = self.selectedCellIndex
 
-        self.notify(events.view.track.CellMove(
-            self.index, self.selectedCellIndex, index))
+        self.notify(
+            events.view.track.CellMove(self.index, self.selectedCellIndex,
+                                       index))
         self.selectedCellIndex = index
 
     def copySelectedCellIntoBuffer(self):
@@ -221,18 +216,17 @@ class Track(Observation, QWidget):
         view.show()
 
     def onTemplateUpdate(self):
-        self.notify(events.view.track.TemplateUpdated(
-            self.index, self.template))
+        self.notify(
+            events.view.track.TemplateUpdated(self.index, self.template))
 
         confirmation = ConfirmationDialog(
-            "Restart Interpreter",
-            "Do you want to restart track's " +
-            "interpreter for the changes to " +
-            "take effect?")
+            "Restart Interpreter", "Do you want to restart track's " +
+            "interpreter for the changes to " + "take effect?")
 
         if confirmation.exec_() == QMessageBox.Yes:
-            self.notify(events.view.track.InterpreterRestart(
-                self.index, self.template))
+            self.notify(
+                events.view.track.InterpreterRestart(self.index,
+                                                     self.template))
 
     def saveAsTemplate(self):
         self.notify(events.view.track.SaveAsTemplate(self.template))
@@ -399,8 +393,7 @@ class Cell(CellBase, metaclass=FinalMeta):
 
         self.add_responder(events.view.main.CellEditName,
                            self.editNameResponder)
-        self.add_responder(events.view.track.Select,
-                           self.trackSelectResponder)
+        self.add_responder(events.view.track.Select, self.trackSelectResponder)
 
     def _initNameLabel(self):
         super()._initNameLabel()
@@ -431,8 +424,8 @@ class Cell(CellBase, metaclass=FinalMeta):
 
     def setSelected(self, value):
         if value:
-            self.notify(events.view.track.CellSelected(
-                self.track.index, self.index))
+            self.notify(
+                events.view.track.CellSelected(self.track.index, self.index))
         super().setSelected(value)
 
     def mousePressEvent(self, event):
@@ -441,14 +434,15 @@ class Cell(CellBase, metaclass=FinalMeta):
         return super().mousePressEvent(event)
 
     def onEditingNameFinished(self):
-        self.notify(events.view.track.CellNameChanged(
-            self.track.index, self.index, self.name()))
+        self.notify(
+            events.view.track.CellNameChanged(self.track.index, self.index,
+                                              self.name()))
 
         return super().onEditingNameFinished()
 
     def evaluate(self):
-        self.notify(events.view.track.CellEvaluate(
-            self.track.index, self.index))
+        self.notify(
+            events.view.track.CellEvaluate(self.track.template, self.code()))
 
     def updateStyle(self):
         if self.track.selected and self.selected:
@@ -478,10 +472,12 @@ class Cell(CellBase, metaclass=FinalMeta):
         self.setCode(model.code)
 
         if notify:
-            self.notify(events.view.track.CellNameChanged(
-                self.track.index, self.index, model.name))
-            self.notify(events.view.track.CellCodeChanged(
-                self.track.index, self.index, model.code))
+            self.notify(
+                events.view.track.CellNameChanged(self.track.index, self.index,
+                                                  model.name))
+            self.notify(
+                events.view.track.CellCodeChanged(self.track.index, self.index,
+                                                  model.code))
 
     def edit(self):
         view = self.track.editor.codeView
@@ -494,11 +490,15 @@ class Cell(CellBase, metaclass=FinalMeta):
         self.preview.setText(code)
 
         if notify:
-            self.notify(events.view.track.CellCodeChanged(
-                self.track.index, self.index, self.code()))
+            self.notify(
+                events.view.track.CellCodeChanged(self.track.index, self.index,
+                                                  self.code()))
 
     def code(self):
         return self._code
+
+    def template(self):
+        return self.track.template
 
     def codeWindowTitle(self):
         return self.track.name() + " | " + self.name()
@@ -506,8 +506,7 @@ class Cell(CellBase, metaclass=FinalMeta):
     def clear(self, confirm=True):
         if confirm:
             confirmation = ConfirmationDialog(
-                "Clear Cell",
-                "Do you really want to clear the selected cell?")
+                "Clear Cell", "Do you really want to clear the selected cell?")
 
             if confirmation.exec_() == QMessageBox.No:
                 return
@@ -515,8 +514,9 @@ class Cell(CellBase, metaclass=FinalMeta):
         self.setName(str(self.index + 1))
         self.setCode("", True)
 
-        self.notify(events.view.track.CellNameChanged(
-            self.track.index, self.index, self.name()))
+        self.notify(
+            events.view.track.CellNameChanged(self.track.index, self.index,
+                                              self.name()))
 
     def mouseDoubleClickEvent(self, event):
         self.edit()

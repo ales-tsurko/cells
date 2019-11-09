@@ -1,14 +1,15 @@
-import os
 import glob
+import os
 from abc import ABC, abstractmethod
 
-from PySide2.QtWebEngineWidgets import QWebEngineView, QWebEnginePage
-from PySide2.QtWidgets import QShortcut, QAction
 from PySide2.QtCore import Qt, QUrl
 from PySide2.QtGui import QKeySequence
-from cells.observation import Observation
-from cells import events
+from PySide2.QtWebEngineWidgets import QWebEnginePage, QWebEngineView
+from PySide2.QtWidgets import QAction, QShortcut
+
 import cells.utility as utility
+from cells import events
+from cells.observation import Observation
 from cells.settings import Settings
 
 
@@ -29,12 +30,13 @@ class CodeView(Observation, QWebEngineView):
         self.setWindowModality(Qt.ApplicationModal)
 
         self.page().loadFinished.connect(self.onLoadFinished)
-        self.setWindowFlags(Qt.Tool | Qt.WindowTitleHint | Qt.CustomizeWindowHint |
-                            Qt.WindowCloseButtonHint | Qt.WindowMaximizeButtonHint)
+        self.setWindowFlags(Qt.Tool | Qt.WindowTitleHint
+                            | Qt.CustomizeWindowHint | Qt.WindowCloseButtonHint
+                            | Qt.WindowMaximizeButtonHint)
         self.setWindowFlag(Qt.WindowMinimizeButtonHint, False)
 
-        self.closeShortcut = QShortcut(
-            QKeySequence(self.tr("Ctrl+w")), self, self.close)
+        self.closeShortcut = QShortcut(QKeySequence(self.tr("Ctrl+w")), self,
+                                       self.close)
 
         self.add_responder(events.settings.Save, self.settingsSaveResponder)
 
@@ -81,8 +83,7 @@ class CodeView(Observation, QWebEngineView):
         return name.lower().replace(" ", "_")
 
     def setCodeAsync(self, code):
-        self.page().runJavaScript(
-            f"editor.session.setValue({repr(code)});")
+        self.page().runJavaScript(f"editor.session.setValue({repr(code)});")
 
     def postContent(self):
         self.page().runJavaScript(
@@ -108,6 +109,7 @@ class CodeView(Observation, QWebEngineView):
 
     def closeEvent(self, event):
         self.postContent()
+
         return super().closeEvent(event)
 
 
@@ -118,8 +120,8 @@ class Ace(Observation, QWebEnginePage):
         QWebEnginePage.__init__(self)
         Observation.__init__(self, subject)
 
-        aceUrl = QUrl.fromLocalFile(os.path.join(
-            utility.viewResourcesDir(), "ace", "index.html"))
+        aceUrl = QUrl.fromLocalFile(
+            os.path.join(utility.viewResourcesDir(), "ace", "index.html"))
         self.load(aceUrl)
         # I'd like to move all the python<->js communication here
         # but when I'm starting to implement something more than just
@@ -140,10 +142,13 @@ class Ace(Observation, QWebEnginePage):
             self.getContent(message[len(Token.getContent):])
 
     def evaluate(self, code):
-        self.notify(events.view.code.Evaluate(code))
+        if self.delegate:
+            self.notify(
+                events.view.code.Evaluate(self.delegate.template(), code))
 
     def getContent(self, content):
-        self.delegate is not None and self.delegate.setCode(content, True)
+        if self.delegate is not None:
+            self.delegate.setCode(content, True)
 
 
 class Token:
@@ -152,7 +157,6 @@ class Token:
 
 
 class CodeDelegate(ABC):
-
     @abstractmethod
     def setCode(self, code, notify):
         pass
@@ -165,19 +169,23 @@ class CodeDelegate(ABC):
     def codeWindowTitle(self):
         return ""
 
+    @abstractmethod
+    def template(self):
+        pass
+
 
 def aceSrcDir():
-    return os.path.join(
-        utility.viewResourcesDir(), "ace", "ace-builds", "src")
+    return os.path.join(utility.viewResourcesDir(), "ace", "ace-builds", "src")
 
 
 def acePropertyNames(prefix, postfix, title=True):
     themesDir = aceSrcDir()
-    names = sorted(glob.glob(os.path.join(
-        themesDir, prefix + "*" + postfix)))
+    names = sorted(glob.glob(os.path.join(themesDir, prefix + "*" + postfix)))
     names = [os.path.basename(name) for name in names]
-    names = [name[len(prefix):-len(postfix)].replace("_", " ")
-             for name in names]
+    names = [
+        name[len(prefix):-len(postfix)].replace("_", " ") for name in names
+    ]
+
     if title:
         names = [name.title() for name in names]
 
