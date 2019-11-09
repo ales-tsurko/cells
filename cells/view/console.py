@@ -33,7 +33,8 @@ class Console(Observation, QPlainTextEdit):
         self.clear()
 
     def backendStdoutResponder(self, e):
-        self.appendPlainText(e.output)
+        if e.output:
+            self.appendPlainText(e.output)
 
     def clear(self):
         self.document().clear()

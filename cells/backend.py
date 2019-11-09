@@ -56,6 +56,10 @@ class BackendRouter(Observation):
         backend = self.backends[template.run_command]
         self.event_loop.create_task(backend.evaluate(event.code))
 
+    def delete(self):
+        for backend in self.backends.values():
+            backend.stop()
+
 
 class Backend(Observation):
     def __init__(self, event_loop, template, subject):
@@ -75,21 +79,18 @@ class Backend(Observation):
             *self.template.run_command.split(),
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE)
+            stderr=subprocess.STDOUT)
         output = await self.collect_output()
         self.notify(events.backend.Stdout(output))
         await self.evaluate(self.template.setup_code)
         # self.notify(events.backend.Ready(...))
 
-    def stop(self):
+    async def stop(self):
         if self.proc:
-            #  self.proc.terminate()
             self.proc.kill()
 
     async def evaluate(self, code):
         for line in code.encode("utf-8").splitlines():
-            if len(line) < 1:
-                continue
             self.proc.stdin.write(line)
             self.proc.stdin.write(b"\n")
             await self.proc.stdin.drain()

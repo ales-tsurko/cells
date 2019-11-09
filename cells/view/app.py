@@ -20,6 +20,8 @@ class App(Observation):
     def __init__(self, subject):
         Observation.__init__(self, subject)
         self.subject = subject
+        self.loop = None
+        self.backend = None
 
         self.app = QApplication(sys.argv)
         self.app.setApplicationName(ApplicationInfo.name)
@@ -39,6 +41,9 @@ class App(Observation):
         self.main.close()
         self.main.deleteLater()
         self.main = Main(self.subject)
+        self.backend.delete()
+        self.backend = BackendRouter(self.loop, self.subject)
+
         self.main.show()
 
     def _init_responders(self):
@@ -46,13 +51,12 @@ class App(Observation):
                            self.document_new_responder)
 
     def run(self):
-        loop = QEventLoop(self.app)
-        BackendRouter(loop, self.subject)
-        asyncio.set_event_loop(loop)
+        self.loop = QEventLoop(self.app)
+        self.backend = BackendRouter(self.loop, self.subject)
+        asyncio.set_event_loop(self.loop)
         self.main.show()
-        #  loop.create_task(backend.run())
 
         self.subject.on_next(events.app.Quit())
 
-        with loop:
-            sys.exit(loop.run_forever())
+        with self.loop:
+            sys.exit(self.loop.run_forever())
