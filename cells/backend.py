@@ -36,7 +36,7 @@ class BackendRouter(Observation):
         backend = Backend(self.event_loop, template, self.subject)
         self.backends[template.run_command] = backend
         self.backends[template.run_command].increment_references()
-        self.event_loop.create_task(backend.run())
+        backend.run()
 
     def track_remove_responder(self, event):
         template = event.template
@@ -76,7 +76,11 @@ class Backend(Observation):
         self.references = 0
         self.evaluation_queue = []
 
-    async def run(self):
+    def run(self):
+        self.evaluation_queue.append(
+            self.event_loop.create_task(self.runTask()))
+
+    async def runTask(self):
         if not self.template.run_command:
             return
 

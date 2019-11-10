@@ -75,8 +75,8 @@ class Editor(Observation, QScrollArea):
         for (n, track) in enumerate(e.document.tracks):
             trackView = Track(self, self.subject, n, track.name,
                               track.template)
-            trackView.deserialize(track)
             self.innerLayout.addWidget(trackView)
+            trackView.deserialize(track)
 
     def trackClickedResponder(self, e):
         self.selectTrackAt(e.index)

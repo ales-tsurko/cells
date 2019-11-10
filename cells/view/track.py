@@ -276,7 +276,7 @@ class Track(Observation, QWidget):
         for cell in model.cells:
             newCell = self.addCell(False)
             newCell.deserialize(cell)
-        self.notify(events.view.track.Deserialized(self.index, self.template))
+        self.notify(events.view.track.Deserialized(self.index, model.template))
 
     def isPasteBufferEmpty(self):
         return self._pasteBuffer is None
