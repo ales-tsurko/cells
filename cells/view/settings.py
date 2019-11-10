@@ -12,11 +12,11 @@ from .code import acePropertyNames
 
 
 class Settings(Observation, QDialog):
-    def __init__(self, subject):
+    def __init__(self, subject, settings):
         Observation.__init__(self, subject)
         QDialog.__init__(self)
 
-        self.model = SettingsModel(subject)
+        self.model = settings
         self.model.open()
 
         self.setWindowTitle("Settings")
@@ -77,7 +77,7 @@ class EditorPage(QWidget):
 
         self._initThemeChooser()
         self._initKeybindingsChooser()
-        
+
         self.deserialize(self.model)
 
     def _initThemeChooser(self):

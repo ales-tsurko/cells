@@ -40,6 +40,7 @@ class Settings(Observation, dict):
         self.setdefault("editor", {})
         self['editor'].setdefault("theme", "Gruvbox")
         self['editor'].setdefault("keybindings", "Sublime")
+        self.setdefault("powermode", False)
 
         self.notify(events.settings.Load(self))
 

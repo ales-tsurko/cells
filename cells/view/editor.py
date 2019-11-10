@@ -13,15 +13,16 @@ from .track_editor import TrackEditor
 
 
 class Editor(Observation, QScrollArea):
-    def __init__(self, subject):
+    def __init__(self, subject, powermode=False):
         Observation.__init__(self, subject)
         QScrollArea.__init__(self)
+        self.powermode = powermode
 
         self.setFrameShape(QFrame.NoFrame)
         self.setMinimumSize(200, 300)
 
         self.codeView = CodeView(subject)
-        self.trackEditor = TrackEditor(self.subject)
+        self.trackEditor = TrackEditor(self.subject, self.powermode)
 
         self.selectedTrackIndex = -1
 

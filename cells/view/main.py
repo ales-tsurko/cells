@@ -12,13 +12,16 @@ from .console import Console
 from .dialogs import ConfirmationDialog
 from .editor import Editor
 from .settings import Settings
+from cells.settings import Settings as SettingsModel
 
 
 class Main(QMainWindow, Observation):
-    def __init__(self, subject, powermode=False):
+    def __init__(self, subject):
         QMainWindow.__init__(self, None)
         Observation.__init__(self, subject)
-        self.powermode = powermode
+        self.settings = SettingsModel(self.subject)
+
+        self.powermode = self.settings["powermode"]
 
         self.setWindowTitle("Default")
         self.setMinimumSize(800, 600)
@@ -163,7 +166,7 @@ class Main(QMainWindow, Observation):
         centralView.setFrameStyle(QFrame.NoFrame | QFrame.Plain)
         centralView.setRubberBand(-1)
 
-        self.browser = Browser(self.document, self.subject)
+        self.browser = Browser(self.document, self.subject, self.powermode)
 
         centralView.addWidget(self.browser)
 
@@ -171,7 +174,7 @@ class Main(QMainWindow, Observation):
         canvas.setFrameStyle(QFrame.NoFrame | QFrame.Plain)
         canvas.setOrientation(Qt.Vertical)
         canvas.setRubberBand(-1)
-        self.editor = Editor(self.subject)
+        self.editor = Editor(self.subject, self.powermode)
         self.console = Console(self.subject)
 
         canvas.addWidget(self.editor)
@@ -232,7 +235,7 @@ class Main(QMainWindow, Observation):
             self.saved = True
 
     def onSettings(self, e):
-        settings = Settings(self.subject)
+        settings = Settings(self.subject, self.settings)
         settings.exec_()
 
     def onTrackNew(self, e):
