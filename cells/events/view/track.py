@@ -1,4 +1,5 @@
 from typing import NamedTuple
+
 from cells.model import TrackTemplateModel
 
 
@@ -28,6 +29,11 @@ class WillRestart(NamedTuple):
 class InterpreterRestart(NamedTuple):
     track_index: int
     setup_code: str
+
+
+class Deserialized(NamedTuple):
+    track_index: int
+    template: TrackTemplateModel
 
 
 class Remove(NamedTuple):

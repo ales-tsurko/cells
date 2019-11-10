@@ -239,9 +239,12 @@ class Editor(Observation, QScrollArea):
 
         if self.numOfTracks() > 1:
             firstTrack = self.trackAt(0)
-            [track.addCell() for _ in firstTrack.cells]
+            for _ in firstTrack.cells:
+                track.addCell()
             track.selectCellAt(firstTrack.selectedCellIndex)
-            not firstTrack.isPasteBufferEmpty() and track.fillPasteBuffer()
+
+            if not firstTrack.isPasteBufferEmpty():
+                track.fillPasteBuffer()
 
     def selectTrackAt(self, index):
         if self.selectedTrackIndex == index:

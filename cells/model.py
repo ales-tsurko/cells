@@ -104,7 +104,7 @@ class Document(Observation, dict):
 
     @notify_update
     def track_new_responder(self, e):
-        track = TrackModel(e.name, [])
+        track = TrackModel(e.name, [], e.template)
         self.model.tracks.append(track)
         self.notify(events.track.New(track))
 

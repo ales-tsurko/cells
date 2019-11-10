@@ -14,6 +14,8 @@ class BackendRouter(Observation):
         self.backends = {}
 
         self.add_responder(events.view.track.New, self.track_new_responder)
+        self.add_responder(events.view.track.Deserialized,
+                           self.track_new_responder)
         self.add_responder(events.view.track.Remove,
                            self.track_remove_responder)
         self.add_responder(events.view.track.CellEvaluate,
