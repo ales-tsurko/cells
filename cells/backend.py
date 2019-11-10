@@ -26,7 +26,7 @@ class BackendRouter(Observation):
 
         if template.run_command in self.backends:
             backend = self.backends[template.run_command]
-            self.event_loop.create_task(backend.evaluate(template.setup_code))
+            backend.evaluate(template.setup_code)
             self.backends[template.run_command].increment_references()
 
             return
@@ -56,7 +56,7 @@ class BackendRouter(Observation):
             return
 
         backend = self.backends[template.run_command]
-        self.event_loop.create_task(backend.evaluate(event.code))
+        backend.evaluate(event.code)
 
     def delete(self):
         for backend in self.backends.values():
@@ -72,6 +72,7 @@ class Backend(Observation):
                                     flags=re.MULTILINE)
         self.proc = None
         self.references = 0
+        self.evaluation_queue = []
 
     async def run(self):
         if not self.template.run_command:
@@ -84,14 +85,24 @@ class Backend(Observation):
             stderr=subprocess.STDOUT)
         output = await self.collect_output()
         self.notify(events.backend.Stdout(output))
-        await self.evaluate(self.template.setup_code)
+        self.evaluate(self.template.setup_code)
         # self.notify(events.backend.Ready(...))
 
     def stop(self):
         if self.proc:
             self.proc.stdin.close()
 
-    async def evaluate(self, code):
+    def evaluate(self, code):
+        if len(code) < 1:
+            return
+
+        self.evaluation_queue.append(
+            self.event_loop.create_task(self.evaluateTask(code)))
+
+    async def evaluateTask(self, code):
+        if len(self.evaluation_queue) > 1:
+            await self.evaluation_queue.pop(0)
+
         for line in code.encode("utf-8").splitlines():
             self.proc.stdin.write(line)
             self.proc.stdin.write(b"\n")
