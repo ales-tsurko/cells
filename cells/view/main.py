@@ -1,25 +1,24 @@
-from PySide2.QtGui import QKeySequence
-from PySide2.QtWidgets import (QFileDialog, QMainWindow, QMessageBox,
-                               QBoxLayout, QHBoxLayout, QWidget, QSplitter,
-                               QFrame)
 from PySide2.QtCore import Qt
+from PySide2.QtGui import QKeySequence
+from PySide2.QtWidgets import (QBoxLayout, QFileDialog, QFrame, QHBoxLayout,
+                               QMainWindow, QMessageBox, QSplitter, QWidget)
 
 from cells import events
+from cells.model import Document
 from cells.observation import Observation
 
 from .browser import Browser
 from .console import Console
+from .dialogs import ConfirmationDialog
 from .editor import Editor
 from .settings import Settings
-from .dialogs import ConfirmationDialog
-from cells.model import Document
 
 
 class Main(QMainWindow, Observation):
-
-    def __init__(self, subject):
+    def __init__(self, subject, powermode=False):
         QMainWindow.__init__(self, None)
         Observation.__init__(self, subject)
+        self.powermode = powermode
 
         self.setWindowTitle("Default")
         self.setMinimumSize(800, 600)
@@ -50,44 +49,42 @@ class Main(QMainWindow, Observation):
                             self.onFileOpen)
         self._addMenuAction(fileMenu, "Save", QKeySequence.Save,
                             self.onFileSave)
-        self._addMenuAction(fileMenu,
-                            "Duplicate",
-                            QKeySequence.SaveAs,
+        self._addMenuAction(fileMenu, "Duplicate", QKeySequence.SaveAs,
                             self.onFileSaveAs)
 
     def _createEditMenu(self):
         editMenu = self.menuBar().addMenu("Edit")
 
         trackSub = editMenu.addMenu("Track")
-        self._addMenuAction(trackSub, "New", self.tr('Ctrl+t'),
-                            self.onTrackNew)
+
+        if self.powermode:
+            self._addMenuAction(trackSub, "New", self.tr('Ctrl+t'),
+                                self.onTrackNew)
         self._addMenuAction(trackSub, "Edit Name", self.tr('Shift+n'),
                             self.onTrackRename)
-        self._addMenuAction(trackSub, "Remove",
-                            self.tr('Ctrl+Backspace'),
+        self._addMenuAction(trackSub, "Remove", self.tr('Ctrl+Backspace'),
                             self.onTrackRemove)
 
         trackSub.addSeparator()
-        self._addMenuAction(trackSub, "Select Left",
-                            self.tr('h'),
+        self._addMenuAction(trackSub, "Select Left", self.tr('h'),
                             self.onTrackSelectLeft)
-        self._addMenuAction(trackSub, "Select Right",
-                            self.tr('l'),
+        self._addMenuAction(trackSub, "Select Right", self.tr('l'),
                             self.onTrackSelectRight)
         trackSub.addSeparator()
-        self._addMenuAction(trackSub, "Move Left",
-                            self.tr('Shift+h'),
+        self._addMenuAction(trackSub, "Move Left", self.tr('Shift+h'),
                             self.onTrackMoveLeft)
-        self._addMenuAction(trackSub, "Move Right",
-                            self.tr('Shift+l'),
+        self._addMenuAction(trackSub, "Move Right", self.tr('Shift+l'),
                             self.onTrackMoveRight)
         trackSub.addSeparator()
         self._addMenuAction(trackSub, "Setup", self.tr('Shift+e'),
                             self.onTrackSetup)
-        self._addMenuAction(trackSub, "Save as Template", self.tr(""),
-                            self.onTrackSaveAsTemplate)
+
+        if self.powermode:
+            self._addMenuAction(trackSub, "Save as Template", self.tr(""),
+                                self.onTrackSaveAsTemplate)
         trackSub.addSeparator()
-        self._addMenuAction(trackSub, "Restart Interpreter", self.tr("Ctrl+Shift+R"),
+        self._addMenuAction(trackSub, "Restart Interpreter",
+                            self.tr("Ctrl+Shift+R"),
                             self.onTrackRestartInterpreter)
 
         rowSub = editMenu.addMenu("Row")
@@ -96,15 +93,12 @@ class Main(QMainWindow, Observation):
         rowSub.addSeparator()
         self._addMenuAction(rowSub, "Add", self.tr('Alt+Return'),
                             self.onRowAdd)
-        self._addMenuAction(rowSub, "Remove",
-                            self.tr('Shift+Backspace'),
+        self._addMenuAction(rowSub, "Remove", self.tr('Shift+Backspace'),
                             self.onRowRemove)
         rowSub.addSeparator()
-        self._addMenuAction(rowSub, "Select Up",
-                            self.tr('k'),
+        self._addMenuAction(rowSub, "Select Up", self.tr('k'),
                             self.onRowSelectUp)
-        self._addMenuAction(rowSub, "Select Down",
-                            self.tr('j'),
+        self._addMenuAction(rowSub, "Select Down", self.tr('j'),
                             self.onRowSelectDown)
         rowSub.addSeparator()
         self._addMenuAction(rowSub, "Move Up", self.tr('Shift+K'),
@@ -120,8 +114,7 @@ class Main(QMainWindow, Observation):
                             self.onRowPaste)
 
         cellSub = editMenu.addMenu("Cell")
-        self._addMenuAction(cellSub, "Edit", self.tr('e'),
-                            self.onCellEdit)
+        self._addMenuAction(cellSub, "Edit", self.tr('e'), self.onCellEdit)
         self._addMenuAction(cellSub, "Edit Name", self.tr('n'),
                             self.onCellEditName)
         self._addMenuAction(cellSub, "Evaluate", self.tr('Shift+Return'),
@@ -129,12 +122,12 @@ class Main(QMainWindow, Observation):
         self._addMenuAction(cellSub, "Clear", self.tr('Backspace'),
                             self.onCellClear)
         cellSub.addSeparator()
-        self._addMenuAction(cellSub, "Copy", self.tr(
-            "Alt+Shift+c"), self.onCellCopy)
-        self._addMenuAction(cellSub, "Cut", self.tr(
-            "Alt+Shift+x"), self.onCellCut)
-        self._addMenuAction(cellSub, "Paste", self.tr(
-            "Alt+Shift+v"), self.onCellPaste)
+        self._addMenuAction(cellSub, "Copy", self.tr("Alt+Shift+c"),
+                            self.onCellCopy)
+        self._addMenuAction(cellSub, "Cut", self.tr("Alt+Shift+x"),
+                            self.onCellCut)
+        self._addMenuAction(cellSub, "Paste", self.tr("Alt+Shift+v"),
+                            self.onCellPaste)
 
         editMenu.addSeparator()
 
@@ -149,16 +142,16 @@ class Main(QMainWindow, Observation):
 
         consoleSub = viewMenu.addMenu("Console")
 
-        self._addMenuAction(consoleSub, "Toggle", self.tr(
-            "Ctrl+`"), self.onConsoleToggle)
-        self._addMenuAction(consoleSub, "Clear",
-                            self.tr("Ctrl+k"), self.onConsoleClear)
+        self._addMenuAction(consoleSub, "Toggle", self.tr("Ctrl+`"),
+                            self.onConsoleToggle)
+        self._addMenuAction(consoleSub, "Clear", self.tr("Ctrl+k"),
+                            self.onConsoleClear)
 
         consoleSub.addSeparator()
-        self._addMenuAction(consoleSub, "To Bottom",
-                            self.tr("Ctrl+1"), self.onConsoleToBottom)
-        self._addMenuAction(consoleSub, "To Right",
-                            self.tr("Ctrl+2"), self.onConsoleToRight)
+        self._addMenuAction(consoleSub, "To Bottom", self.tr("Ctrl+1"),
+                            self.onConsoleToBottom)
+        self._addMenuAction(consoleSub, "To Right", self.tr("Ctrl+2"),
+                            self.onConsoleToRight)
 
     def _addMenuAction(self, menu, name, shortcut, callback):
         newAct = menu.addAction(name)
@@ -323,6 +316,7 @@ class Main(QMainWindow, Observation):
     def onBrowserToggle(self, e):
         browser = self.centralWidget().widget(0)
         browser.setVisible(not browser.isVisible())
+
         if browser.isVisible():
             browser.setFocus()
 
@@ -351,6 +345,7 @@ class Main(QMainWindow, Observation):
 
         if reply == QMessageBox.Cancel:
             e.ignore()
+
             return
 
         self.editor.close()
@@ -359,14 +354,15 @@ class Main(QMainWindow, Observation):
 
         self.notify(events.view.main.Close())
         self.unregister()
+
         return super().closeEvent(e)
 
     def checkSave(self, e):
         if self.saved:
             return
 
-        confirmation = ConfirmationDialog(
-            "Close Document", "Do you want to save changes?",  True)
+        confirmation = ConfirmationDialog("Close Document",
+                                          "Do you want to save changes?", True)
         reply = confirmation.exec_()
 
         if reply == QMessageBox.Cancel:

@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from PySide2.QtCore import Qt, QUrl
 from PySide2.QtGui import QKeySequence
 from PySide2.QtWebEngineWidgets import QWebEnginePage, QWebEngineView
-from PySide2.QtWidgets import QAction, QShortcut
+from PySide2.QtWidgets import QAction, QShortcut, QSizePolicy
 
 import cells.utility as utility
 from cells import events
@@ -25,6 +25,7 @@ class CodeView(Observation, QWebEngineView):
         page = Ace(delegate, subject)
         self.setPage(page)
         self.setMinimumSize(500, 300)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.setContextMenuPolicy(Qt.NoContextMenu)
         self.setWindowModality(Qt.ApplicationModal)

@@ -18,13 +18,14 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         QWidget.__init__(self)
 
         self._template = None
+        self.powermode = powermode
         self.descriptionMaxLen = 500
 
         layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignTop)
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
-
-        self.layout().setSpacing(0)
-        self.layout().setContentsMargins(0, 0, 0, 0)
 
         self._initForm()
         self._initCodeEditor()
@@ -46,24 +47,32 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
     def _initForm(self):
 
         layout = QFormLayout()
-        self.backendName = QLineEdit(self, maxLength=20)
-        self.backendName.textChanged.connect(self.onBackendNameChanged)
         self.runCommand = QLineEdit(self, maxLength=200)
         self.runCommand.textChanged.connect(self.onRunCommandChanged)
-        self.commandPrompt = QLineEdit(self, maxLength=20)
-        self.commandPrompt.textChanged.connect(self.onPromptIndicatorChanged)
 
-        self.editorMode = QComboBox()
-        [self.editorMode.addItem(mode) for mode in self._availableModes()]
-        self.editorMode.currentIndexChanged.connect(self.onEditorModeChanged)
+        if self.powermode:
+            self.backendName = QLineEdit(self, maxLength=20)
+            self.backendName.textChanged.connect(self.onBackendNameChanged)
 
-        self.description = QPlainTextEdit(self, fixedHeight=100)
+            self.commandPrompt = QLineEdit(self, maxLength=20)
+            self.commandPrompt.textChanged.connect(
+                self.onPromptIndicatorChanged)
 
-        layout.addRow(self.tr("Backend Name:"), self.backendName)
+            self.editorMode = QComboBox()
+            [self.editorMode.addItem(mode) for mode in self._availableModes()]
+            self.editorMode.currentIndexChanged.connect(
+                self.onEditorModeChanged)
+
+            self.description = QPlainTextEdit(self, fixedHeight=100)
+
         layout.addRow(self.tr("Run Command:"), self.runCommand)
-        layout.addRow(self.tr("Command Prompt (Regex):"), self.commandPrompt)
-        layout.addRow(self.tr("Editor Mode:"), self.editorMode)
-        layout.addRow(self.tr("Description:"), self.description)
+
+        if self.powermode:
+            layout.addRow(self.tr("Backend Name:"), self.backendName)
+            layout.addRow(self.tr("Command Prompt (Regex):"),
+                          self.commandPrompt)
+            layout.addRow(self.tr("Editor Mode:"), self.editorMode)
+            layout.addRow(self.tr("Description:"), self.description)
 
         layout.setSpacing(10)
         layout.setContentsMargins(10, 10, 10, 10)
@@ -71,7 +80,6 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
 
     def _initCodeEditor(self):
         self.codeView = CodeView(self.subject)
-        self.codeView.setFixedHeight(210)
         self.layout().addWidget(QLabel("Setup Code:", margin=10))
         self.layout().addWidget(self.codeView)
         self.codeView.setDelegate(self)
@@ -132,11 +140,17 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         if self._template is None:
             return
 
-        self.backendName.setText(self._template.backend_name.strip())
         self.runCommand.setText(self._template.run_command.strip())
-        self.commandPrompt.setText(self._template.command_prompt.strip())
-        self.editorMode.setCurrentText(self._template.editor_mode)
-        self.description.document().setPlainText(self._template.description)
+
+        if self.powermode:
+            self.backendName.setText(self._template.backend_name.strip())
+            self.commandPrompt.setText(self._template.command_prompt.strip())
+            self.editorMode.setCurrentText(self._template.editor_mode)
+            self.description.document().setPlainText(
+                self._template.description)
+        else:
+            self.codeView.setMode(self._template.editor_mode)
+
         self.setWindowTitle("Track Editor")
 
     def delete(self):
@@ -154,7 +168,7 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         return super().showEvent(event)
 
     def closeEvent(self, event):
-        if self._template is not None:
+        if self._template is not None and self.powermode:
             self._template.description = self.description.toPlainText(
             )[:self.descriptionMaxLen]
 

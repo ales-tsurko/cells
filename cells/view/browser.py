@@ -16,6 +16,7 @@ from .track_editor import TrackEditor
 class Browser(Observation, QListWidget):
     def __init__(self, document, subject, powermode=False):
         self.templateManager = TrackTemplateManager(document, subject)
+        self.powermode = powermode
 
         Observation.__init__(self, subject)
         QListWidget.__init__(self)
@@ -38,21 +39,22 @@ class Browser(Observation, QListWidget):
         # as far as ownership of actions isn't transfered
         # to add action, we need to keep them by reference counter,
         # so we make them attributes
-        self._newTrackAct = QAction("New Track")
+        self._newTrackAct = QAction("New Track (Return)")
         self._newTrackAct.setShortcut(self.tr("Return"))
         self._newTrackAct.triggered.connect(self.onTrackNewFromTemplate)
         self._newTrackAct.setShortcutContext(Qt.WidgetShortcut)
+        self.addAction(self._newTrackAct)
 
-        self._deleteAct = QAction("Delete")
-        self._deleteAct.setShortcut(self.tr("Alt+Backspace"))
-        self._deleteAct.triggered.connect(self.onTemplateDelete)
-        self._deleteAct.setShortcutContext(Qt.WidgetShortcut)
+        if self.powermode:
+            self._deleteAct = QAction("Delete (Alt+Backspace)")
+            self._deleteAct.setShortcut(self.tr("Alt+Backspace"))
+            self._deleteAct.triggered.connect(self.onTemplateDelete)
+            self._deleteAct.setShortcutContext(Qt.WidgetShortcut)
+            self.addAction(self._deleteAct)
 
-        self._editAct = QAction("Edit")
-        self._editAct.triggered.connect(self.onTemplateEdit)
-        # self._editAct.setShortcutContext(Qt.WidgetShortcut)
-
-        self.addActions([self._newTrackAct, self._deleteAct, self._editAct])
+            self._editAct = QAction("Edit")
+            self._editAct.triggered.connect(self.onTemplateEdit)
+            self.addAction(self._editAct)
 
     def contextMenuEvent(self, event):
         menu = QMenu()
