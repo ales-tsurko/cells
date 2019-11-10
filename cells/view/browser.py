@@ -10,11 +10,11 @@ from cells.observation import Observation
 from cells import events
 from cells.model import TrackTemplateManager
 from .dialogs import ConfirmationDialog
-from .editor import TrackEditor
+from .track_editor import TrackEditor
 
 
 class Browser(Observation, QListWidget):
-    def __init__(self, document, subject):
+    def __init__(self, document, subject, powermode=False):
         self.templateManager = TrackTemplateManager(document, subject)
 
         Observation.__init__(self, subject)
@@ -62,19 +62,19 @@ class Browser(Observation, QListWidget):
     def onTrackNewFromTemplate(self, e):
         if not self.currentItem():
             return
-        
+
         template = self.templateManager.templates[self.currentRow()]
         self.notify(events.view.browser.TrackNewFromTemplate(deepcopy(template)))
 
     def onTemplateDelete(self, e):
         if not self.currentItem():
             return
-        
+
         item = self.currentItem()
         name = self.itemWidget(item).template.backend_name
 
         confirmation = ConfirmationDialog(
-            "Delete Track Template", 
+            "Delete Track Template",
             f"Do you really want to delete {name} track template?")
         if confirmation.exec_() == ConfirmationDialog.Yes:
             self.templateManager.delete_at(self.currentRow())
@@ -83,15 +83,15 @@ class Browser(Observation, QListWidget):
     def onTemplateEdit(self, e):
         if not self.currentItem():
             return
-        
+
         template = self.templateManager.templates[self.currentRow()]
         self.templateEditor.setTemplate(template)
         self.templateEditor.show()
-        
+
     def onTemplateUpdate(self):
         if not self.currentItem():
             return
-        
+
         template = self.templateManager.templates[self.currentRow()]
         itemWidget = self.itemWidget(self.currentItem())
         itemWidget.deserialize(template)
@@ -133,7 +133,7 @@ class Item(Observation, QWidget):
         self.description = QLabel(description, wordWrap=True)
 
         layout = QVBoxLayout()
-        
+
         layout.setSpacing(3)
         layout.setAlignment(Qt.AlignTop)
         layout.addWidget(self.name)
@@ -146,7 +146,7 @@ class Item(Observation, QWidget):
         if len(value) <= self.maxLineLen:
             return value
         return value[:self.maxLineLen] + "..."
-    
+
     def deserialize(self, template):
         self.name.setText(self.shortenString(template.backend_name))
         self.command.setText(self.shortenString(template.run_command))
