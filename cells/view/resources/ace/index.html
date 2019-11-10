@@ -55,9 +55,7 @@
       // IMPORTANT: don't change this variable name, it's exposed to Python
       // or change it in code.py too
       var editor = ace.edit("editor");
-      editor.getSession().setMode("ace/mode/supercollider");
       editor.setTheme("ace/theme/tomorrow");
-      editor.getSession().setTabSize(2);
       editor.setBehavioursEnabled(true);
       editor.getSession().setUseSoftTabs(true);
 
@@ -65,7 +63,10 @@
       editor.setOptions({
           enableBasicAutocompletion: true,
           enableSnippets: true,
-          enableLiveAutocompletion: true
+          enableLiveAutocompletion: true,
+          useSoftTabs: true,
+          navigateWithinSoftTabs: true,
+          tabSize: 4
       });
 
       // evaluation interface
