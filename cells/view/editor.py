@@ -58,6 +58,10 @@ class Editor(Observation, QScrollArea):
                            self.cellSelectedResponder)
         self.add_responder(events.view.main.CellEvaluate,
                            self.cellEvaluateResponder)
+        # we evaluate row here instead of in Track to keep left-to-right
+        # evaluation order when we move tracks
+        self.add_responder(events.view.main.RowEvaluate,
+                           self.rowEvaluateResponder)
         self.add_responder(events.view.main.CellClear, self.cellClearResponder)
         self.add_responder(events.view.main.CellEdit, self.cellEditResponder)
         self.add_responder(events.view.main.TrackSetup,
@@ -181,6 +185,16 @@ class Editor(Observation, QScrollArea):
 
         track.cells[track.selectedCellIndex].evaluate()
 
+    def rowEvaluateResponder(self, e):
+        if not self.hasSelectedTrack():
+            return
+
+        for index in range(self.numOfTracks()):
+            track = self.trackAt(index)
+
+            if track.hasSelectedCell():
+                track.cells[track.selectedCellIndex].evaluate()
+
     def cellClearResponder(self, e):
         if not self.hasSelectedTrack():
             return
@@ -239,6 +253,7 @@ class Editor(Observation, QScrollArea):
 
         if self.numOfTracks() > 1:
             firstTrack = self.trackAt(0)
+
             for _ in firstTrack.cells:
                 track.addCell()
             track.selectCellAt(firstTrack.selectedCellIndex)
