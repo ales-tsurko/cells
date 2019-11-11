@@ -87,11 +87,11 @@ class Backend(Observation):
 
     async def runTask(self):
         if not self.template.run_command or \
-                self.proc and not self.proc.returncode:
+                self.proc and self.proc.returncode is None:
 
             return
 
-        if len(self.evaluation_queue) > 1:
+        if len(self.evaluation_queue) > 1 and self.proc:
             await self.evaluation_queue.pop(0)
 
         self.proc = await asyncio.create_subprocess_shell(

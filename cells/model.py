@@ -23,6 +23,20 @@ class CellModel:
 
 @dataclass_json
 @dataclass
+class RegexSubstitution:
+    regex: str = field(default="")
+    substitution: str = field(default="")
+
+
+@dataclass_json
+@dataclass
+class BackendMiddlewareModel:
+    stdin: RegexSubstitution = field(default=RegexSubstitution())
+    stdout: RegexSubstitution = field(default=RegexSubstitution())
+
+
+@dataclass_json
+@dataclass
 class TrackTemplateModel:
     backend_name: str = field(default="Default")
     setup_code: str = field(default="")
@@ -31,6 +45,8 @@ class TrackTemplateModel:
     description: str = field(default="")
     editor_mode: str = field(default="plain text")
     path: str = field(default="")
+    backend_middleware: BackendMiddlewareModel = field(
+        default=BackendMiddlewareModel())
 
     def __repr__(self):
         return f"Path: {self.path}\n" +\
