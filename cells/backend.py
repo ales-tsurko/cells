@@ -111,7 +111,6 @@ class Backend(Observation):
         output = await self.collect_output()
         self.notify(events.backend.Stdout(output))
         self.evaluate(self.template.setup_code)
-        # self.notify(events.backend.Ready(...))
 
     def stop(self):
         if self.proc:
@@ -127,6 +126,7 @@ class Backend(Observation):
 
     def evaluate(self, code):
         if len(code) < 1:
+            # self.notify(events.backend.Ready(...))
             return
 
         code = self.stdin_middleware_re.sub(
@@ -146,11 +146,9 @@ class Backend(Observation):
             output = await self.collect_output()
 
             self.notify(events.backend.Stdout(output))
+            # self.notify(events.backend.Ready(...))
 
     async def collect_output(self):
-        # self.notify(events.backend.Busy(...))
-        # TODO Add timeout? But what if a user
-        # wants to execute long-running process?
         data = b""
 
         while True:

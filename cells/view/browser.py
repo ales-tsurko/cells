@@ -94,7 +94,7 @@ class BrowserList(Observation, QListWidget):
 
         Observation.__init__(self, subject)
         QListWidget.__init__(self)
-        self.templateEditor = TrackEditor(self.subject, self.powermode)
+        self.templateEditor = TrackEditor(self.subject, self.powermode, True)
         self.templateEditor.onTemplateUpdate = self.onTemplateUpdate
 
         self.setStyleSheet("border: 0;")

@@ -14,12 +14,13 @@ class FinalMeta(type(QWidget), type(CodeDelegate)):
 
 
 class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
-    def __init__(self, subject, powermode=False):
+    def __init__(self, subject, powermode=False, allowEditBackend=False):
         Observation.__init__(self, subject)
         QWidget.__init__(self)
 
         self._template = None
         self.powermode = powermode
+        self.allowEditBackend = allowEditBackend
         self.descriptionMaxLen = 500
 
         layout = QVBoxLayout()
@@ -28,7 +29,8 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
-        self._initForm()
+        if self.allowEditBackend:
+            self._initForm()
         self._initCodeEditor()
 
         self.setFixedSize(630, 600)
@@ -178,9 +180,10 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         if self._template is None:
             return
 
-        self.runCommand.setText(self._template.run_command.strip())
+        if self.allowEditBackend:
+            self.runCommand.setText(self._template.run_command.strip())
 
-        if self.powermode:
+        if self.powermode and self.allowEditBackend:
             self.backendName.setText(self._template.backend_name.strip())
             self.commandPrompt.setText(self._template.command_prompt.strip())
             self.editorMode.setCurrentText(self._template.editor_mode)
@@ -214,10 +217,12 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         return super().showEvent(event)
 
     def closeEvent(self, event):
-        if self._template is not None and self.powermode:
+        if self._template is not None and \
+                self.powermode and \
+                self.allowEditBackend:
             self._template.description = self.description.toPlainText(
             )[:self.descriptionMaxLen]
 
         self.codeView.close()
 
-        return super().closeEvent(event)
+        super().closeEvent(event)
