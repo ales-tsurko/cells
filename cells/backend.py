@@ -72,6 +72,15 @@ class Backend(Observation):
         self.template = template
         self.prompt_re = re.compile(template.command_prompt.encode("utf-8"),
                                     flags=re.MULTILINE)
+
+        if len(template.backend_middleware.stdin.regex) > 1:
+            self.stdin_middleware_re = re.compile(
+                template.backend_middleware.stdin.regex, flags=re.MULTILINE)
+
+        if len(template.backend_middleware.stdout.regex) > 1:
+            self.stdout_middleware_re = re.compile(
+                template.backend_middleware.stdout.regex, flags=re.MULTILINE)
+
         self.proc = None
         self.references = 0
         self.evaluation_queue = []
@@ -120,6 +129,9 @@ class Backend(Observation):
         if len(code) < 1:
             return
 
+        code = self.stdin_middleware_re.sub(
+            self.template.backend_middleware.stdin.substitution, code)
+
         self.evaluation_queue.append(
             self.event_loop.create_task(self.evaluateTask(code)))
 
@@ -150,6 +162,8 @@ class Backend(Observation):
 
         data = self.prompt_re.sub(b"", data)
         result = data.strip().decode("utf-8")
+        result = self.stdout_middleware_re.sub(
+            self.template.backend_middleware.stdout.substitution, result)
 
         return result
 

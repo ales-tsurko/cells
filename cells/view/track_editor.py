@@ -1,7 +1,8 @@
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QKeySequence
-from PySide2.QtWidgets import (QComboBox, QFormLayout, QLabel, QLineEdit,
-                               QPlainTextEdit, QShortcut, QVBoxLayout, QWidget)
+from PySide2.QtWidgets import (QComboBox, QFormLayout, QHBoxLayout, QLabel,
+                               QLineEdit, QPlainTextEdit, QShortcut,
+                               QVBoxLayout, QWidget)
 
 from cells.observation import Observation
 
@@ -30,7 +31,7 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         self._initForm()
         self._initCodeEditor()
 
-        self.setFixedSize(630, 500)
+        self.setFixedSize(630, 600)
 
         self.setContextMenuPolicy(Qt.NoContextMenu)
         self.setWindowModality(Qt.ApplicationModal)
@@ -54,7 +55,8 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
             self.backendName = QLineEdit(self, maxLength=20)
             self.backendName.textChanged.connect(self.onBackendNameChanged)
 
-            self.commandPrompt = QLineEdit(self, maxLength=20)
+            self.commandPrompt = QLineEdit(self, maxLength=100)
+            self.commandPrompt.setToolTip("regex")
             self.commandPrompt.textChanged.connect(
                 self.onPromptIndicatorChanged)
 
@@ -62,6 +64,20 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
             [self.editorMode.addItem(mode) for mode in self._availableModes()]
             self.editorMode.currentIndexChanged.connect(
                 self.onEditorModeChanged)
+
+            self.stdinRegex = QLineEdit(self, maxLength=100)
+            self.stdinRegex.setToolTip("regex")
+            self.stdinRegex.textChanged.connect(self.onStdinRegexChanged)
+            self.stdinReplace = QLineEdit(self, maxLength=100)
+            self.stdinReplace.setToolTip("substitution string")
+            self.stdinReplace.textChanged.connect(self.onStdinReplaceChanged)
+
+            self.stdoutRegex = QLineEdit(self, maxLength=100)
+            self.stdoutRegex.setToolTip("regex")
+            self.stdoutRegex.textChanged.connect(self.onStdoutRegexChanged)
+            self.stdoutReplace = QLineEdit(self, maxLength=100)
+            self.stdoutReplace.setToolTip("substitution string")
+            self.stdoutReplace.textChanged.connect(self.onStdoutReplaceChanged)
 
             self.description = QPlainTextEdit(self, fixedHeight=100)
 
@@ -72,6 +88,18 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
             layout.addRow(self.tr("Command Prompt (Regex):"),
                           self.commandPrompt)
             layout.addRow(self.tr("Editor Mode:"), self.editorMode)
+
+            stdinMiddlewareLayout = QHBoxLayout()
+            stdinMiddlewareLayout.addWidget(self.stdinRegex)
+            stdinMiddlewareLayout.addWidget(self.stdinReplace)
+            layout.addRow(self.tr("Stdin Middleware:"), stdinMiddlewareLayout)
+
+            stdoutMiddlewareLayout = QHBoxLayout()
+            stdoutMiddlewareLayout.addWidget(self.stdoutRegex)
+            stdoutMiddlewareLayout.addWidget(self.stdoutReplace)
+            layout.addRow(self.tr("Stdout Middleware:"),
+                          stdoutMiddlewareLayout)
+
             layout.addRow(self.tr("Description:"), self.description)
 
         layout.setSpacing(10)
@@ -88,22 +116,16 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         return acePropertyNames("mode-", ".js", False)
 
     def onBackendNameChanged(self, e):
-        if self._template is None:
-            return
-
-        self._template.backend_name = e.strip()
+        if self._template is not None:
+            self._template.backend_name = e.strip()
 
     def onRunCommandChanged(self, e):
-        if self._template is None:
-            return
-
-        self._template.run_command = e.strip()
+        if self._template is not None:
+            self._template.run_command = e.strip()
 
     def onPromptIndicatorChanged(self, e):
-        if self._template is None:
-            return
-
-        self._template.command_prompt = e.strip()
+        if self._template is not None:
+            self._template.command_prompt = e.strip()
 
     def onEditorModeChanged(self, e):
         mode = self.editorMode.itemText(e)
@@ -111,6 +133,22 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
 
         if self._template is not None:
             self._template.editor_mode = mode
+
+    def onStdinRegexChanged(self, e):
+        if self._template is not None:
+            self._template.backend_middleware.stdin.regex = e.strip()
+
+    def onStdinReplaceChanged(self, e):
+        if self._template is not None:
+            self._template.backend_middleware.stdin.substitution = e
+
+    def onStdoutRegexChanged(self, e):
+        if self._template is not None:
+            self._template.backend_middleware.stdout.regex = e.strip()
+
+    def onStdoutReplaceChanged(self, e):
+        if self._template is not None:
+            self._template.backend_middleware.stdout.substitution = e
 
     def setTemplate(self, delegate):
         self._template = delegate
@@ -146,6 +184,14 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
             self.backendName.setText(self._template.backend_name.strip())
             self.commandPrompt.setText(self._template.command_prompt.strip())
             self.editorMode.setCurrentText(self._template.editor_mode)
+            self.stdinRegex.setText(
+                self._template.backend_middleware.stdin.regex)
+            self.stdinReplace.setText(
+                self._template.backend_middleware.stdin.substitution)
+            self.stdoutRegex.setText(
+                self._template.backend_middleware.stdout.regex)
+            self.stdoutReplace.setText(
+                self._template.backend_middleware.stdout.substitution)
             self.description.document().setPlainText(
                 self._template.description)
         else:
