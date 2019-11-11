@@ -76,16 +76,26 @@ class Backend(Observation):
         self.references = 0
         self.evaluation_queue = []
 
+        self.add_responder(events.app.Quit, self.appQuitResponder)
+
+    def appQuitResponder(self, e):
+        self.stop()
+
     def run(self):
         self.evaluation_queue.append(
             self.event_loop.create_task(self.runTask()))
 
     async def runTask(self):
-        if not self.template.run_command:
+        if not self.template.run_command or \
+                self.proc and not self.proc.returncode:
+
             return
 
-        self.proc = await asyncio.create_subprocess_exec(
-            *self.template.run_command.split(),
+        if len(self.evaluation_queue) > 1:
+            await self.evaluation_queue.pop(0)
+
+        self.proc = await asyncio.create_subprocess_shell(
+            self.template.run_command,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT)
@@ -96,7 +106,15 @@ class Backend(Observation):
 
     def stop(self):
         if self.proc:
-            self.proc.stdin.close()
+            self.evaluation_queue.append(
+                self.event_loop.create_task(self.stopTask()))
+
+    async def stopTask(self):
+        if len(self.evaluation_queue) > 1:
+            await self.evaluation_queue.pop(0)
+        self.proc.stdin.close()
+        output = await self.proc.stdout.read()
+        print(output.decode("utf-8"))
 
     def evaluate(self, code):
         if len(code) < 1:

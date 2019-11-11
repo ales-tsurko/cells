@@ -198,9 +198,10 @@ class TrackTemplateManager(Observation):
 
     def read_dir(self, path):
         self.templates = [
-            self.read(p) for p in sorted(
-                glob.glob(os.path.join(path, "*" + TRACK_TEMPLATE_EXT)))
+            self.read(p)
+            for p in glob.glob(os.path.join(path, "*" + TRACK_TEMPLATE_EXT))
         ]
+        sorted(self.templates, key=lambda template: template.backend_name)
 
     def read(self, path):
         with open(path, "r") as f:

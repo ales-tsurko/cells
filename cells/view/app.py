@@ -56,7 +56,10 @@ class App(Observation):
         asyncio.set_event_loop(self.loop)
         self.main.show()
 
-        self.subject.on_next(events.app.Quit())
-
         with self.loop:
-            sys.exit(self.loop.run_forever())
+            code = self.loop.run_forever()
+            pending = asyncio.Task.all_tasks()
+            self.notify(events.app.Quit())
+            self.loop.run_until_complete(
+                asyncio.wait_for(asyncio.gather(*pending), 60))
+            sys.exit(code)
