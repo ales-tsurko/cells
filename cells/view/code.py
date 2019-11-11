@@ -111,8 +111,6 @@ class CodeView(Observation, QWebEngineView):
     def closeEvent(self, event):
         self.postContent()
 
-        return super().closeEvent(event)
-
 
 class Ace(Observation, QWebEnginePage):
     def __init__(self, delegate, subject):

@@ -525,11 +525,6 @@ class Cell(CellBase, metaclass=FinalMeta):
 
         return super().mouseDoubleClickEvent(event)
 
-    def delete(self):
-        self.track.editor.codeView.close()
-
-        return super().delete()
-
     def closeEvent(self, event):
         self.track.editor.codeView.close()
 
