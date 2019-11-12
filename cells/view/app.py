@@ -60,6 +60,9 @@ class App(Observation):
             code = self.loop.run_forever()
             pending = asyncio.Task.all_tasks()
             self.notify(events.app.Quit())
-            self.loop.run_until_complete(
-                asyncio.wait_for(asyncio.gather(*pending), 60))
+            try:
+                self.loop.run_until_complete(
+                    asyncio.wait_for(asyncio.gather(*pending), 10))
+            except asyncio.futures.TimeoutError as e:
+                print(e)
             sys.exit(code)

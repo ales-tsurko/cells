@@ -213,8 +213,7 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
 
     def showEvent(self, event):
         self.codeView.show()
-
-        return super().showEvent(event)
+        super().showEvent(event)
 
     def closeEvent(self, event):
         if self._template is not None and \
@@ -224,5 +223,4 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
             )[:self.descriptionMaxLen]
 
         self.codeView.close()
-
         super().closeEvent(event)

@@ -1,6 +1,5 @@
 import asyncio
 import re
-import signal
 from asyncio import subprocess
 
 from cells import events
@@ -73,9 +72,13 @@ class Backend(Observation):
         self.prompt_re = re.compile(template.command_prompt.encode("utf-8"),
                                     flags=re.MULTILINE)
 
+        self.stdin_middleware_re = None
+
         if len(template.backend_middleware.stdin.regex) > 1:
             self.stdin_middleware_re = re.compile(
                 template.backend_middleware.stdin.regex, flags=re.MULTILINE)
+
+        self.stdout_middleware_re = None
 
         if len(template.backend_middleware.stdout.regex) > 1:
             self.stdout_middleware_re = re.compile(
@@ -85,16 +88,16 @@ class Backend(Observation):
         self.references = 0
         self.evaluation_queue = []
 
-        self.add_responder(events.app.Quit, self.appQuitResponder)
+        self.add_responder(events.app.Quit, self.app_quit_responder)
 
-    def appQuitResponder(self, e):
+    def app_quit_responder(self, e):
         self.stop()
 
     def run(self):
         self.evaluation_queue.append(
-            self.event_loop.create_task(self.runTask()))
+            self.event_loop.create_task(self.run_task()))
 
-    async def runTask(self):
+    async def run_task(self):
         if not self.template.run_command or \
                 self.proc and self.proc.returncode is None:
 
@@ -115,27 +118,32 @@ class Backend(Observation):
     def stop(self):
         if self.proc:
             self.evaluation_queue.append(
-                self.event_loop.create_task(self.stopTask()))
+                self.event_loop.create_task(self.stop_task()))
 
-    async def stopTask(self):
+    async def stop_task(self):
         if len(self.evaluation_queue) > 1:
             await self.evaluation_queue.pop(0)
         self.proc.stdin.close()
-        output = await self.proc.stdout.read()
-        print(output.decode("utf-8"))
+        try:
+            output = await asyncio.wait_for(self.proc.stdout.read(), 10)
+            print(output.decode("utf-8"))
+        except asyncio.futures.TimeoutError:
+            print("Timeout on reading STDOUT after process stop")
 
     def evaluate(self, code):
         if len(code) < 1:
             # self.notify(events.backend.Ready(...))
+
             return
 
-        code = self.stdin_middleware_re.sub(
-            self.template.backend_middleware.stdin.substitution, code)
+        if self.stdin_middleware_re:
+            code = self.stdin_middleware_re.sub(
+                self.template.backend_middleware.stdin.substitution, code)
 
         self.evaluation_queue.append(
-            self.event_loop.create_task(self.evaluateTask(code)))
+            self.event_loop.create_task(self.evaluate_task(code)))
 
-    async def evaluateTask(self, code):
+    async def evaluate_task(self, code):
         if len(self.evaluation_queue) > 1:
             await self.evaluation_queue.pop(0)
 
@@ -152,16 +160,26 @@ class Backend(Observation):
         data = b""
 
         while True:
-            chunk = await self.proc.stdout.read(64)
-            data += chunk
+            try:
+                chunk = await asyncio.wait_for(self.proc.stdout.read(64), 10)
+                data += chunk
+                print(data)
 
-            if self.prompt_re.search(chunk) is not None:
-                break
+                if self.prompt_re.search(chunk) is not None:
+                    break
+            except asyncio.futures.TimeoutError:
+                return "Error: timeout for reading STDOUT of backend " + \
+                      f"{self.template.backend_name} with command " + \
+                      f"`{self.template.run_command}`"
+
+        print("have to be returned already")
 
         data = self.prompt_re.sub(b"", data)
         result = data.strip().decode("utf-8")
-        result = self.stdout_middleware_re.sub(
-            self.template.backend_middleware.stdout.substitution, result)
+
+        if self.stdout_middleware_re:
+            result = self.stdout_middleware_re.sub(
+                self.template.backend_middleware.stdout.substitution, result)
 
         return result
 
