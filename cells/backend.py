@@ -87,6 +87,7 @@ class Backend(Observation):
         self.proc = None
         self.references = 0
         self.evaluation_queue = []
+        self.pipe_task = None
 
         self.add_responder(events.app.Quit, self.app_quit_responder)
 
@@ -110,11 +111,10 @@ class Backend(Observation):
             self.template.run_command,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT)
-        await self.proc.stdin.drain()
-        output = await self.collect_output()
-        self.notify(events.backend.Stdout(output))
+            stderr=subprocess.PIPE)
+        self.pipe_task = asyncio.gather(self.pipe_stdout(), self.pipe_stderr())
         self.evaluate(self.template.setup_code)
+        # self.notify(events.backend.Ready(...))
 
     def stop(self):
         if self.proc:
@@ -124,17 +124,14 @@ class Backend(Observation):
     async def stop_task(self):
         if len(self.evaluation_queue) > 1:
             await self.evaluation_queue.pop(0)
-        self.proc.stdin.close()
+        self.proc.stdin.write_eof()
         try:
-            output = await asyncio.wait_for(self.proc.stdout.read(), 10)
-            print(output.decode("utf-8"))
+            await asyncio.wait_for(self.pipe_task, 10)
         except asyncio.futures.TimeoutError:
             print("Timeout on reading STDOUT after process stop")
 
     def evaluate(self, code):
         if len(code) < 1:
-            # self.notify(events.backend.Ready(...))
-
             return
 
         if self.stdin_middleware_re:
@@ -148,38 +145,27 @@ class Backend(Observation):
         if len(self.evaluation_queue) > 1:
             await self.evaluation_queue.pop(0)
 
-        for line in code.encode("utf-8").splitlines():
-            self.proc.stdin.write(line + b"\n")
-            await self.proc.stdin.drain()
-            output = await self.collect_output()
+        self.proc.stdin.write(code.encode("utf-8") + b"\n")
+        await self.proc.stdin.drain()
+        #  self.notify(events.backend.Ready(...))
 
-            self.notify(events.backend.Stdout(output))
-            #  self.notify(events.backend.Ready(...))
+    async def pipe_stdout(self):
+        async for out in self.proc.stdout:
+            out = out.rstrip().decode("utf-8")
 
-    async def collect_output(self):
-        data = b""
+            if self.stdout_middleware_re:
+                out = self.stdout_middleware_re.sub(
+                    self.template.backend_middleware.stdout.substitution, out)
+            self.notify(events.backend.Stdout(out))
 
-        while True:
-            try:
-                chunk = await asyncio.wait_for(self.proc.stdout.read(64), 10)
-                data += chunk
-                print(chunk)
+    async def pipe_stderr(self):
+        async for out in self.proc.stderr:
+            out = out.rstrip().decode("utf-8")
 
-                if self.prompt_re.search(chunk) is not None:
-                    break
-            except asyncio.futures.TimeoutError:
-                return "Error: timeout for reading STDOUT of backend " + \
-                      f"{self.template.backend_name} with command " + \
-                      f"`{self.template.run_command}`"
-
-        data = self.prompt_re.sub(b"", data)
-        result = data.strip().decode("utf-8")
-
-        if self.stdout_middleware_re:
-            result = self.stdout_middleware_re.sub(
-                self.template.backend_middleware.stdout.substitution, result)
-
-        return result
+            if self.stdout_middleware_re:
+                out = self.stdout_middleware_re.sub(
+                    self.template.backend_middleware.stdout.substitution, out)
+            self.notify(events.backend.Stderr(out))
 
     def increment_references(self):
         self.references += 1
