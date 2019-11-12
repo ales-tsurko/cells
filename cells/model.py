@@ -217,8 +217,7 @@ class TrackTemplateManager(Observation):
             self.read(p)
             for p in glob.glob(os.path.join(path, "*" + TRACK_TEMPLATE_EXT))
         ]
-        self.teamplates = sorted(self.templates,
-                                 key=lambda template: template.backend_name)
+        self.templates.sort(key=lambda template: template.backend_name)
 
     def read(self, path):
         with open(path, "r") as f:

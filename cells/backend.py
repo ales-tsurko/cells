@@ -111,6 +111,8 @@ class Backend(Observation):
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT)
+        self.proc.stdin.write(b"\n\r")
+        await self.proc.stdin.drain()
         output = await self.collect_output()
         self.notify(events.backend.Stdout(output))
         self.evaluate(self.template.setup_code)
@@ -148,7 +150,7 @@ class Backend(Observation):
             await self.evaluation_queue.pop(0)
 
         for line in code.encode("utf-8").splitlines():
-            self.proc.stdin.write(line + b"\n")
+            self.proc.stdin.write(line + b"\n\r")
             await self.proc.stdin.drain()
             output = await self.collect_output()
 
@@ -162,7 +164,7 @@ class Backend(Observation):
             try:
                 chunk = await asyncio.wait_for(self.proc.stdout.read(64), 10)
                 data += chunk
-                print(data)
+                print(chunk)
 
                 if self.prompt_re.search(chunk) is not None:
                     break
