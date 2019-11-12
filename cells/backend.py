@@ -78,10 +78,10 @@ class Backend(Observation):
             self.stdin_middleware_re = re.compile(
                 template.backend_middleware.stdin.regex, flags=re.MULTILINE)
 
-        self.stdout_middleware_re = None
+        self.out_middleware_re = None
 
         if len(template.backend_middleware.stdout.regex) > 1:
-            self.stdout_middleware_re = re.compile(
+            self.out_middleware_re = re.compile(
                 template.backend_middleware.stdout.regex, flags=re.MULTILINE)
 
         self.proc = None
@@ -112,7 +112,8 @@ class Backend(Observation):
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
-        self.pipe_task = asyncio.gather(self.pipe_stdout(), self.pipe_stderr())
+        self.pipe_task = asyncio.gather(self.pipe(self.proc.stdout),
+                                        self.pipe(self.proc.stderr))
         self.evaluate(self.template.setup_code)
         # self.notify(events.backend.Ready(...))
 
@@ -149,23 +150,14 @@ class Backend(Observation):
         await self.proc.stdin.drain()
         #  self.notify(events.backend.Ready(...))
 
-    async def pipe_stdout(self):
-        async for out in self.proc.stdout:
+    async def pipe(self, stream):
+        async for out in stream:
             out = out.rstrip().decode("utf-8")
 
-            if self.stdout_middleware_re:
-                out = self.stdout_middleware_re.sub(
+            if self.out_middleware_re:
+                out = self.out_middleware_re.sub(
                     self.template.backend_middleware.stdout.substitution, out)
             self.notify(events.backend.Stdout(out))
-
-    async def pipe_stderr(self):
-        async for out in self.proc.stderr:
-            out = out.rstrip().decode("utf-8")
-
-            if self.stdout_middleware_re:
-                out = self.stdout_middleware_re.sub(
-                    self.template.backend_middleware.stdout.substitution, out)
-            self.notify(events.backend.Stderr(out))
 
     def increment_references(self):
         self.references += 1
