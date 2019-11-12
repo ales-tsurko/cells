@@ -148,13 +148,12 @@ class Backend(Observation):
             await self.evaluation_queue.pop(0)
 
         for line in code.encode("utf-8").splitlines():
-            self.proc.stdin.write(line)
-            self.proc.stdin.write(b"\n")
+            self.proc.stdin.write(line + b"\n")
             await self.proc.stdin.drain()
             output = await self.collect_output()
 
             self.notify(events.backend.Stdout(output))
-            # self.notify(events.backend.Ready(...))
+            #  self.notify(events.backend.Ready(...))
 
     async def collect_output(self):
         data = b""
@@ -171,8 +170,6 @@ class Backend(Observation):
                 return "Error: timeout for reading STDOUT of backend " + \
                       f"{self.template.backend_name} with command " + \
                       f"`{self.template.run_command}`"
-
-        print("have to be returned already")
 
         data = self.prompt_re.sub(b"", data)
         result = data.strip().decode("utf-8")
