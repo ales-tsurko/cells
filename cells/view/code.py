@@ -14,8 +14,9 @@ from cells.settings import Settings
 
 
 class CodeView(Observation, QWebEngineView):
-    def __init__(self, subject, delegate=None):
+    def __init__(self, subject, delegate=None, viewTip=True):
         self.delegate = delegate
+        self.viewTip = viewTip
 
         Observation.__init__(self, subject)
         QWebEngineView.__init__(self)
@@ -59,7 +60,7 @@ class CodeView(Observation, QWebEngineView):
         if self.delegate is None:
             return
 
-        if len(self.delegate.code()) < 1:
+        if len(self.delegate.code()) < 1 and self.viewTip:
             self.setCodeAsync(self.tip())
             self.page().runJavaScript("editor.selectAll();")
         else:

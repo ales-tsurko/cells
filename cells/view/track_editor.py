@@ -105,7 +105,7 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         self.layout().addLayout(layout)
 
     def _initCodeEditor(self):
-        self.codeView = CodeView(self.subject)
+        self.codeView = CodeView(self.subject, viewTip=False)
         self.layout().addWidget(QLabel("Setup Code:", margin=10))
         self.layout().addWidget(self.codeView)
         self.codeView.setDelegate(self)
