@@ -1,3 +1,5 @@
+import random
+
 from PySide2.QtGui import QFont, QTextOption
 from PySide2.QtWidgets import QFrame, QPlainTextEdit
 
@@ -10,6 +12,7 @@ class Console(Observation, QPlainTextEdit):
     def __init__(self, subject):
         Observation.__init__(self, subject)
         QPlainTextEdit.__init__(self)
+        self.whoami = self._initWhoami()
         self.setReadOnly(True)
         self.setMinimumHeight(150)
         self.setMinimumWidth(250)
@@ -25,12 +28,22 @@ class Console(Observation, QPlainTextEdit):
         self.add_responder(events.backend.Stdout, self.backendStdoutResponder)
         self.add_responder(events.backend.Stderr, self.backendStderrResponder)
 
+    def _initWhoami(self):
+        first = random.choice(
+            ["Live", "Generative", "Algorithmic", "Creative"])
+        second = random.choice(
+            ["Coding", "Prototyping", "Audio", "Visuals", "Thing"])
+        third = random.choice(
+            ["Environment", "Workstation", "Sequencer", "Editor"])
+
+        return f"{first} {second} {third}"
+
     def sayHello(self):
         self.appendPlainText(FIGLET_NAME)
-        version = f"Live Coding Environment v{ApplicationInfo.version}"
+        version = f"{self.whoami} v{ApplicationInfo.version}"
         longestLine = max(FIGLET_NAME.splitlines(), key=lambda line: len(line))
-        numOfSpaces = (len(longestLine)-len(version))//2
-        self.appendPlainText(" "*numOfSpaces + version)
+        numOfSpaces = (len(longestLine) - len(version)) // 2
+        self.appendPlainText(" " * numOfSpaces + version)
 
     def consoleClearResponder(self, e):
         self.clear()
@@ -40,7 +53,8 @@ class Console(Observation, QPlainTextEdit):
             self.appendPlainText(e.output)
 
     def backendStderrResponder(self, e):
-        #TODO print in different color
+        # TODO print in different color
+
         if e.output:
             self.appendPlainText(e.output)
 

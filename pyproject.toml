@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "cells"
-version = "0.1.0"
-description = ""
+version = "1.0.0-beta1"
+description = "Live coding environment."
 authors = ["Ales Tsurko <ales.tsurko@gmail.com>"]
 license = "MIT"
 readme = "README.md"
