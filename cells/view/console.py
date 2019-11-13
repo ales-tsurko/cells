@@ -26,9 +26,9 @@ class Console(Observation, QPlainTextEdit):
         self.add_responder(events.backend.Stderr, self.backendStderrResponder)
 
     def sayHello(self):
-        hello = ApplicationInfo.name + " v" + str(ApplicationInfo.version)
-
-        self.appendPlainText(hello)
+        self.appendPlainText(FIGLET_NAME)
+        version = "Live Coding Environment v" + str(ApplicationInfo.version)
+        self.appendPlainText(version)
 
     def consoleClearResponder(self, e):
         self.clear()

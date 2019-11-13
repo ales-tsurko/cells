@@ -70,17 +70,17 @@ class Backend(Observation):
         self.event_loop = event_loop
         self.template = template
 
-        self.stdin_middleware_re = None
+        self.input_middleware_re = None
 
-        if len(template.backend_middleware.stdin.regex) > 1:
-            self.stdin_middleware_re = re.compile(
-                template.backend_middleware.stdin.regex, flags=re.MULTILINE)
+        if len(template.backend_middleware.input.regex) > 1:
+            self.input_middleware_re = re.compile(
+                template.backend_middleware.input.regex, flags=re.MULTILINE)
 
-        self.out_middleware_re = None
+        self.output_middleware_re = None
 
-        if len(template.backend_middleware.stdout.regex) > 1:
-            self.out_middleware_re = re.compile(
-                template.backend_middleware.stdout.regex, flags=re.MULTILINE)
+        if len(template.backend_middleware.output.regex) > 1:
+            self.output_middleware_re = re.compile(
+                template.backend_middleware.output.regex, flags=re.MULTILINE)
 
         self.proc = None
         self.references = 0
@@ -110,8 +110,11 @@ class Backend(Observation):
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
-        self.pipe_task = asyncio.gather(self.pipe(self.proc.stdout),
-                                        self.pipe(self.proc.stderr))
+        self.pipe_task = asyncio.gather(
+            self.pipe(self.proc.stdout,
+                      lambda out: self.notify(events.backend.Stdout(out))),
+            self.pipe(self.proc.stderr,
+                      lambda out: self.notify(events.backend.Stderr(out))))
         self.evaluate(self.template.setup_code)
         # self.notify(events.backend.Ready(...))
 
@@ -135,9 +138,9 @@ class Backend(Observation):
         if len(code) < 1:
             return
 
-        if self.stdin_middleware_re:
-            code = self.stdin_middleware_re.sub(
-                self.template.backend_middleware.stdin.substitution, code)
+        if self.input_middleware_re:
+            code = self.input_middleware_re.sub(
+                self.template.backend_middleware.input.substitution, code)
 
         self.evaluation_queue.append(
             self.event_loop.create_task(self.evaluate_task(code)))
@@ -150,15 +153,16 @@ class Backend(Observation):
         await self.proc.stdin.drain()
         #  self.notify(events.backend.Ready(...))
 
-    async def pipe(self, stream):
+    async def pipe(self, stream, callback=None):
         async for out in stream:
             out = out.rstrip().decode("utf-8")
 
-            if self.out_middleware_re:
-                out = self.out_middleware_re.sub(
-                    self.template.backend_middleware.stdout.substitution, out)
-            # TODO stderr/stdout separation
-            self.notify(events.backend.Stdout(out))
+            if self.output_middleware_re:
+                out = self.output_middleware_re.sub(
+                    self.template.backend_middleware.output.substitution, out)
+
+            if callback:
+                callback(out)
 
     def increment_references(self):
         self.references += 1

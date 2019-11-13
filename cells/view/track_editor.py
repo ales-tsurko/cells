@@ -62,21 +62,21 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
             self.editorMode.currentIndexChanged.connect(
                 self.onEditorModeChanged)
 
-            self.stdinRegex = QLineEdit(self, maxLength=100)
-            self.stdinRegex.setToolTip("regex")
-            self.stdinRegex.textChanged.connect(self.onStdinRegexChanged)
-            self.stdinReplace = QLineEdit(self, maxLength=100)
-            self.stdinReplace.setToolTip("substitution string")
-            self.stdinReplace.textChanged.connect(self.onStdinReplaceChanged)
+            self.inputRegex = QLineEdit(self, maxLength=100)
+            self.inputRegex.setToolTip("regex")
+            self.inputRegex.textChanged.connect(self.onInputRegexChanged)
+            self.inputReplace = QLineEdit(self, maxLength=100)
+            self.inputReplace.setToolTip("substitution string")
+            self.inputReplace.textChanged.connect(self.onInputReplaceChanged)
 
-            self.stdoutRegex = QLineEdit(self, maxLength=100)
-            self.stdoutRegex.setToolTip("regex")
-            self.stdoutRegex.textChanged.connect(self.onStdoutRegexChanged)
-            self.stdoutReplace = QLineEdit(self, maxLength=100)
-            self.stdoutReplace.setToolTip("substitution string")
-            self.stdoutReplace.textChanged.connect(self.onStdoutReplaceChanged)
+            self.outputRegex = QLineEdit(self, maxLength=100)
+            self.outputRegex.setToolTip("regex")
+            self.outputRegex.textChanged.connect(self.onOutputRegexChanged)
+            self.outputReplace = QLineEdit(self, maxLength=100)
+            self.outputReplace.setToolTip("substitution string")
+            self.outputReplace.textChanged.connect(self.onOutputReplaceChanged)
 
-            self.description = QPlainTextEdit(self, fixedHeight=100)
+            self.description = QPlainTextEdit(self, minimumHeight=100)
 
         layout.addRow(self.tr("Run Command:"), self.runCommand)
 
@@ -84,16 +84,16 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
             layout.addRow(self.tr("Backend Name:"), self.backendName)
             layout.addRow(self.tr("Editor Mode:"), self.editorMode)
 
-            stdinMiddlewareLayout = QHBoxLayout()
-            stdinMiddlewareLayout.addWidget(self.stdinRegex)
-            stdinMiddlewareLayout.addWidget(self.stdinReplace)
-            layout.addRow(self.tr("Stdin Middleware:"), stdinMiddlewareLayout)
+            inputMiddlewareLayout = QHBoxLayout()
+            inputMiddlewareLayout.addWidget(self.inputRegex)
+            inputMiddlewareLayout.addWidget(self.inputReplace)
+            layout.addRow(self.tr("Input Middleware:"), inputMiddlewareLayout)
 
-            stdoutMiddlewareLayout = QHBoxLayout()
-            stdoutMiddlewareLayout.addWidget(self.stdoutRegex)
-            stdoutMiddlewareLayout.addWidget(self.stdoutReplace)
-            layout.addRow(self.tr("Stdout Middleware:"),
-                          stdoutMiddlewareLayout)
+            outputMiddlewareLayout = QHBoxLayout()
+            outputMiddlewareLayout.addWidget(self.outputRegex)
+            outputMiddlewareLayout.addWidget(self.outputReplace)
+            layout.addRow(self.tr("Output Middleware:"),
+                          outputMiddlewareLayout)
 
             layout.addRow(self.tr("Description:"), self.description)
 
@@ -125,21 +125,21 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         if self._template is not None:
             self._template.editor_mode = mode
 
-    def onStdinRegexChanged(self, e):
+    def onInputRegexChanged(self, e):
         if self._template is not None:
-            self._template.backend_middleware.stdin.regex = e.strip()
+            self._template.backend_middleware.input.regex = e
 
-    def onStdinReplaceChanged(self, e):
+    def onInputReplaceChanged(self, e):
         if self._template is not None:
-            self._template.backend_middleware.stdin.substitution = e
+            self._template.backend_middleware.input.substitution = e
 
-    def onStdoutRegexChanged(self, e):
+    def onOutputRegexChanged(self, e):
         if self._template is not None:
-            self._template.backend_middleware.stdout.regex = e.strip()
+            self._template.backend_middleware.output.regex = e
 
-    def onStdoutReplaceChanged(self, e):
+    def onOutputReplaceChanged(self, e):
         if self._template is not None:
-            self._template.backend_middleware.stdout.substitution = e
+            self._template.backend_middleware.output.substitution = e
 
     def setTemplate(self, delegate):
         self._template = delegate
@@ -175,14 +175,14 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         if self.powermode and self.allowEditBackend:
             self.backendName.setText(self._template.backend_name.strip())
             self.editorMode.setCurrentText(self._template.editor_mode)
-            self.stdinRegex.setText(
-                self._template.backend_middleware.stdin.regex)
-            self.stdinReplace.setText(
-                self._template.backend_middleware.stdin.substitution)
-            self.stdoutRegex.setText(
-                self._template.backend_middleware.stdout.regex)
-            self.stdoutReplace.setText(
-                self._template.backend_middleware.stdout.substitution)
+            self.inputRegex.setText(
+                self._template.backend_middleware.input.regex)
+            self.inputReplace.setText(
+                self._template.backend_middleware.input.substitution)
+            self.outputRegex.setText(
+                self._template.backend_middleware.output.regex)
+            self.outputReplace.setText(
+                self._template.backend_middleware.output.substitution)
             self.description.document().setPlainText(
                 self._template.description)
         else:

@@ -31,8 +31,8 @@ class RegexSubstitution:
 @dataclass_json
 @dataclass
 class BackendMiddlewareModel:
-    stdin: RegexSubstitution = field(default=RegexSubstitution())
-    stdout: RegexSubstitution = field(default=RegexSubstitution())
+    input: RegexSubstitution = field(default=RegexSubstitution())
+    output: RegexSubstitution = field(default=RegexSubstitution())
 
 
 @dataclass_json
