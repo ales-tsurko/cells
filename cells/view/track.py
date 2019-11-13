@@ -219,8 +219,7 @@ class Track(Observation, QWidget):
 
         if confirmation.exec_() == QMessageBox.Yes:
             self.notify(
-                events.view.track.BackendRestart(self.index,
-                                                     self.template))
+                events.view.track.BackendRestart(self.index, self.template))
 
     def saveAsTemplate(self):
         self.notify(events.view.track.SaveAsTemplate(deepcopy(self.template)))

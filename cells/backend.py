@@ -21,21 +21,13 @@ class BackendRouter(Observation):
                            self.cell_evaluate_responder)
         self.add_responder(events.view.code.Evaluate,
                            self.cell_evaluate_responder)
+        self.add_responder(events.view.editor.TrackRestartBackend,
+                           self.track_restart_backend_responder)
+        self.add_responder(events.view.editor.BackendRestartAll,
+                           self.backend_restart_all_responder)
 
     def track_new_responder(self, event):
-        template = event.template
-
-        if template.run_command in self.backends:
-            backend = self.backends[template.run_command]
-            backend.evaluate(template.setup_code)
-            self.backends[template.run_command].increment_references()
-
-            return
-
-        backend = Backend(self.event_loop, template, self.subject)
-        self.backends[template.run_command] = backend
-        self.backends[template.run_command].increment_references()
-        backend.run(template.setup_code)
+        self.new_backend_from_template(event.template)
 
     def track_remove_responder(self, event):
         template = event.template
@@ -58,6 +50,35 @@ class BackendRouter(Observation):
 
         backend = self.backends[template.run_command]
         backend.evaluate(event.code)
+
+    def track_restart_backend_responder(self, e):
+        self.restart_backends_for_templates(e.templates)
+
+    def backend_restart_all_responder(self, e):
+        self.restart_backends_for_templates(e.templates)
+
+    def restart_backends_for_templates(self, templates):
+        run_commands = set()
+
+        for template in templates:
+            if template.run_command not in run_commands:
+                run_commands.add(template.run_command)
+                backend = self.backends.pop(template.run_command)
+                backend.stop()
+            self.new_backend_from_template(template)
+
+    def new_backend_from_template(self, template):
+        if template.run_command in self.backends:
+            backend = self.backends[template.run_command]
+            backend.evaluate(template.setup_code)
+            self.backends[template.run_command].increment_references()
+
+            return
+
+        backend = Backend(self.event_loop, template, self.subject)
+        self.backends[template.run_command] = backend
+        self.backends[template.run_command].increment_references()
+        backend.run(template.setup_code)
 
     def delete(self):
         for backend in self.backends.values():
