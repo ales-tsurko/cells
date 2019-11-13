@@ -57,11 +57,6 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
             self.backendName = QLineEdit(self, maxLength=20)
             self.backendName.textChanged.connect(self.onBackendNameChanged)
 
-            self.commandPrompt = QLineEdit(self, maxLength=100)
-            self.commandPrompt.setToolTip("regex")
-            self.commandPrompt.textChanged.connect(
-                self.onPromptIndicatorChanged)
-
             self.editorMode = QComboBox()
             [self.editorMode.addItem(mode) for mode in self._availableModes()]
             self.editorMode.currentIndexChanged.connect(
@@ -87,8 +82,6 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
 
         if self.powermode:
             layout.addRow(self.tr("Backend Name:"), self.backendName)
-            layout.addRow(self.tr("Command Prompt (Regex):"),
-                          self.commandPrompt)
             layout.addRow(self.tr("Editor Mode:"), self.editorMode)
 
             stdinMiddlewareLayout = QHBoxLayout()
@@ -124,10 +117,6 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
     def onRunCommandChanged(self, e):
         if self._template is not None:
             self._template.run_command = e.strip()
-
-    def onPromptIndicatorChanged(self, e):
-        if self._template is not None:
-            self._template.command_prompt = e.strip()
 
     def onEditorModeChanged(self, e):
         mode = self.editorMode.itemText(e)
@@ -185,7 +174,6 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
 
         if self.powermode and self.allowEditBackend:
             self.backendName.setText(self._template.backend_name.strip())
-            self.commandPrompt.setText(self._template.command_prompt.strip())
             self.editorMode.setCurrentText(self._template.editor_mode)
             self.stdinRegex.setText(
                 self._template.backend_middleware.stdin.regex)

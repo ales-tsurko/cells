@@ -69,8 +69,6 @@ class Backend(Observation):
         super().__init__(subject)
         self.event_loop = event_loop
         self.template = template
-        self.prompt_re = re.compile(template.command_prompt.encode("utf-8"),
-                                    flags=re.MULTILINE)
 
         self.stdin_middleware_re = None
 
@@ -128,6 +126,8 @@ class Backend(Observation):
         self.proc.stdin.write_eof()
         try:
             await asyncio.wait_for(self.pipe_task, 10)
+            self.notify(
+                events.backend.Stdout(f"Quit {self.template.backend_name}."))
         except asyncio.futures.TimeoutError:
             print("Timeout on reading STDOUT after process stop")
 
@@ -157,6 +157,7 @@ class Backend(Observation):
             if self.out_middleware_re:
                 out = self.out_middleware_re.sub(
                     self.template.backend_middleware.stdout.substitution, out)
+            # TODO stderr/stdout separation
             self.notify(events.backend.Stdout(out))
 
     def increment_references(self):
