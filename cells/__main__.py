@@ -1,12 +1,12 @@
-from rx.subject import Subject
 from cells.view.app import App
+from rx.subject import Subject
 
 
 def main():
     subject = Subject()
 
     app = App(subject)
-    
+
     app.run()
 
 

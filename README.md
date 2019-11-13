@@ -7,7 +7,7 @@ mix SuperCollider, Python, Tidal Cycles, Node.js etc. in the same project.
 
 
 
-## Build
+## Build/Run
 
 You need Python and [poetry](https://github.com/sdispater/poetry).
 
@@ -16,9 +16,14 @@ First, you need to install dependencies:
 poetry install
 ```
 
-Then you can run project:
+Then switch to environment:
 ```
-poetry run cells
+poetry shell
+```
+
+And finally, you can run the project:
+```
+python cells -d
 ```
 
 

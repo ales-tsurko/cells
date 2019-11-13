@@ -7,6 +7,7 @@ from uuid import uuid4
 
 from appdirs import user_data_dir
 from cells import events
+from cells.cli import CLI
 from cells.observation import Observation
 from cells.settings import ApplicationInfo
 from dataclasses_json import dataclass_json
@@ -268,6 +269,8 @@ class TrackTemplateManager(Observation):
 
 def standard_track_template_dir():
     data_dir = user_data_dir(ApplicationInfo.name, ApplicationInfo.author)
+    if CLI.develop:
+        data_dir = os.getcwd()
     templates_dir = os.path.join(data_dir, "track_templates")
     not os.path.exists(templates_dir) and os.makedirs(templates_dir)
 
