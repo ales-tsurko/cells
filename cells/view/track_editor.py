@@ -117,24 +117,28 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
 
     def onSave(self):
         self.shouldSave = True
-        self._template.backend_name = self.backendName.text().strip()
 
-        self._template.run_command = self.runCommand.text().strip()
+        if self.allowEditBackend:
+            self._template.run_command = self.runCommand.text().strip()
 
-        self._template.editor_mode = self.editorMode.currentText()
+        if self.powermode and self.allowEditBackend:
+            self._template.backend_name = self.backendName.text().strip()
 
-        self._template.backend_middleware.input.regex = \
-            self.inputRegex.text()
-        self._template.backend_middleware.input.substitution = \
-            self.inputReplace.text()
 
-        self._template.backend_middleware.output.regex = \
-            self.outputRegex.text()
-        self._template.backend_middleware.output.substitution = \
-            self.outputReplace.text()
+            self._template.editor_mode = self.editorMode.currentText()
 
-        self._template.description = self.description.toPlainText(
-        )[:self.descriptionMaxLen]
+            self._template.backend_middleware.input.regex = \
+                self.inputRegex.text()
+            self._template.backend_middleware.input.substitution = \
+                self.inputReplace.text()
+
+            self._template.backend_middleware.output.regex = \
+                self.outputRegex.text()
+            self._template.backend_middleware.output.substitution = \
+                self.outputReplace.text()
+
+            self._template.description = self.description.toPlainText(
+            )[:self.descriptionMaxLen]
 
         self._template.setup_code = self._code
 
@@ -205,10 +209,7 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         super().showEvent(event)
 
     def closeEvent(self, event):
-        if self._template is not None and \
-                self.powermode and \
-                self.allowEditBackend and \
-                not self.deleted:
+        if self._template is not None and not self.deleted:
             question = "Do you want to save changes in " +\
                        f"{self._template.backend_name} template?"
             confirmation = ConfirmationDialog("Update Track Template",
