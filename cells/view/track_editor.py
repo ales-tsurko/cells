@@ -156,10 +156,10 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
             return
 
         self._code = code
-        self.onTemplateUpdate()
 
         if self.shouldSave:
             self._template.setup_code = code
+            self.onTemplateUpdate()
 
     def onTemplateUpdate(self):
         pass
@@ -210,6 +210,7 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         return self._template
 
     def showEvent(self, event):
+        self.shouldSave = False
         self.codeView.show()
         super().showEvent(event)
 
