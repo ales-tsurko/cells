@@ -7,6 +7,7 @@ from PySide2.QtWidgets import (QComboBox, QFormLayout, QHBoxLayout, QLabel,
 from cells.observation import Observation
 
 from .code import CodeDelegate, CodeView, acePropertyNames
+from .dialogs import ConfirmationDialog
 
 
 class FinalMeta(type(QWidget), type(CodeDelegate)):
@@ -19,9 +20,12 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         QWidget.__init__(self)
 
         self._template = None
+        self.deleted = False
+        self.shouldSave = False
         self.powermode = powermode
         self.allowEditBackend = allowEditBackend
         self.descriptionMaxLen = 500
+        self._code = ""
 
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignTop)
@@ -51,11 +55,9 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
 
         layout = QFormLayout()
         self.runCommand = QLineEdit(self, maxLength=200)
-        self.runCommand.textChanged.connect(self.onRunCommandChanged)
 
         if self.powermode:
             self.backendName = QLineEdit(self, maxLength=20)
-            self.backendName.textChanged.connect(self.onBackendNameChanged)
 
             self.editorMode = QComboBox()
             [self.editorMode.addItem(mode) for mode in self._availableModes()]
@@ -64,17 +66,13 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
 
             self.inputRegex = QLineEdit(self, maxLength=100)
             self.inputRegex.setToolTip("regex")
-            self.inputRegex.textChanged.connect(self.onInputRegexChanged)
             self.inputReplace = QLineEdit(self, maxLength=100)
             self.inputReplace.setToolTip("substitution string")
-            self.inputReplace.textChanged.connect(self.onInputReplaceChanged)
 
             self.outputRegex = QLineEdit(self, maxLength=100)
             self.outputRegex.setToolTip("regex")
-            self.outputRegex.textChanged.connect(self.onOutputRegexChanged)
             self.outputReplace = QLineEdit(self, maxLength=100)
             self.outputReplace.setToolTip("substitution string")
-            self.outputReplace.textChanged.connect(self.onOutputReplaceChanged)
 
             self.description = QPlainTextEdit(self, minimumHeight=100)
 
@@ -110,14 +108,6 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
     def _availableModes(self):
         return acePropertyNames("mode-", ".js", False)
 
-    def onBackendNameChanged(self, e):
-        if self._template is not None:
-            self._template.backend_name = e.strip()
-
-    def onRunCommandChanged(self, e):
-        if self._template is not None:
-            self._template.run_command = e.strip()
-
     def onEditorModeChanged(self, e):
         mode = self.editorMode.itemText(e)
         self.codeView.setMode(mode)
@@ -125,21 +115,28 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         if self._template is not None:
             self._template.editor_mode = mode
 
-    def onInputRegexChanged(self, e):
-        if self._template is not None:
-            self._template.backend_middleware.input.regex = e
+    def onSave(self):
+        self.shouldSave = True
+        self._template.backend_name = self.backendName.text().strip()
 
-    def onInputReplaceChanged(self, e):
-        if self._template is not None:
-            self._template.backend_middleware.input.substitution = e
+        self._template.run_command = self.runCommand.text().strip()
 
-    def onOutputRegexChanged(self, e):
-        if self._template is not None:
-            self._template.backend_middleware.output.regex = e
+        self._template.editor_mode = self.editorMode.currentText()
 
-    def onOutputReplaceChanged(self, e):
-        if self._template is not None:
-            self._template.backend_middleware.output.substitution = e
+        self._template.backend_middleware.input.regex = \
+            self.inputRegex.text()
+        self._template.backend_middleware.input.substitution = \
+            self.inputReplace.text()
+
+        self._template.backend_middleware.output.regex = \
+            self.outputRegex.text()
+        self._template.backend_middleware.output.substitution = \
+            self.outputReplace.text()
+
+        self._template.description = self.description.toPlainText(
+        )[:self.descriptionMaxLen]
+
+        self._template.setup_code = self._code
 
     def setTemplate(self, delegate):
         self._template = delegate
@@ -150,8 +147,10 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         if self._template is None:
             return
 
-        self._template.setup_code = code
+        self._code = code
         self.onTemplateUpdate()
+        if self.shouldSave:
+            self._template.setup_code = code
 
     def onTemplateUpdate(self):
         pass
@@ -187,10 +186,12 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
                 self._template.description)
         else:
             self.codeView.setMode(self._template.editor_mode)
+        self._code = self._template.setup_code
 
         self.setWindowTitle("Track Editor")
 
     def delete(self):
+        self.deleted = True
         self.codeView.delete()
         self.unregister()
         self.setParent(None)
@@ -206,9 +207,15 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
     def closeEvent(self, event):
         if self._template is not None and \
                 self.powermode and \
-                self.allowEditBackend:
-            self._template.description = self.description.toPlainText(
-            )[:self.descriptionMaxLen]
+                self.allowEditBackend and \
+                not self.deleted:
+            question = "Do you want to save changes in " +\
+                       f"{self._template.backend_name} template?"
+            confirmation = ConfirmationDialog("Update Track Template",
+                                              question)
+
+            if confirmation.exec_() == ConfirmationDialog.Yes:
+                self.onSave()
 
         self.codeView.close()
         super().closeEvent(event)
