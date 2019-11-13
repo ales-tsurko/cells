@@ -22,7 +22,9 @@ class Editor(Observation, QScrollArea):
         self.setMinimumSize(200, 300)
 
         self.codeView = CodeView(subject)
-        self.trackEditor = TrackEditor(self.subject, self.powermode)
+        self.trackEditor = TrackEditor(self.subject,
+                                       self.powermode,
+                                       confirmUpdate=False)
 
         self.selectedTrackIndex = -1
 

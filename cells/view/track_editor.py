@@ -15,7 +15,11 @@ class FinalMeta(type(QWidget), type(CodeDelegate)):
 
 
 class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
-    def __init__(self, subject, powermode=False, allowEditBackend=False):
+    def __init__(self,
+                 subject,
+                 powermode=False,
+                 allowEditBackend=False,
+                 confirmUpdate=True):
         Observation.__init__(self, subject)
         QWidget.__init__(self)
 
@@ -24,6 +28,7 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         self.shouldSave = False
         self.powermode = powermode
         self.allowEditBackend = allowEditBackend
+        self.confirmUpdate = confirmUpdate
         self.descriptionMaxLen = 500
         self._code = ""
 
@@ -124,7 +129,6 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         if self.powermode and self.allowEditBackend:
             self._template.backend_name = self.backendName.text().strip()
 
-
             self._template.editor_mode = self.editorMode.currentText()
 
             self._template.backend_middleware.input.regex = \
@@ -153,6 +157,7 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
 
         self._code = code
         self.onTemplateUpdate()
+
         if self.shouldSave:
             self._template.setup_code = code
 
@@ -210,12 +215,15 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
 
     def closeEvent(self, event):
         if self._template is not None and not self.deleted:
-            question = "Do you want to save changes in " +\
-                       f"{self._template.backend_name} template?"
-            confirmation = ConfirmationDialog("Update Track Template",
-                                              question)
+            if self.confirmUpdate:
+                question = "Do you want to save changes in " +\
+                        f"{self._template.backend_name} template?"
+                confirmation = ConfirmationDialog("Update Track Template",
+                                                question)
 
-            if confirmation.exec_() == ConfirmationDialog.Yes:
+                if confirmation.exec_() == ConfirmationDialog.Yes:
+                    self.onSave()
+            else:
                 self.onSave()
 
         self.codeView.close()
