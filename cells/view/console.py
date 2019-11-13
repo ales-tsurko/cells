@@ -27,8 +27,10 @@ class Console(Observation, QPlainTextEdit):
 
     def sayHello(self):
         self.appendPlainText(FIGLET_NAME)
-        version = "Live Coding Environment v" + str(ApplicationInfo.version)
-        self.appendPlainText(version)
+        version = f"Live Coding Environment v{ApplicationInfo.version}"
+        longestLine = max(FIGLET_NAME.splitlines(), key=lambda line: len(line))
+        numOfSpaces = (len(longestLine)-len(version))//2
+        self.appendPlainText(" "*numOfSpaces + version)
 
     def consoleClearResponder(self, e):
         self.clear()

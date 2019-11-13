@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QFont
 from PySide2.QtWidgets import (QAction, QLabel, QLineEdit, QMessageBox,
@@ -221,7 +223,7 @@ class Track(Observation, QWidget):
                                                      self.template))
 
     def saveAsTemplate(self):
-        self.notify(events.view.track.SaveAsTemplate(self.template))
+        self.notify(events.view.track.SaveAsTemplate(deepcopy(self.template)))
 
     def setName(self, name):
         self.header.setName(name)

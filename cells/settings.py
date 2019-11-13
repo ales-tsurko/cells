@@ -24,7 +24,7 @@ r"""
 class ApplicationInfo:
     name = "Cells"
     author = "Ales Tsurko"
-    version = "0.1.0"
+    version = "1.0.0-beta1"
 
 
 class Settings(Observation, dict):
