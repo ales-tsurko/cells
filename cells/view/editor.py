@@ -70,8 +70,10 @@ class Editor(Observation, QScrollArea):
                            self.trackSaveAsTemplateResponder)
         self.add_responder(events.track.TrackTemplateSaved,
                            self.trackTemplateSavedResponder)
-        self.add_responder(events.view.main.TrackRestartInterpreter,
-                           self.trackRestartInterpreterResponder)
+        self.add_responder(events.view.main.TrackRestartBackend,
+                           self.trackRestartBackendResponder)
+        self.add_responder(events.view.main.BackendRestartAll,
+                           self.backendRestartAllResponder)
 
     def documentOpenResponder(self, e):
         self.clear()
@@ -236,13 +238,30 @@ class Editor(Observation, QScrollArea):
         msgBox.setDetailedText(repr(e.template))
         msgBox.exec()
 
-    def trackRestartInterpreterResponder(self, e):
-        # TODO
-
+    def trackRestartBackendResponder(self, e):
         if not self.hasSelectedTrack():
             return
 
         track = self.trackAt(self.selectedTrackIndex)
+        backendName = track.template.backend_name
+        templates = []
+
+        for n in range(self.numOfTracks()):
+            track = self.trackAt(n)
+
+            if track.template.backend_name == backendName:
+                templates.append(track.template)
+
+        self.notify(events.view.editor.TrackRestartBackend(templates))
+
+    def backendRestartAllResponder(self, e):
+        if self.numOfTracks() < 1:
+            return
+
+        templates = [
+            self.trackAt(n).template for n in range(self.numOfTracks())
+        ]
+        self.notify(events.view.editor.BackendRestartAll(templates))
 
     def newTrack(self, template):
         length = self.innerLayout.count()

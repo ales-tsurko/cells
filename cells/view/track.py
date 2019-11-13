@@ -214,12 +214,12 @@ class Track(Observation, QWidget):
             events.view.track.TemplateUpdated(self.index, self.template))
 
         confirmation = ConfirmationDialog(
-            "Restart Interpreter", "Do you want to restart track's " +
-            "interpreter for the changes to " + "take effect?")
+            "Restart Backend", "Do you want to restart track's " +
+            "backend for the changes to " + "take effect?")
 
         if confirmation.exec_() == QMessageBox.Yes:
             self.notify(
-                events.view.track.InterpreterRestart(self.index,
+                events.view.track.BackendRestart(self.index,
                                                      self.template))
 
     def saveAsTemplate(self):

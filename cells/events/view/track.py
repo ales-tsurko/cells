@@ -26,7 +26,7 @@ class WillRestart(NamedTuple):
     template: TrackTemplateModel
 
 
-class InterpreterRestart(NamedTuple):
+class BackendRestart(NamedTuple):
     track_index: int
     setup_code: str
 

@@ -35,7 +35,7 @@ class BackendRouter(Observation):
         backend = Backend(self.event_loop, template, self.subject)
         self.backends[template.run_command] = backend
         self.backends[template.run_command].increment_references()
-        backend.run()
+        backend.run(template.setup_code)
 
     def track_remove_responder(self, event):
         template = event.template
@@ -92,11 +92,11 @@ class Backend(Observation):
     def app_quit_responder(self, e):
         self.stop()
 
-    def run(self):
+    def run(self, setup_code):
         self.evaluation_queue.append(
-            self.event_loop.create_task(self.run_task()))
+            self.event_loop.create_task(self.run_task(setup_code)))
 
-    async def run_task(self):
+    async def run_task(self, setup_code):
         if not self.template.run_command or \
                 self.proc and self.proc.returncode is None:
 
@@ -115,7 +115,7 @@ class Backend(Observation):
                       lambda out: self.notify(events.backend.Stdout(out))),
             self.pipe(self.proc.stderr,
                       lambda out: self.notify(events.backend.Stderr(out))))
-        self.evaluate(self.template.setup_code)
+        self.evaluate(setup_code)
         # self.notify(events.backend.Ready(...))
 
     def stop(self):

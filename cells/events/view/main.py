@@ -57,7 +57,11 @@ class TrackSaveAsTemplate(NamedTuple):
     pass
 
 
-class TrackRestartInterpreter(NamedTuple):
+class TrackRestartBackend(NamedTuple):
+    pass
+
+
+class BackendRestartAll(NamedTuple):
     pass
 
 

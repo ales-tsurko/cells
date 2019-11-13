@@ -6,13 +6,13 @@ from PySide2.QtWidgets import (QBoxLayout, QFileDialog, QFrame, QHBoxLayout,
 from cells import events
 from cells.model import Document
 from cells.observation import Observation
+from cells.settings import Settings as SettingsModel
 
 from .browser import Browser
 from .console import Console
 from .dialogs import ConfirmationDialog
 from .editor import Editor
 from .settings import Settings
-from cells.settings import Settings as SettingsModel
 
 
 class Main(QMainWindow, Observation):
@@ -86,9 +86,9 @@ class Main(QMainWindow, Observation):
             self._addMenuAction(trackSub, "Save as Template", self.tr(""),
                                 self.onTrackSaveAsTemplate)
         trackSub.addSeparator()
-        self._addMenuAction(trackSub, "Restart Interpreter",
+        self._addMenuAction(trackSub, "Restart Backend",
                             self.tr("Ctrl+Shift+R"),
-                            self.onTrackRestartInterpreter)
+                            self.onTrackRestartBackend)
 
         rowSub = editMenu.addMenu("Row")
         self._addMenuAction(rowSub, "Evaluate", self.tr('Ctrl+Return'),
@@ -131,6 +131,11 @@ class Main(QMainWindow, Observation):
                             self.onCellCut)
         self._addMenuAction(cellSub, "Paste", self.tr("Alt+Shift+v"),
                             self.onCellPaste)
+
+        editMenu.addSeparator()
+
+        self._addMenuAction(editMenu, "Restart All Backends",
+                            self.tr("Ctrl+Shift+."), self.onBackendRestartAll)
 
         editMenu.addSeparator()
 
@@ -265,8 +270,8 @@ class Main(QMainWindow, Observation):
     def onTrackSaveAsTemplate(self, e):
         self.notify(events.view.main.TrackSaveAsTemplate())
 
-    def onTrackRestartInterpreter(self, e):
-        self.notify(events.view.main.TrackRestartInterpreter())
+    def onTrackRestartBackend(self, e):
+        self.notify(events.view.main.TrackRestartBackend())
 
     def onRowEvaluate(self, e):
         self.notify(events.view.main.RowEvaluate())
@@ -312,6 +317,9 @@ class Main(QMainWindow, Observation):
 
     def onCellPaste(self, e):
         self.notify(events.view.main.CellPaste())
+
+    def onBackendRestartAll(self, e):
+        self.notify(events.view.main.BackendRestartAll())
 
     def onConsoleClear(self, e):
         self.notify(events.view.main.ConsoleClear())
