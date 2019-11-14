@@ -206,7 +206,7 @@ class Item(Observation, QWidget):
     def __init__(self, template, subject):
         Observation.__init__(self, subject)
         QWidget.__init__(self)
-        self.maxLineLen = 35
+        self.maxLineLen = 32
         self.template = template
 
         name = self.shortenString(template.backend_name)
@@ -228,10 +228,16 @@ class Item(Observation, QWidget):
         self.setLayout(layout)
 
     def shortenString(self, value):
-        if len(value) <= self.maxLineLen:
+        lines = value.splitlines()
+        if len(lines) < 1:
             return value
 
-        return value[:self.maxLineLen] + "..."
+        firstLine = lines[0]
+
+        if len(firstLine) <= self.maxLineLen:
+            return firstLine
+
+        return firstLine[:self.maxLineLen] + "..."
 
     def deserialize(self, template):
         self.name.setText(self.shortenString(template.backend_name))
