@@ -1,8 +1,10 @@
 import asyncio
+import os
 import re
 from asyncio import subprocess
 
 from cells import events
+from cells.model import standard_track_template_dir
 from cells.observation import Observation
 
 
@@ -130,7 +132,8 @@ class Backend(Observation):
             self.template.run_command,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE)
+            stderr=subprocess.PIPE,
+            cwd=self.artifacts_path())
         self.pipe_task = asyncio.gather(
             self.pipe(self.proc.stdout,
                       lambda out: self.notify(events.backend.Stdout(out))),
@@ -185,8 +188,27 @@ class Backend(Observation):
             if callback:
                 callback(out)
 
+    def artifacts_path(self):
+        regex = re.compile(r'[\W_]+', re.UNICODE)
+        name = regex.sub("", self.template.backend_name).lower()
+        path = os.path.join(artifacts_dir(), name)
+
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        return path
+
     def increment_references(self):
         self.references += 1
 
     def decrement_references(self):
         self.references -= 1
+
+
+def artifacts_dir():
+    path = os.path.join(standard_track_template_dir(), "artifacts")
+
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    return path
