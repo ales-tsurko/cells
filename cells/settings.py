@@ -7,7 +7,7 @@ from cells import events
 from cells.observation import Observation
 
 FIGLET_NAME = \
-r"""
+    r"""
       ___           ___                                       ___
      /\__\         /\__\                                     /\__\
     /:/  /        /:/ _/_                                   /:/ _/_
@@ -20,6 +20,7 @@ r"""
     \::/  /       \::/  /       \::/  /       \::/  /        /:/  /
      \/__/         \/__/         \/__/         \/__/         \/__/
 """
+
 
 class ApplicationInfo:
     name = "Cells"
@@ -61,8 +62,11 @@ class Settings(Observation, dict):
     #     self.save()
 
     def open(self):
-        with open(self.path, "r") as f:
-            self.update(toml.load(f))
+        try:
+            with open(self.path, "r+") as f:
+                self.update(toml.load(f))
+        except FileNotFoundError:
+            print("settings file not found, defaults will be used")
 
     def save(self):
         with open(self.path, "w+") as f:
