@@ -16,11 +16,11 @@ rx = "^3.0.1"
 appdirs = "^1.4.3"
 toml = "^0.10.0"
 dataclasses_json = "^0.3.5"
-"delegator.py" = "^0.1.1"
 asyncqt = "^0.7.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
+nuitka = "^0.6.5"
 
 [build-system]
 requires = ["poetry>=1.0.0b4"]
