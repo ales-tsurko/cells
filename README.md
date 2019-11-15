@@ -1,7 +1,7 @@
 # Cells
 
-Cells is a live coding environment. It allows you to organize and run
-code snippets for interpreted programming languages. 
+Cells is a live coding environment. It allows you to organize and run code
+snippets for interactive programming languages. 
 
 Cells allows you to run simultaneously in the same project:
 - Clojure 
