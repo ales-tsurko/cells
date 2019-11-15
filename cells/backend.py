@@ -166,8 +166,6 @@ class Backend(Observation):
             code = self.input_middleware_re.sub(
                 self.template.backend_middleware.input.substitution, code)
 
-        print(code)
-
         self.evaluation_queue.append(
             self.event_loop.create_task(self.evaluate_task(code)))
 

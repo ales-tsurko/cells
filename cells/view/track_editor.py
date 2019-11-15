@@ -79,7 +79,7 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
             self.outputReplace = QLineEdit(self, maxLength=100)
             self.outputReplace.setToolTip("substitution string")
 
-            self.description = QPlainTextEdit(self, minimumHeight=100)
+            self.description = QPlainTextEdit(self, minimumHeight=80)
 
         layout.addRow(self.tr("Run Command:"), self.runCommand)
 
