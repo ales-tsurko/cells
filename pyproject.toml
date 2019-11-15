@@ -23,5 +23,5 @@ asyncqt = "^0.7.0"
 pytest = "^5.2"
 
 [build-system]
-requires = ["poetry>=1.0.0b3"]
+requires = ["poetry>=1.0.0b4"]
 build-backend = "poetry.masonry.api"

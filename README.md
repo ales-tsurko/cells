@@ -16,14 +16,9 @@ First, you need to install dependencies:
 poetry install
 ```
 
-Then switch to environment:
+Then:
 ```
-poetry shell
-```
-
-And finally, you can run the project:
-```
-python cells -d
+poetry run cells -d
 ```
 
 
