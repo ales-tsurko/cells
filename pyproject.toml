@@ -11,15 +11,17 @@ cells = "cells.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.7"
-pyside2 = "^5.13.1"
+pyside2 = "^5.13.2"
 rx = "^3.0.1"
 appdirs = "^1.4.3"
 toml = "^0.10.0"
 dataclasses_json = "^0.3.5"
 asyncqt = "^0.7.0"
+shiboken2 = "^5.13.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
+macholib = "^1.11"
 nuitka = "^0.6.5"
 
 [build-system]
