@@ -1,4 +1,6 @@
 #!/bin/sh
 
+set -e
+
 mkdir -p ~/Library/Application\ Support/Cells
 mv /tmp/track_templates ~/Library/Application\ Support/Cells

@@ -1,4 +1,5 @@
 #!/bin/sh
+
 set -e
 
 PACKAGES_PATH=dist/packages/macos
@@ -16,6 +17,7 @@ pkgbuild --identifier by.alestsurko.cells \
 mkdir -p /tmp/track_templates
 pkgbuild --identifier by.alestsurko.cells.ctt \
          --install-location /tmp/track_templates \
+         --ownership preserve \
          --scripts packaging/macos/scripts/ \
          --root track_templates $PACKAGES_PATH/_templates.pkg
 
