@@ -6,7 +6,7 @@ block_cipher = None
 
 resources = utility.viewResourcesDir()
 
-a = Analysis(['cells/__main__.py'],
+a = Analysis(['../cells/__main__.py'],
              pathex=['/Users/alestsurko/Desktop/cells'],
              binaries=[],
              datas=[(resources, "resources")],
