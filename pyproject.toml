@@ -22,7 +22,7 @@ shiboken2 = "^5.13.2"
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
 macholib = "^1.11"
-nuitka = "^0.6.5"
+PyInstaller = "^3.5"
 
 [build-system]
 requires = ["poetry>=1.0.0b4"]
