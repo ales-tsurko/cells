@@ -2,15 +2,14 @@ import glob
 import os
 from abc import ABC, abstractmethod
 
+import cells.utility as utility
+from cells import events
+from cells.observation import Observation
+from cells.settings import ApplicationInfo, Settings
 from PySide2.QtCore import Qt, QUrl
 from PySide2.QtGui import QKeySequence
 from PySide2.QtWebEngineWidgets import QWebEnginePage, QWebEngineView
 from PySide2.QtWidgets import QAction, QShortcut, QSizePolicy
-
-import cells.utility as utility
-from cells import events
-from cells.observation import Observation
-from cells.settings import Settings
 
 
 class CodeView(Observation, QWebEngineView):

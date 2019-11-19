@@ -8,7 +8,7 @@ block_cipher = None
 resources = utility.viewResourcesDir()
 
 a = Analysis(['../cells/__main__.py'],
-             pathex=['/Users/alestsurko/Desktop/cells'],
+             pathex=[os.path.join(os.getcwd(), "cells")],
              binaries=[],
              datas=[(resources, "resources")],
              hiddenimports=["PySide2.QtPrintSupport"],
@@ -26,6 +26,7 @@ exe = EXE(pyz,
           name='Cells',
           debug=False,
           bootloader_ignore_signals=False,
+          manifest=None,
           strip=False,
           upx=True,
           console=False)

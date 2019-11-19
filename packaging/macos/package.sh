@@ -6,27 +6,27 @@ PACKAGES_PATH=dist/packages/macos
 
 pyinstaller packaging/Cells.spec -y
 
-# write every envvar into Info.plist
-unset IFS
-for var in $(compgen -e); do
-    defaults write $PWD/dist/Cells.app/Contents/Info.plist LSEnvironment -dict-add "$var" "\"${!var}\""
-done
+cp ./packaging/macos/cells.sh ./dist/Cells.app/Contents/MacOS/
+
+defaults write $PWD/dist/Cells.app/Contents/Info.plist CFBundleExecutable -string cells.sh
+
+chmod -R 755 ./dist/Cells.app
 
 mkdir -p $PACKAGES_PATH
 
 # package application
 pkgbuild --identifier by.alestsurko.cells \
          --install-location /Applications \
-         --ownership preserve \
-         --component dist/Cells.app $PACKAGES_PATH/_cells.pkg
+         --component dist/Cells.app \
+         $PACKAGES_PATH/_cells.pkg
 
 # package templates
 mkdir -p /tmp/track_templates
 pkgbuild --identifier by.alestsurko.cells.ctt \
          --install-location /tmp/track_templates \
-         --ownership preserve \
          --scripts packaging/macos/scripts/ \
-         --root track_templates $PACKAGES_PATH/_templates.pkg
+         --root track_templates \
+         $PACKAGES_PATH/_templates.pkg
 
 # synthesize Distribution.xml
 productbuild --synthesize \
