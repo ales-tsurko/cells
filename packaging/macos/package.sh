@@ -6,8 +6,11 @@ PACKAGES_PATH=dist/packages/macos
 
 pyinstaller packaging/Cells.spec -y
 
-# export user's $PATH into App
-defaults write $PWD/dist/Cells.app/Contents/Info.plist LSEnvironment -dict PATH "$PATH"
+# write every envvar into Info.plist
+unset IFS
+for var in $(compgen -e); do
+    defaults write $PWD/dist/Cells.app/Contents/Info.plist LSEnvironment -dict-add "$var" "\"${!var}\""
+done
 
 mkdir -p $PACKAGES_PATH
 
