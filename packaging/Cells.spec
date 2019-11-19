@@ -1,5 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
 import os
+
 from cells import utility
 
 block_cipher = None
@@ -36,27 +37,29 @@ coll = COLLECT(exe,
                upx=True,
                upx_exclude=[],
                name='Cells')
-app = BUNDLE(coll,
-             name='Cells.app',
-             icon=None,
-             bundle_identifier='by.alestsurko.cells',
-             info_plist={
-                'NSPrincipalClass': 'NSApplication',
-                'NSAppleScriptEnabled': False,
-                'CFBundleDocumentTypes': [
-                        {
-                            'CFBundleTypeName': 'Cells Document Format',
-                            'CFBundleTypeRole': 'Editor',
-                            # 'CFBundleTypeIconFile': 'MyFileIcon.icns',
-                            'LSItemContentTypes': ['by.alestsurko.cells'],
-                            'LSHandlerRank': 'Owner'
-                        },
-                        {
-                            'CFBundleTypeName': 'Cells Track Template Format',
-                            'CFBundleTypeRole': 'Editor',
-                            # 'CFBundleTypeIconFile': 'MyFileIcon.icns',
-                            'LSItemContentTypes': ['by.alestsurko.ctt'],
-                            'LSHandlerRank': 'Owner'
-                        },
-                    ]
-                })
+app = BUNDLE(
+    coll,
+    name='Cells.app',
+    icon=None,
+    bundle_identifier='by.alestsurko.cells',
+    info_plist={
+        'NSPrincipalClass':
+        'NSApplication',
+        'NSAppleScriptEnabled': False,
+        'CFBundleDocumentTypes': [
+            {
+                'CFBundleTypeName': 'Cells Document Format',
+                'CFBundleTypeRole': 'Editor',
+                # 'CFBundleTypeIconFile': 'MyFileIcon.icns',
+                'LSItemContentTypes': ['by.alestsurko.cells'],
+                'LSHandlerRank': 'Owner'
+            },
+            {
+                'CFBundleTypeName': 'Cells Track Template Format',
+                'CFBundleTypeRole': 'Editor',
+                # 'CFBundleTypeIconFile': 'MyFileIcon.icns',
+                'LSItemContentTypes': ['by.alestsurko.ctt'],
+                'LSHandlerRank': 'Owner'
+            },
+        ]
+    })

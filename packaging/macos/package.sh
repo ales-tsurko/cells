@@ -6,11 +6,15 @@ PACKAGES_PATH=dist/packages/macos
 
 pyinstaller packaging/Cells.spec -y
 
+# export user's $PATH into App
+defaults write $PWD/dist/Cells.app/Contents/Info.plist LSEnvironment -dict PATH "$PATH"
+
 mkdir -p $PACKAGES_PATH
 
 # package application
 pkgbuild --identifier by.alestsurko.cells \
          --install-location /Applications \
+         --ownership preserve \
          --component dist/Cells.app $PACKAGES_PATH/_cells.pkg
 
 # package templates
