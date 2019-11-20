@@ -28,14 +28,14 @@ exe = EXE(pyz,
           bootloader_ignore_signals=False,
           manifest=None,
           strip=False,
-          upx=True,
+          upx=False,
           console=False)
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
                a.datas,
                strip=False,
-               upx=True,
+               upx=False,
                upx_exclude=[],
                name='Cells')
 app = BUNDLE(
@@ -44,8 +44,7 @@ app = BUNDLE(
     icon=None,
     bundle_identifier='by.alestsurko.cells',
     info_plist={
-        'NSPrincipalClass':
-        'NSApplication',
+        'NSPrincipalClass': 'NSApplication',
         'NSAppleScriptEnabled': False,
         'CFBundleDocumentTypes': [
             {
