@@ -3,7 +3,8 @@
 set -e
 
 mkdir -p ~/Library/Application\ Support/Cells
-mv /tmp/track_templates ~/Library/Application\ Support/Cells
-chown -R $(stat -f "%Su" /dev/console) ~/Library/Application\ Support/Cells/
+rm -rf ~/Library/Application\ Support/Cells/track_templates
+mv -f /tmp/track_templates ~/Library/Application\ Support/Cells/
+chown -R $(stat -f "%Su" /dev/console) ~/Library/Application\ Support/Cells
 
 exit 0

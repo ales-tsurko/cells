@@ -29,7 +29,7 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         self.powermode = powermode
         self.allowEditBackend = allowEditBackend
         self.confirmUpdate = confirmUpdate
-        self.descriptionMaxLen = 500
+        self.descriptionMaxLen = 1000
         self._code = ""
 
         layout = QVBoxLayout()

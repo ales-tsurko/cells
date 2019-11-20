@@ -73,7 +73,7 @@ productbuild --distribution $PACKAGES_PATH/Distribution.xml \
              --package-path $PACKAGES_PATH \
              $PACKAGES_PATH/Cells.pkg
 
-echo "Clening up"
+echo "Cleaning up"
 rm -f $PACKAGES_PATH/_cells.pkg
 rm -f $PACKAGES_PATH/_templates.pkg
 rm -rf dist/Cells.app
