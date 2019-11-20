@@ -4,6 +4,9 @@ set -e
 
 PACKAGES_PATH=dist/packages/macos
 
+cp .venv/lib/python3.7/site-packages/shiboken2/libshiboken2.abi*.dylib \
+   .venv/lib/python3.7/site-packages/PySide2/ 
+
 pyinstaller packaging/Cells.spec -y
 
 cp ./packaging/macos/cells.sh ./dist/Cells.app/Contents/MacOS/
