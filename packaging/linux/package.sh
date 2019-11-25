@@ -34,19 +34,12 @@ echo "Copying postinst"
 cp packaging/linux/postinst $DEB_PACK_DIR/DEBIAN/
 
 echo "Copying track templates"
-cp -R track_templates $DEB_PACK_DIR/
+mkdir -p $DEB_PACK_DIR/tmp/track_templates
+cp -R ./track_templates/* $DEB_PACK_DIR/tmp/track_templates
 
 echo "Packaging binaries"
 mkdir -p $DEB_PACK_DIR/usr/share/Cells
-mv dist/Cells/Cells $DEB_PACK_DIR/usr/share/Cells
-mv dist/Cells/resources $DEB_PACK_DIR/usr/share/Cells
-
-echo "Packaging resources"
-mkdir -p $DEB_PACK_DIR/usr/include
-mkdir -p $DEB_PACK_DIR/usr/lib
-mv dist/Cells/include/* $DEB_PACK_DIR/usr/include
-mv dist/Cells/lib/* $DEB_PACK_DIR/usr/lib
-mv dist/Cells/* $DEB_PACK_DIR/usr/lib
+mv dist/Cells/* $DEB_PACK_DIR/usr/share/Cells
 
 echo "Building package"
 dpkg -b $DEB_PACK_DIR $PACKAGE_DIR/cells-${CELLS_VERSION}-${CELLS_REVISION_NUMBER}_amd64.deb

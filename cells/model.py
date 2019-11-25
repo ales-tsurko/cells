@@ -214,6 +214,8 @@ class TrackTemplateManager(Observation):
         self.save(e.template, self.new_template_path())
 
     def read_dir(self, path):
+        print("Reading templates from:", path)
+
         self.templates = [
             self.read(p)
             for p in glob.glob(os.path.join(path, "*" + TRACK_TEMPLATE_EXT))
