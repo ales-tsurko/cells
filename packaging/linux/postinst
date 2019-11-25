@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -e
+
+cd $(dirname "$0")
+
+ln -s /usr/share/Cells/Cells /usr/bin/cells
+
+mkdir -p $HOME/.local/share/Cells/
+rm -rf $HOME/.local/share/Cells/track_templates
+cp -R track_templates $HOME/.local/share/Cells/
+chown -R $(stat -f "%Su" /dev/console) $HOME/.local/share/Cells/track_templates
+
+exit 0
