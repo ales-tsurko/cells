@@ -21,7 +21,7 @@ color: #FFFFFF\
 background: #6699CC\
 }\
 .ace-vibrant-ink.ace_multiselect .ace_selection.ace_start {\
-box-shadow: 0 0 3px 0px #0F0F0F;\
+box-shadow: 0 0 3px 0px #0F0F0F\
 }\
 .ace-vibrant-ink .ace_marker-layer .ace_step {\
 background: rgb(102, 82, 0)\

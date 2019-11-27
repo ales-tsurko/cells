@@ -21,7 +21,7 @@ color: #A7A7A7\
 background: rgba(221, 240, 255, 0.20)\
 }\
 .ace-twilight.ace_multiselect .ace_selection.ace_start {\
-box-shadow: 0 0 3px 0px #141414;\
+box-shadow: 0 0 3px 0px #141414\
 }\
 .ace-twilight .ace_marker-layer .ace_step {\
 background: rgb(102, 82, 0)\

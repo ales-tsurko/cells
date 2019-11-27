@@ -21,7 +21,7 @@ color: #000000\
 background: #BDD5FC\
 }\
 .ace-clouds.ace_multiselect .ace_selection.ace_start {\
-box-shadow: 0 0 3px 0px #FFFFFF;\
+box-shadow: 0 0 3px 0px #FFFFFF\
 }\
 .ace-clouds .ace_marker-layer .ace_step {\
 background: rgb(255, 255, 0)\

@@ -21,7 +21,7 @@ color: #AEAFAD\
 background: #D6D6D6\
 }\
 .ace-tomorrow.ace_multiselect .ace_selection.ace_start {\
-box-shadow: 0 0 3px 0px #FFFFFF;\
+box-shadow: 0 0 3px 0px #FFFFFF\
 }\
 .ace-tomorrow .ace_marker-layer .ace_step {\
 background: rgb(255, 255, 0)\

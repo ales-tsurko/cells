@@ -21,7 +21,7 @@ color: #91FF00\
 background: rgba(90, 100, 126, 0.88)\
 }\
 .ace-idle-fingers.ace_multiselect .ace_selection.ace_start {\
-box-shadow: 0 0 3px 0px #323232;\
+box-shadow: 0 0 3px 0px #323232\
 }\
 .ace-idle-fingers .ace_marker-layer .ace_step {\
 background: rgb(102, 82, 0)\

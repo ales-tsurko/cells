@@ -2,7 +2,10 @@ define("ace/theme/xcode",["require","exports","module","ace/lib/dom"], function(
 
 exports.isDark = false;
 exports.cssClass = "ace-xcode";
-exports.cssText = "\
+exports.cssText = ".ace-xcode .ace_gutter {\
+background: #FFFFFF;\
+color: rgb(128,128,128)\
+}\
 .ace-xcode .ace_gutter {\
 background: #e8e8e8;\
 color: #333\
@@ -22,7 +25,7 @@ color: #000000\
 background: #B5D5FF\
 }\
 .ace-xcode.ace_multiselect .ace_selection.ace_start {\
-box-shadow: 0 0 3px 0px #FFFFFF;\
+box-shadow: 0 0 3px 0px #FFFFFF\
 }\
 .ace-xcode .ace_marker-layer .ace_step {\
 background: rgb(198, 219, 174)\

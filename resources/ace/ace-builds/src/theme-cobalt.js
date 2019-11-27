@@ -21,7 +21,7 @@ color: #FFFFFF\
 background: rgba(179, 101, 57, 0.75)\
 }\
 .ace-cobalt.ace_multiselect .ace_selection.ace_start {\
-box-shadow: 0 0 3px 0px #002240;\
+box-shadow: 0 0 3px 0px #002240\
 }\
 .ace-cobalt .ace_marker-layer .ace_step {\
 background: rgb(127, 111, 19)\
@@ -105,8 +105,7 @@ color: #9EFFFF\
 }\
 .ace-cobalt .ace_indent-guide {\
 background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAEklEQVQImWNgYGBgYHCLSvkPAAP3AgSDTRd4AAAAAElFTkSuQmCC) right repeat-y\
-}\
-";
+}";
 
 var dom = require("../lib/dom");
 dom.importCssString(exports.cssText, exports.cssClass);

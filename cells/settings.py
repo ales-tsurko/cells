@@ -39,7 +39,7 @@ class Settings(Observation, dict):
         # self.add_responder(events.app.Quit, self.app_quit_responder)
 
         self.setdefault("editor", {})
-        self['editor'].setdefault("theme", "Gruvbox")
+        self['editor'].setdefault("theme", "Cells")
         self['editor'].setdefault("keybindings", "Sublime")
         self.setdefault("powermode", False)
 

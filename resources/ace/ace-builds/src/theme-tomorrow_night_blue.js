@@ -22,7 +22,7 @@ color: #FFFFFF\
 background: #003F8E\
 }\
 .ace-tomorrow-night-blue.ace_multiselect .ace_selection.ace_start {\
-box-shadow: 0 0 3px 0px #002451;\
+box-shadow: 0 0 3px 0px #002451\
 }\
 .ace-tomorrow-night-blue .ace_marker-layer .ace_step {\
 background: rgb(127, 111, 19)\

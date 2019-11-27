@@ -21,7 +21,7 @@ color: #F8F8F0\
 background: #49483E\
 }\
 .ace-monokai.ace_multiselect .ace_selection.ace_start {\
-box-shadow: 0 0 3px 0px #272822;\
+box-shadow: 0 0 3px 0px #272822\
 }\
 .ace-monokai .ace_marker-layer .ace_step {\
 background: rgb(102, 82, 0)\
