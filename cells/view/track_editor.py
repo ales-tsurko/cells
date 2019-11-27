@@ -171,7 +171,7 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         return self._template.setup_code
 
     def codeWindowTitle(self):
-        return "Track Editor"
+        return "Track Template Editor"
 
     def deserialize(self):
         if self._template is None:

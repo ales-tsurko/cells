@@ -29,10 +29,12 @@ rsync -r .venv/. $APPDIR/venv
 echo "Copying resources"
 cp -R resources $APPDIR
 
+echo "Copying icons"
+cp packaging/macos/*.icns $APPRESOURCES/
+
 echo "Copying executable scripts"
 cp packaging/macos/runner $APPDIR
 cp packaging/macos/run $APPDIR
-# chmod +x $APPDIR/runner
 
 echo "Writing defaults"
 defaults write $PWD/$APP/Contents/Info.plist CFBundleName -string Cells
@@ -41,6 +43,26 @@ defaults write $PWD/$APP/Contents/Info.plist CFBundleIdentifier -string by.alest
 defaults write $PWD/$APP/Contents/Info.plist CFBundleVersion -string "1.0.0"
 defaults write $PWD/$APP/Contents/Info.plist CFBundleExecutable -string run
 defaults write $PWD/$APP/Contents/Info.plist NSPrincipalClass -string NSApplication
+defaults write $PWD/$APP/Contents/Info.plist CFBundleIconFile -string "AppIcon"
+plutil -insert CFBundleDocumentTypes -json '[{ 
+    "CFBundleTypeName": "Cells Document Format", 
+    "CFBundleTypeIconFile": "DocumentIcon.icns", 
+    "CFBundleTypeOSTypes": [".cls"],
+    "CFBundleTypeExtensions": ["cells"],
+    "CFBundleTypeRole": "Editor", 
+    "LSHandlerRank": "Owner", 
+    "LSItemContentTypes": ["by.alestsurko.cells.document"],
+    "LSTypeIsPackage": false
+}, { 
+    "CFBundleTypeName": "Cells Track Template Format",
+    "CFBundleTypeRole": "Viewer",
+    "CFBundleTypeIconFile": "TrackTemplateIcon.icns", 
+    "LSHandlerRank": "Owner", 
+    "LSItemContentTypes": ["by.alestsurko.cells.ctt"],
+    "CFBundleTypeExtensions": ["ctt"],
+    "CFBundleTypeOSTypes": [".ctt"],
+    "LSTypeIsPackage": false
+}]' $PWD/$APP/Contents/Info.plist
 
 echo "Setting permissions"
 chmod -R 755 $APP
