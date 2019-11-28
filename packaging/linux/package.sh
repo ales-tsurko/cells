@@ -28,6 +28,15 @@ Version: ${CELLS_VERSION}\n\
 Maintainer: Ales Tsurko <ales.tsurko@gmail.com>\n\
 Description: Live coding environment.\n\
 Homepage: https://github.com/AlesTsurko/cells\n\
+Suggests: \
+chezscheme9.5, \
+haskell-platform, \
+lua | lua5.3, \
+nodejs, \
+python | python3 | python3.7, \
+ruby-full, \
+sbcl, \
+supercollider-ide | supercollider\n\
 Architecture: amd64" > $DEB_PACK_DIR/DEBIAN/control
 
 echo "Copying postinst"
