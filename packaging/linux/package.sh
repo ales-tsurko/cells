@@ -18,6 +18,9 @@ rm -rf dist/*
 echo "Compiling binary"
 pyinstaller packaging/Cells.spec -y
 
+echo "Copying app icon"
+cp ./packaging/linux/AppIcon.png ./dist/Cells/
+
 echo "Creating debian package structure"
 mkdir -p $DEB_PACK_DIR
 mkdir -p $DEB_PACK_DIR/DEBIAN
@@ -28,7 +31,7 @@ Version: ${CELLS_VERSION}\n\
 Maintainer: Ales Tsurko <ales.tsurko@gmail.com>\n\
 Description: Live coding environment.\n\
 Homepage: https://github.com/AlesTsurko/cells\n\
-Suggests: \
+Recommends: \
 chezscheme9.5, \
 haskell-platform, \
 lua | lua5.3, \
@@ -45,6 +48,20 @@ cp packaging/linux/postinst $DEB_PACK_DIR/DEBIAN/
 echo "Copying track templates"
 mkdir -p $DEB_PACK_DIR/tmp/track_templates
 cp -R ./track_templates/* $DEB_PACK_DIR/tmp/track_templates
+
+echo "Generating cells.desktop"
+echo "\
+[Desktop Entry]
+Version=${CELLS_VERSION}
+Name=Cells
+Coment=Live coding environment
+Exec=/usr/share/Cells/Cells
+Icon=/usr/share/Cells/AppIcon.png
+Terminal=false
+Type=Application
+Categories=Utility;Application;\
+" > $DEB_PACK_DIR/tmp/cells.desktop
+chmod +x $DEB_PACK_DIR/tmp/cells.desktop
 
 echo "Packaging binaries"
 mkdir -p $DEB_PACK_DIR/usr/share/Cells

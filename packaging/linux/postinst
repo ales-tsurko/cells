@@ -9,4 +9,7 @@ rm -rf $HOME/.local/share/Cells/track_templates
 mv -f /tmp/track_templates $HOME/.local/share/Cells/
 chown -R $(logname) $HOME/.local/share/Cells/track_templates/
 
+mv /tmp/cells.desktop /usr/share/applications/
+chmod +x /usr/share/applications/cells.desktop
+
 exit 0
