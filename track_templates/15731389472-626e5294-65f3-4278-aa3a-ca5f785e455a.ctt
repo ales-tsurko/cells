@@ -1,1 +1,14 @@
-{"backend_name": "Node.js", "setup_code": "", "run_command": "node -i -e \"repl.repl.ignoreUndefined=true\"", "command_prompt": "", "description": "JavaScript (Node.js) track template.", "editor_mode": "javascript", "path": "/Users/alestsurko/Desktop/cells/track_templates/15731389472-626e5294-65f3-4278-aa3a-ca5f785e455a.ctt", "backend_middleware": {"input": {"regex": "", "substitution": ""}, "output": {"regex": "(> |\\.\\.\\. )", "substitution": ""}}}
+{
+    "backend_middleware": {
+        "input": {"regex": "", "substitution": ""},
+        "output": {"regex": "(> |\\.\\.\\. )", "substitution": ""}
+    },
+    "backend_name": "Node.js",
+    "command_prompt": "",
+    "description": "JavaScript (Node.js) track template.",
+    "editor_mode": "javascript",
+    "path": "/Users/alestsurko/Desktop/cells/track_templates/15731389472-626e5294-65f3-4278-aa3a-ca5f785e455a.ctt",
+    "run_command": "node -i -e \"repl.repl.ignoreUndefined=true\"",
+    "setup_code": "",
+    "icon_name": "javascript_icon"
+}

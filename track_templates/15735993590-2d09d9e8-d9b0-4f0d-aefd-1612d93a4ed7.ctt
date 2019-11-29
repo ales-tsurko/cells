@@ -1,1 +1,14 @@
-{"backend_name": "Scheme (Chez)", "setup_code": "", "run_command": "chez", "command_prompt": "", "description": "Chez Scheme track template.", "editor_mode": "scheme", "path": "/Users/alestsurko/Desktop/cells/track_templates/15735993590-2d09d9e8-d9b0-4f0d-aefd-1612d93a4ed7.ctt", "backend_middleware": {"input": {"regex": "", "substitution": ""}, "output": {"regex": "> ", "substitution": ""}}}
+{
+    "backend_middleware": {
+        "input": {"regex": "", "substitution": ""},
+        "output": {"regex": "> ", "substitution": ""}
+    },
+    "backend_name": "Scheme (Chez)",
+    "command_prompt": "",
+    "description": "Chez Scheme track template.",
+    "editor_mode": "scheme",
+    "path": "/Users/alestsurko/Desktop/cells/track_templates/15735993590-2d09d9e8-d9b0-4f0d-aefd-1612d93a4ed7.ctt",
+    "run_command": "chez",
+    "setup_code": "",
+    "icon_name": "scheme_icon"
+}

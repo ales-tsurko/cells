@@ -1,1 +1,14 @@
-{"backend_name": "Clojure", "setup_code": "", "run_command": "clojure -r", "command_prompt": "", "description": "Clojure track template.", "editor_mode": "clojure", "path": "/Users/alestsurko/Desktop/cells/track_templates/15737518580-35af647c-3802-4eda-a94e-309faaaf233a.ctt", "backend_middleware": {"input": {"regex": "", "substitution": ""}, "output": {"regex": "(user=> |^nil\\s*$)", "substitution": ""}}}
+{
+    "backend_middleware": {
+        "input": {"regex": "", "substitution": ""},
+        "output": {"regex": "(user=> |^nil\\s*$)", "substitution": ""}
+    },
+    "backend_name": "Clojure",
+    "command_prompt": "",
+    "description": "Clojure track template.",
+    "editor_mode": "clojure",
+    "path": "/Users/alestsurko/Desktop/cells/track_templates/15737518580-35af647c-3802-4eda-a94e-309faaaf233a.ctt",
+    "run_command": "clojure -r",
+    "setup_code": "",
+    "icon_name": "clojure_icon"
+}

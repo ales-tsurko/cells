@@ -1,17 +1,17 @@
 from copy import deepcopy
 
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import (QAction, QFrame, QLabel, QListWidget,
-                               QListWidgetItem, QMenu, QTextEdit, QVBoxLayout,
-                               QWidget)
-
 from cells import events
 from cells.model import TrackTemplateManager
 from cells.observation import Observation
+from PySide2.QtCore import Qt
+from PySide2.QtSvg import QSvgWidget
+from PySide2.QtWidgets import (QAction, QFrame, QHBoxLayout, QLabel,
+                               QListWidget, QListWidgetItem, QMenu, QTextEdit,
+                               QVBoxLayout, QWidget)
 
 from .dialogs import ConfirmationDialog
+from .theme import ScrollBar, Theme
 from .track_editor import TrackEditor
-from .theme import Theme, ScrollBar
 
 
 class Browser(QWidget):
@@ -109,7 +109,6 @@ class BrowserList(Observation, QListWidget):
         QListWidget.__init__(self)
         self.templateEditor = TrackEditor(self.subject, self.powermode, True)
         self.templateEditor.onTemplateUpdate = self.onTemplateUpdate
-
 
         self.setFrameStyle(QFrame.NoFrame | QFrame.Plain)
         self.setHorizontalScrollBar(ScrollBar())
@@ -223,40 +222,78 @@ class Item(Observation, QWidget):
     def __init__(self, template, subject):
         Observation.__init__(self, subject)
         QWidget.__init__(self)
-        self.maxLineLen = 32
+        self.maxNameLen = 21
+        self.maxDescLen = 27
+        self.maxCommandLen = 13
         self.template = template
 
-        name = self.shortenString(template.backend_name)
-        description = self.shortenString(template.description)
-        runCommand = self.shortenString(template.run_command)
-
-        self.name = QLabel(name, wordWrap=True)
-        self.command = QLabel(runCommand, wordWrap=True)
-        self.description = QLabel(description, wordWrap=True)
+        name = self.shortenString(template.backend_name, self.maxNameLen)
+        description = self.shortenString(template.description, self.maxDescLen)
+        runCommand = self.shortenString(template.run_command, self.maxCommandLen)
+        iconPath = template.icon_path()
+        self.setFixedSize(Theme.browser.item.size)
 
         layout = QVBoxLayout()
 
-        layout.setSpacing(3)
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
         layout.setAlignment(Qt.AlignTop)
-        layout.addWidget(self.name)
-        layout.addWidget(self.command)
-        layout.addWidget(self.description)
 
         self.setLayout(layout)
 
-    def shortenString(self, value):
+        self.__initHeader__(name, runCommand, iconPath)
+        self.__initDescription__(description)
+
+    def __initHeader__(self, name, command, iconPath):
+        hlayout = QHBoxLayout()
+        hlayout.setSpacing(0)
+        hlayout.setContentsMargins(18, 18, 18, 18)
+
+        icon = QSvgWidget(iconPath)
+        icon.setFixedSize(36, 36)
+        hlayout.addWidget(icon)
+
+        vlayout = QVBoxLayout()
+        vlayout.setSpacing(0)
+        vlayout.setContentsMargins(0, 0, 0, 0)
+
+        self.name = QLabel(name, wordWrap=True)
+        self.name.setFont(Theme.browser.item.headerFont)
+        self.name.setStyleSheet(Theme.browser.item.headerStyle)
+        vlayout.addWidget(self.name)
+
+        self.command = QLabel(command, wordWrap=True)
+        self.command.setFont(Theme.browser.item.commandFont)
+        self.command.setStyleSheet(Theme.browser.item.commandStyle)
+        vlayout.addWidget(self.command)
+
+        hlayout.addLayout(vlayout)
+
+        self.layout().addLayout(hlayout)
+
+    def __initDescription__(self, description):
+        self.description = QLabel(description, wordWrap=True)
+        self.description.setFont(Theme.browser.item.descriptionFont)
+        self.description.setStyleSheet(Theme.browser.item.descriptionStyle)
+        self.layout().addWidget(self.description)
+
+    def shortenString(self, value, length):
         lines = value.splitlines()
+
         if len(lines) < 1:
             return value
 
         firstLine = lines[0]
 
-        if len(firstLine) <= self.maxLineLen:
+        if len(firstLine) <= length:
             return firstLine
 
-        return firstLine[:self.maxLineLen] + "..."
+        return firstLine[:length] + "..."
 
     def deserialize(self, template):
-        self.name.setText(self.shortenString(template.backend_name))
-        self.command.setText(self.shortenString(template.run_command))
-        self.description.setText(self.shortenString(template.description))
+        self.name.setText(self.shortenString(template.backend_name, self.maxNameLen))
+        self.command.setText(self.shortenString(template.run_command, self.maxCommandLen))
+        self.description.setText(self.shortenString(template.description, self.maxDescLen))
+
+    def sizeHint(self):
+        return Theme.browser.item.size

@@ -46,6 +46,7 @@ class TrackTemplateModel:
     description: str = field(default="")
     editor_mode: str = field(default="plain text")
     path: str = field(default="")
+    icon_name: str = field(default="")
     backend_middleware: BackendMiddlewareModel = field(
         default=BackendMiddlewareModel())
 
@@ -57,6 +58,10 @@ class TrackTemplateModel:
                f"Editor Mode: {self.editor_mode}\n" +\
                f"Description: {self.description}\n" +\
                f"Setup Code: {self.setup_code}"
+
+    def icon_path(self):
+        return os.path.join(os.path.dirname(self.path), "resources",
+                            f'{self.icon_name}.svg')
 
 
 @dataclass_json
@@ -271,6 +276,7 @@ class TrackTemplateManager(Observation):
 
 def standard_track_template_dir():
     data_dir = user_data_dir(ApplicationInfo.name, ApplicationInfo.author)
+
     if CLI.develop:
         data_dir = os.getcwd()
     templates_dir = os.path.join(data_dir, "track_templates")

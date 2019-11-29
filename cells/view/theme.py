@@ -3,6 +3,7 @@ import os
 import cells.utility as utility
 from PySide2.QtGui import QColor, QFont, QFontDatabase
 from PySide2.QtWidgets import QScrollBar
+from PySide2.QtCore import QSize
 
 
 class Fonts:
@@ -44,8 +45,24 @@ class Browser:
     def __init__(self):
         self.style = "background-color: #19181B; border: none; padding: 0; margin: 0;"
         self.width = 216
+        self.item = BrowserItem()
         self.info = TemplateInfo()
 
+
+class BrowserItem:
+    def __init__(self):
+        self.size = QSize(216, 108)
+
+        self.headerFont = QFont("Open Sans", 13)
+        self.headerFont.setWeight(QFont.DemiBold)
+        self.headerStyle = "margin-left: 18px; margin-right: 9px;"
+
+        self.commandFont = QFont("Fira Code", 11)
+        self.commandFont.setWeight(QFont.Light)
+        self.commandStyle = "margin-left: 18px; margin-right: 9px;"
+
+        self.descriptionFont = QFont("Open Sans", 12)
+        self.descriptionStyle = "margin-left: 9px; margin-right: 9px;"
 
 class TemplateInfo:
     def __init__(self):

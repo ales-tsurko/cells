@@ -1,1 +1,14 @@
-{"backend_name": "Haskell", "setup_code": ":set +m", "run_command": "ghci", "command_prompt": "", "description": "Haskell track template.", "editor_mode": "haskell", "path": "/Users/alestsurko/Desktop/cells/track_templates/15737501798-8d0d835c-e337-47db-9990-2b5c98661118.ctt", "backend_middleware": {"input": {"regex": ".\\Z", "substitution": "\\g<0>\\n"}, "output": {"regex": "Prelude> |Prelude\\|", "substitution": ""}}}
+{
+    "backend_middleware": {
+        "input": {"regex": ".\\Z", "substitution": "\\g<0>\\n"},
+        "output": {"regex": "Prelude> |Prelude\\|", "substitution": ""}
+    },
+    "backend_name": "Haskell",
+    "command_prompt": "",
+    "description": "Haskell track template.",
+    "editor_mode": "haskell",
+    "path": "/Users/alestsurko/Desktop/cells/track_templates/15737501798-8d0d835c-e337-47db-9990-2b5c98661118.ctt",
+    "run_command": "ghci",
+    "setup_code": ":set +m",
+    "icon_name": "haskell_icon"
+}
