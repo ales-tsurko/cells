@@ -1,9 +1,9 @@
 import os
 
 import cells.utility as utility
+from PySide2.QtCore import QSize
 from PySide2.QtGui import QColor, QFont, QFontDatabase
 from PySide2.QtWidgets import QScrollBar
-from PySide2.QtCore import QSize
 
 
 class Fonts:
@@ -34,7 +34,7 @@ class Fonts:
 
 class Console:
     def __init__(self):
-        self.style = "background-color: #242127; margin: 0; padding: 0;"
+        self.style = "background-color: #242127; margin: 0; padding: 0; selection-background-color: #19181B;"
         self.stdoutFontColor = QColor(255, 246, 255)
         self.stderrFontColor = QColor(206, 24, 1)
         self.font = QFont("Fira Code", 12)
@@ -43,7 +43,22 @@ class Console:
 
 class Browser:
     def __init__(self):
-        self.style = "background-color: #19181B; border: none; padding: 0; margin: 0;"
+        self.style = """
+            QListView {
+                show-decoration-selected: 1;
+                background: #19181B;
+            }
+
+            QListView::item:selected {
+                border: none;
+                background: #D9EBF5;
+            }
+
+            QListView::item {
+                border-top: 1px solid #19181B;
+                background: #322F35;
+            }
+        """
         self.width = 216
         self.item = BrowserItem()
         self.info = TemplateInfo()
@@ -55,14 +70,18 @@ class BrowserItem:
 
         self.headerFont = QFont("Open Sans", 13)
         self.headerFont.setWeight(QFont.DemiBold)
-        self.headerStyle = "margin-left: 18px; margin-right: 9px;"
+        self.headerStyle = "margin-left: 18px; margin-right: 9px; color: #DAD6DE;"
+        self.headerStyleSelected = "margin-left: 18px; margin-right: 9px; color: #322F35;"
 
         self.commandFont = QFont("Fira Code", 11)
         self.commandFont.setWeight(QFont.Light)
-        self.commandStyle = "margin-left: 18px; margin-right: 9px;"
+        self.commandStyle = "margin-left: 18px; margin-right: 9px; color: #DAD6DE;"
+        self.commandStyleSelected = "margin-left: 18px; margin-right: 9px; color: #322F35;"
 
         self.descriptionFont = QFont("Open Sans", 12)
-        self.descriptionStyle = "margin-left: 9px; margin-right: 9px;"
+        self.descriptionStyle = "margin-left: 9px; margin-right: 9px; color: #DAD6DE;"
+        self.descriptionStyleSelected = "margin-left: 9px; margin-right: 9px; color: #322F35;"
+
 
 class TemplateInfo:
     def __init__(self):

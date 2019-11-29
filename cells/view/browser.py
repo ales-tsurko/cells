@@ -22,7 +22,6 @@ class Browser(QWidget):
         self.powermode = powermode
 
         self.setAttribute(Qt.WA_StyledBackground)
-        self.setStyleSheet(Theme.browser.style)
         self.setStyleSheet("border: 0;")
         self.setFixedWidth(Theme.browser.width)
 
@@ -107,8 +106,12 @@ class BrowserList(Observation, QListWidget):
 
         Observation.__init__(self, subject)
         QListWidget.__init__(self)
+
+        self.setStyleSheet(Theme.browser.style)
+        
         self.templateEditor = TrackEditor(self.subject, self.powermode, True)
         self.templateEditor.onTemplateUpdate = self.onTemplateUpdate
+
 
         self.setFrameStyle(QFrame.NoFrame | QFrame.Plain)
         self.setHorizontalScrollBar(ScrollBar())
@@ -122,6 +125,7 @@ class BrowserList(Observation, QListWidget):
                            self.trackTemplateSavedResponder)
 
         self.itemSelectionChanged.connect(self.onSelectionChanged)
+        self.currentItemChanged.connect(self.onCurrentItemChanged)
 
     def _initActions(self):
         # as far as ownership of actions isn't transfered
@@ -198,6 +202,12 @@ class BrowserList(Observation, QListWidget):
         template = self.templateManager.templates[self.currentRow()]
         self.delegate.onSelectionChanged(template)
 
+        self.itemWidget(self.currentItem()).setSelected(True)
+
+    def onCurrentItemChanged(self, current, previous):
+        if previous:
+            self.itemWidget(previous).setSelected(False)
+
     def addTemplate(self, template):
         item = QListWidgetItem()
         view = Item(template, self.subject)
@@ -222,15 +232,16 @@ class Item(Observation, QWidget):
     def __init__(self, template, subject):
         Observation.__init__(self, subject)
         QWidget.__init__(self)
-        self.maxNameLen = 21
+        self.maxNameLen = 13
         self.maxDescLen = 27
         self.maxCommandLen = 13
         self.template = template
 
+        self.selected = False
+
         name = self.shortenString(template.backend_name, self.maxNameLen)
         description = self.shortenString(template.description, self.maxDescLen)
         runCommand = self.shortenString(template.run_command, self.maxCommandLen)
-        iconPath = template.icon_path()
         self.setFixedSize(Theme.browser.item.size)
 
         layout = QVBoxLayout()
@@ -241,17 +252,22 @@ class Item(Observation, QWidget):
 
         self.setLayout(layout)
 
-        self.__initHeader__(name, runCommand, iconPath)
+        self.__initHeader__(name, runCommand)
         self.__initDescription__(description)
 
-    def __initHeader__(self, name, command, iconPath):
+    def __initHeader__(self, name, command):
         hlayout = QHBoxLayout()
         hlayout.setSpacing(0)
         hlayout.setContentsMargins(18, 18, 18, 18)
 
-        icon = QSvgWidget(iconPath)
-        icon.setFixedSize(36, 36)
-        hlayout.addWidget(icon)
+        self.iconLight = QSvgWidget(self.template.icon_path())
+        self.iconLight.setFixedSize(36, 36)
+        self.iconDark = QSvgWidget(self.template.icon_path(False))
+        self.iconDark.setFixedSize(36, 36)
+        self.iconDark.setHidden(True)
+
+        hlayout.addWidget(self.iconLight)
+        hlayout.addWidget(self.iconDark)
 
         vlayout = QVBoxLayout()
         vlayout.setSpacing(0)
@@ -289,6 +305,24 @@ class Item(Observation, QWidget):
             return firstLine
 
         return firstLine[:length] + "..."
+
+    def setSelected(self, selected):
+        self.selected = selected
+        if self.selected:
+            self.name.setStyleSheet(Theme.browser.item.headerStyleSelected)
+            self.command.setStyleSheet(Theme.browser.item.commandStyleSelected)
+            self.description.setStyleSheet(Theme.browser.item.descriptionStyleSelected)
+
+            self.iconLight.setHidden(True)
+            self.iconDark.setHidden(False)
+            return
+
+        self.name.setStyleSheet(Theme.browser.item.headerStyle)
+        self.command.setStyleSheet(Theme.browser.item.commandStyle)
+        self.description.setStyleSheet(Theme.browser.item.descriptionStyle)
+
+        self.iconLight.setHidden(False)
+        self.iconDark.setHidden(True)
 
     def deserialize(self, template):
         self.name.setText(self.shortenString(template.backend_name, self.maxNameLen))

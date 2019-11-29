@@ -59,9 +59,10 @@ class TrackTemplateModel:
                f"Description: {self.description}\n" +\
                f"Setup Code: {self.setup_code}"
 
-    def icon_path(self):
+    def icon_path(self, light=True):
+        suffix = "_light" if light else "_dark"
         return os.path.join(os.path.dirname(self.path), "resources",
-                            f'{self.icon_name}.svg')
+                            f'{self.icon_name}{suffix}.svg')
 
 
 @dataclass_json
