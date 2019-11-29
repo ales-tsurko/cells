@@ -33,7 +33,7 @@ class Fonts:
 
 class Console:
     def __init__(self):
-        self.style = "background-color: #242127;"
+        self.style = "background-color: #242127; margin: 0; padding: 0;"
         self.stdoutFontColor = QColor(255, 246, 255)
         self.stderrFontColor = QColor(206, 24, 1)
         self.font = QFont("Fira Code", 12)
@@ -42,7 +42,7 @@ class Console:
 
 class Browser:
     def __init__(self):
-        self.style = "background-color: #19181B; border: none;"
+        self.style = "background-color: #19181B; border: none; padding: 0; margin: 0;"
         self.width = 216
         self.info = TemplateInfo()
 
@@ -64,12 +64,30 @@ class TemplateInfo:
         self.textAreaFontColor = QColor(218, 214, 222)
 
 
+class ContextMenu:
+    def __init__(self):
+        self.style = """
+        QMenu {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        QMenu::item {
+            color: #FFF6FF;
+        }
+        QMenu::item:selected {
+            color: #322F35;
+            background: #D9EBF5;
+        }
+        """
+        self.font = QFont("Open Sans", 12)
+
+
 class Theme:
     fonts = Fonts()
     browser = Browser()
     console = Console()
-    editor = ""
-    templateEditor = ''
+    editor = None
+    templateEditor = None
+    contextMenu = ContextMenu()
 
 
 class ScrollBar(QScrollBar):

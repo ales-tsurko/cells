@@ -167,13 +167,14 @@ class Main(QMainWindow, Observation):
         newAct.setShortcut(shortcut)
 
     def _initCentralWidget(self):
-        centralView = QSplitter()
-        centralView.setFrameStyle(QFrame.NoFrame | QFrame.Plain)
-        centralView.setRubberBand(-1)
+        centralView = QWidget()
+        centralView.setLayout(QHBoxLayout())
+        centralView.layout().setSpacing(0)
+        centralView.layout().setContentsMargins(0, 0, 0, 0)
 
         self.browser = Browser(self.document, self.subject, self.powermode)
 
-        centralView.addWidget(self.browser)
+        centralView.layout().addWidget(self.browser)
 
         canvas = QSplitter()
         canvas.setFrameStyle(QFrame.NoFrame | QFrame.Plain)
@@ -185,7 +186,7 @@ class Main(QMainWindow, Observation):
         canvas.addWidget(self.editor)
         canvas.addWidget(self.console)
 
-        centralView.addWidget(canvas)
+        centralView.layout().addWidget(canvas)
         canvas.setSizes([4, 4, 1, 1])
 
         self.setCentralWidget(centralView)
@@ -325,25 +326,25 @@ class Main(QMainWindow, Observation):
         self.notify(events.view.main.ConsoleClear())
 
     def onBrowserToggle(self, e):
-        browser = self.centralWidget().widget(0)
+        browser = self.centralWidget().layout().itemAt(0).widget()
         browser.setVisible(not browser.isVisible())
 
         if browser.isVisible():
             browser.setFocus()
 
     def onConsoleToggle(self, e):
-        console = self.centralWidget().widget(1).widget(1)
+        console = self.centralWidget().layout().itemAt(1).widget().widget(1)
         console.setVisible(not console.isVisible())
 
     def onConsoleToBottom(self, e):
-        self.centralWidget().widget(1).setOrientation(Qt.Vertical)
-        self.centralWidget().widget(1).setStretchFactor(0, 3)
-        self.centralWidget().widget(1).setStretchFactor(1, 1)
+        self.centralWidget().layout().itemAt(1).widget().setOrientation(Qt.Vertical)
+        self.centralWidget().layout().itemAt(1).widget().setStretchFactor(0, 3)
+        self.centralWidget().layout().itemAt(1).widget().setStretchFactor(1, 1)
 
     def onConsoleToRight(self, e):
-        self.centralWidget().widget(1).setOrientation(Qt.Horizontal)
-        self.centralWidget().widget(1).setStretchFactor(0, 5)
-        self.centralWidget().widget(1).setStretchFactor(1, 3)
+        self.centralWidget().layout().itemAt(1).widget().setOrientation(Qt.Horizontal)
+        self.centralWidget().layout().itemAt(1).widget().setStretchFactor(0, 5)
+        self.centralWidget().layout().itemAt(1).widget().setStretchFactor(1, 3)
 
     def onCellEdit(self, e):
         self.notify(events.view.main.CellEdit())

@@ -3,10 +3,11 @@ import random
 from cells import events
 from cells.observation import Observation
 from cells.settings import FIGLET_NAME, ApplicationInfo
+from PySide2.QtCore import Qt
 from PySide2.QtGui import QTextOption
 from PySide2.QtWidgets import QFrame, QTextEdit
 
-from .theme import Theme, ScrollBar
+from .theme import ScrollBar, Theme
 
 
 class Console(Observation, QTextEdit):
@@ -15,16 +16,16 @@ class Console(Observation, QTextEdit):
         QTextEdit.__init__(self)
         self.whoami = self._initWhoami()
         self.setReadOnly(True)
-        self.setMinimumHeight(150)
-        self.setMinimumWidth(250)
+        self.setMinimumHeight(162)
+        self.setMinimumWidth(252)
         self.setFrameShape(QFrame.NoFrame)
         self.sayHello()
         self.setWordWrapMode(QTextOption.NoWrap)
 
-        self.setFont(Theme.console.font)
-        self.setStyleSheet(Theme.console.style)
         self.setHorizontalScrollBar(ScrollBar())
         self.setVerticalScrollBar(ScrollBar())
+        self.setFont(Theme.console.font)
+        self.setStyleSheet(Theme.console.style)
 
         self.add_responder(events.view.main.ConsoleClear,
                            self.consoleClearResponder)

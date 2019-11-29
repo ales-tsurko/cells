@@ -21,6 +21,8 @@ class Browser(QWidget):
         self.subject = subject
         self.powermode = powermode
 
+        self.setAttribute(Qt.WA_StyledBackground)
+        self.setStyleSheet(Theme.browser.style)
         self.setStyleSheet("border: 0;")
         self.setFixedWidth(Theme.browser.width)
 
@@ -62,7 +64,7 @@ class TemplateInfo(QWidget):
         layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
-                
+
         self.setAttribute(Qt.WA_StyledBackground)
         self.setStyleSheet(Theme.browser.info.style)
 
@@ -108,8 +110,6 @@ class BrowserList(Observation, QListWidget):
         self.templateEditor = TrackEditor(self.subject, self.powermode, True)
         self.templateEditor.onTemplateUpdate = self.onTemplateUpdate
 
-        self.setAttribute(Qt.WA_StyledBackground)
-        self.setStyleSheet(Theme.browser.style)
 
         self.setFrameStyle(QFrame.NoFrame | QFrame.Plain)
         self.setHorizontalScrollBar(ScrollBar())
@@ -147,6 +147,8 @@ class BrowserList(Observation, QListWidget):
 
     def contextMenuEvent(self, event):
         menu = QMenu()
+        menu.setStyleSheet(Theme.contextMenu.style)
+        menu.setFont(Theme.contextMenu.font)
         menu.addActions(self.actions())
         menu.exec_(event.globalPos())
 
