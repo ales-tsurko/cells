@@ -11,6 +11,7 @@ from cells.observation import Observation
 
 from .dialogs import ConfirmationDialog
 from .track_editor import TrackEditor
+from .theme import Theme, ScrollBar
 
 
 class Browser(QWidget):
@@ -21,8 +22,7 @@ class Browser(QWidget):
         self.powermode = powermode
 
         self.setStyleSheet("border: 0;")
-        self.setMaximumWidth(250)
-        self.setMinimumWidth(165)
+        self.setFixedWidth(Theme.browser.width)
 
         layout = QVBoxLayout()
         layout.setSpacing(0)
@@ -55,11 +55,16 @@ class Browser(QWidget):
 class TemplateInfo(QWidget):
     def __init__(self):
         super().__init__()
-        self.setFixedHeight(200)
+        self.setFixedHeight(Theme.browser.info.height)
 
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignTop)
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
+                
+        self.setAttribute(Qt.WA_StyledBackground)
+        self.setStyleSheet(Theme.browser.info.style)
 
         self._initName()
         self._initDescription()
@@ -67,11 +72,17 @@ class TemplateInfo(QWidget):
     def _initName(self):
         self.name = QLabel()
         self.name.setWordWrap(True)
+        self.name.setStyleSheet(Theme.browser.info.headerStyle)
+        self.name.setFont(Theme.browser.info.headerFont)
         self.layout().addWidget(self.name)
 
     def _initDescription(self):
         self.description = QTextEdit()
         self.description.setReadOnly(True)
+        self.description.setVerticalScrollBar(ScrollBar())
+        self.description.setStyleSheet(Theme.browser.info.textAreaStyle)
+        self.description.setFont(Theme.browser.info.textAreaFont)
+        self.description.setTextColor(Theme.browser.info.textAreaFontColor)
         self.layout().addWidget(self.description)
 
     def setTemplate(self, template):
@@ -97,8 +108,12 @@ class BrowserList(Observation, QListWidget):
         self.templateEditor = TrackEditor(self.subject, self.powermode, True)
         self.templateEditor.onTemplateUpdate = self.onTemplateUpdate
 
-        self.setStyleSheet("border: 0;")
+        self.setAttribute(Qt.WA_StyledBackground)
+        self.setStyleSheet(Theme.browser.style)
+
         self.setFrameStyle(QFrame.NoFrame | QFrame.Plain)
+        self.setHorizontalScrollBar(ScrollBar())
+        self.setVerticalScrollBar(ScrollBar())
 
         self._initActions()
 

@@ -40,9 +40,33 @@ class Console:
         self.font.setWeight(QFont.Thin)
 
 
+class Browser:
+    def __init__(self):
+        self.style = "background-color: #19181B; border: none;"
+        self.width = 216
+        self.info = TemplateInfo()
+
+
+class TemplateInfo:
+    def __init__(self):
+        self.style = "background-color: #272629; margin: 0; padding: 0;"
+        self.height = 204
+        self.width = 216
+
+        self.headerFont = QFont("Open Sans", 15)
+        self.headerFont.setWeight(QFont.Light)
+        self.headerFont.setItalic(True)
+        self.headerStyle = "margin: 13px 9px 18px 9px; color: #4C4452;"
+
+        self.textAreaStyle = "background-color: #272629; margin: 0 0 18px 9px;"
+        self.textAreaFont = QFont("Open Sans", 13)
+        self.textAreaFont.setWeight(QFont.Normal)
+        self.textAreaFontColor = QColor(218, 214, 222)
+
+
 class Theme:
     fonts = Fonts()
-    browser = ""
+    browser = Browser()
     console = Console()
     editor = ""
     templateEditor = ''
