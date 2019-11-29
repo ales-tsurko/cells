@@ -2,18 +2,16 @@ import asyncio
 import os
 import sys
 
-from PySide2.QtGui import QFontDatabase
-from PySide2.QtWidgets import QApplication
-
-import cells.utility as utility
 from asyncqt import QEventLoop
 from cells import events
 from cells.backend import BackendRouter
 from cells.observation import Observation
 from cells.settings import ApplicationInfo
+from PySide2.QtWidgets import QApplication
 from rx.subject import Subject
 
 from .main import Main
+from .theme import Fonts
 
 
 class App(Observation):
@@ -27,9 +25,8 @@ class App(Observation):
         self.app.setApplicationName(ApplicationInfo.name)
         self.app.setApplicationDisplayName(ApplicationInfo.name)
 
-        font_path = os.path.join(utility.viewResourcesDir(), "fonts",
-                                 "FiraCode_2", "FiraCode-VF.ttf")
-        QFontDatabase.addApplicationFont(font_path)
+        Fonts.initDb()
+
         self.main = Main(subject)
 
         self._init_responders()

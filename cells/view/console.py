@@ -1,17 +1,18 @@
 import random
 
-from PySide2.QtGui import QFont, QTextOption
-from PySide2.QtWidgets import QFrame, QPlainTextEdit
-
 from cells import events
 from cells.observation import Observation
 from cells.settings import FIGLET_NAME, ApplicationInfo
+from PySide2.QtGui import QTextOption
+from PySide2.QtWidgets import QFrame, QTextEdit
+
+from .theme import Theme, ScrollBar
 
 
-class Console(Observation, QPlainTextEdit):
+class Console(Observation, QTextEdit):
     def __init__(self, subject):
         Observation.__init__(self, subject)
-        QPlainTextEdit.__init__(self)
+        QTextEdit.__init__(self)
         self.whoami = self._initWhoami()
         self.setReadOnly(True)
         self.setMinimumHeight(150)
@@ -20,9 +21,11 @@ class Console(Observation, QPlainTextEdit):
         self.sayHello()
         self.setWordWrapMode(QTextOption.NoWrap)
 
-        font = QFont("Fira Code", 12)
-        font.setWeight(QFont.Thin)
-        self.setFont(font)
+        self.setFont(Theme.console.font)
+        self.setStyleSheet(Theme.console.style)
+        self.setHorizontalScrollBar(ScrollBar())
+        self.setVerticalScrollBar(ScrollBar())
+
         self.add_responder(events.view.main.ConsoleClear,
                            self.consoleClearResponder)
         self.add_responder(events.backend.Stdout, self.backendStdoutResponder)
@@ -39,24 +42,26 @@ class Console(Observation, QPlainTextEdit):
         return f"{first} {second} {third}"
 
     def sayHello(self):
-        self.appendPlainText(FIGLET_NAME)
+        self.appendOutput(FIGLET_NAME)
         version = f"{self.whoami} v{ApplicationInfo.version}"
         longestLine = max(FIGLET_NAME.splitlines(), key=lambda line: len(line))
         numOfSpaces = (len(longestLine) - len(version)) // 2
-        self.appendPlainText(" " * numOfSpaces + version)
+        self.appendOutput(" " * numOfSpaces + version)
 
     def consoleClearResponder(self, e):
         self.clear()
 
     def backendStdoutResponder(self, e):
-        if e.output:
-            self.appendPlainText(e.output)
+        self.appendOutput(e.output)
 
     def backendStderrResponder(self, e):
-        # TODO print in different color
+        self.appendOutput(e.output, True)
 
-        if e.output:
-            self.appendPlainText(e.output)
+    def appendOutput(self, text, err=False):
+        if text:
+            color = Theme.console.stderrFontColor if err else Theme.console.stdoutFontColor
+            self.setTextColor(color)
+            self.append(text)
 
     def clear(self):
         self.document().clear()
