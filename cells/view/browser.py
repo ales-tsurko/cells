@@ -126,6 +126,7 @@ class BrowserList(Observation, QListWidget):
 
         self.itemSelectionChanged.connect(self.onSelectionChanged)
         self.currentItemChanged.connect(self.onCurrentItemChanged)
+        self.itemDoubleClicked.connect(self.onItemDoubleClicked)
 
     def _initActions(self):
         # as far as ownership of actions isn't transfered
@@ -207,6 +208,10 @@ class BrowserList(Observation, QListWidget):
     def onCurrentItemChanged(self, current, previous):
         if previous:
             self.itemWidget(previous).setSelected(False)
+
+    def onItemDoubleClicked(self, item):
+        self._newTrackAct.activate(QAction.Trigger)
+
 
     def addTemplate(self, template):
         item = QListWidgetItem()
