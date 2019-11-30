@@ -273,7 +273,7 @@ class Confirmation:
                 background: #272629;
             }
 
-            QMessageBox QLabel {
+            QMessageBox QTextEdit {
                 color: #DAD6DE;
                 font-family: \"Open Sans\";
             }
