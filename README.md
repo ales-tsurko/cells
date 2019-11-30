@@ -41,23 +41,12 @@ poetry run cells -d
 
 ### Version 1.0.0
 
-It's ~90% ready for alpha. But there are some important points:
+~~It's ~90% ready for alpha.~~v1.0.0-beta is ready. But there are some important points:
 
 I chose Python to get the first version quickly and to look at the design
 at a high level, without going deep into details. And without tests. And with
 imperfect code quality... So the first version is going to be more like a prototype. But ready-to-use
 working prototype though, developed with live performance stability in mind.
-
-After I'll finish the programm, these things still have to be done for the v1.0.0:
-
-* [ ] theming
-* [ ] packaging/deployment configuration
-* [ ] documentation
-* [ ] website
-
-I'm going to finish the v1.0.0-beta until November, 19.
-
-
 
 
 ### Version 1.1.0
