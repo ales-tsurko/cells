@@ -3,7 +3,7 @@ from cells.model import TrackTemplateModel
 from cells.observation import Observation
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (QFrame, QHBoxLayout, QMessageBox, QScrollArea,
-                               QWidget)
+                               QWidget, QLabel)
 
 from .code import CodeView
 from .dialogs import ConfirmationDialog
@@ -43,6 +43,9 @@ class Editor(Observation, QScrollArea):
         widget.setLayout(self.innerLayout)
         self.setWidget(widget)
         self.setWidgetResizable(True)
+
+        self._initTip()
+        self.setTipHidden(False)
 
         self.add_responder(events.document.Open, self.documentOpenResponder)
         self.add_responder(events.view.main.TrackNew, self.trackNewResponder)
@@ -84,6 +87,23 @@ class Editor(Observation, QScrollArea):
         self.add_responder(events.view.track.BackendRestart,
                            self.trackConfirmationBackendRestartResponder)
 
+    def _initTip(self):
+        layout = QHBoxLayout()
+        self.tip = QLabel("Add Track From Template")
+        self.tip.setStyleSheet(Theme.editor.tip.style)
+        self.tip.setFont(Theme.editor.tip.font)
+        layout.addWidget(self.tip)
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(layout)
+
+    def setTipHidden(self, hidden):
+        if self.tip.isHidden() == hidden:
+            return
+
+        self.tip.setHidden(hidden)
+
     def documentOpenResponder(self, e):
         self.clear()
 
@@ -92,6 +112,9 @@ class Editor(Observation, QScrollArea):
                               track.template)
             self.innerLayout.addWidget(trackView)
             trackView.deserialize(track)
+
+        if self.numOfTracks() > 1:
+            self.setTipHidden(True)
 
     def trackClickedResponder(self, e):
         self.selectTrackAt(e.index)
@@ -168,6 +191,9 @@ class Editor(Observation, QScrollArea):
         for n in range(self.selectedTrackIndex + 1, self.numOfTracks()):
             track = self.trackAt(n)
             track.setIndex(track.index - 1)
+
+        if self.numOfTracks() < 1:
+            self.setTipHidden(False)
 
     def rowRemoveResponder(self, e):
         if not self.hasSelectedTrack():
@@ -283,6 +309,8 @@ class Editor(Observation, QScrollArea):
         self.notify(events.view.editor.TrackRestartBackend(templates))
 
     def newTrack(self, template):
+        self.setTipHidden(True)
+
         length = self.innerLayout.count()
         name = "Track " + str(length + 1)
         track = Track(self, self.subject, length, name, template)
@@ -298,6 +326,7 @@ class Editor(Observation, QScrollArea):
 
             if not firstTrack.isPasteBufferEmpty():
                 track.fillPasteBuffer()
+
 
     def selectTrackAt(self, index):
         if self.selectedTrackIndex == index:

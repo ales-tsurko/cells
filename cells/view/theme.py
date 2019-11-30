@@ -192,7 +192,14 @@ class ContextMenu:
 class Editor:
     def __init__(self):
         self.style = "background: #272629;"
+        self.tip = EditorTip()
 
+
+class EditorTip:
+    def __init__(self):
+        self.style = "color: #3D3B40;"
+        self.font = QFont("Open Sans", 30)
+        self.font.setWeight(QFont.Bold)
 
 class Theme:
     browser = Browser()
