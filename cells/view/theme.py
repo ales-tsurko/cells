@@ -257,8 +257,23 @@ class Cell:
                 color: #343136;"
         self.previewFont = QFont("Fira Code", 11)
 
+
+class Confirmation:
+    def __init__(self):
+        self.style = """
+            QMessageBox {
+                background: #272629;
+            }
+
+            QMessageBox QLabel {
+                color: #DAD6DE;
+                font-family: \"Open Sans\";
+            }
+        """
+
 class Theme:
     browser = Browser()
+    confirmation = Confirmation()
     console = Console()
     contextMenu = ContextMenu()
     editor = Editor()
