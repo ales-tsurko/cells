@@ -1,13 +1,13 @@
+from cells.observation import Observation
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QKeySequence
 from PySide2.QtWidgets import (QComboBox, QFormLayout, QHBoxLayout, QLabel,
                                QLineEdit, QPlainTextEdit, QShortcut,
                                QVBoxLayout, QWidget)
 
-from cells.observation import Observation
-
 from .code import CodeDelegate, CodeView, acePropertyNames
 from .dialogs import ConfirmationDialog
+from .theme import Theme
 
 
 class FinalMeta(type(QWidget), type(CodeDelegate)):
@@ -43,6 +43,8 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
         self._initCodeEditor()
 
         self.setFixedSize(630, 600)
+        self.setAttribute(Qt.WA_StyledBackground)
+        self.setStyleSheet(Theme.templateEditor.style)
 
         self.setContextMenuPolicy(Qt.NoContextMenu)
         self.setWindowModality(Qt.ApplicationModal)
@@ -60,9 +62,15 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
 
         layout = QFormLayout()
         self.runCommand = QLineEdit(self, maxLength=200)
+        self.runCommand.setStyleSheet(Theme.templateEditor.inputStyle)
+        self.runCommand.setFont(Theme.templateEditor.inputCodeFont)
+        self.runCommand.setFixedHeight(Theme.templateEditor.inputHeight)
 
         if self.powermode:
             self.backendName = QLineEdit(self, maxLength=20)
+            self.backendName.setStyleSheet(Theme.templateEditor.inputStyle)
+            self.backendName.setFont(Theme.templateEditor.inputFont)
+            self.backendName.setFixedHeight(Theme.templateEditor.inputHeight)
 
             self.editorMode = QComboBox()
             [self.editorMode.addItem(mode) for mode in self._availableModes()]
@@ -71,15 +79,32 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
 
             self.inputRegex = QLineEdit(self, maxLength=100)
             self.inputRegex.setToolTip("regex")
+            self.inputRegex.setStyleSheet(Theme.templateEditor.inputStyle)
+            self.inputRegex.setFont(Theme.templateEditor.inputCodeFont)
+            self.inputRegex.setFixedHeight(Theme.templateEditor.inputHeight)
+
             self.inputReplace = QLineEdit(self, maxLength=100)
             self.inputReplace.setToolTip("substitution string")
+            self.inputReplace.setStyleSheet(Theme.templateEditor.inputStyle)
+            self.inputReplace.setFont(Theme.templateEditor.inputCodeFont)
+            self.inputReplace.setFixedHeight(Theme.templateEditor.inputHeight)
 
             self.outputRegex = QLineEdit(self, maxLength=100)
             self.outputRegex.setToolTip("regex")
+            self.outputRegex.setStyleSheet(Theme.templateEditor.inputStyle)
+            self.outputRegex.setFont(Theme.templateEditor.inputCodeFont)
+            self.outputRegex.setFixedHeight(Theme.templateEditor.inputHeight)
+
             self.outputReplace = QLineEdit(self, maxLength=100)
             self.outputReplace.setToolTip("substitution string")
+            self.outputReplace.setStyleSheet(Theme.templateEditor.inputStyle)
+            self.outputReplace.setFont(Theme.templateEditor.inputCodeFont)
+            self.outputReplace.setFixedHeight(Theme.templateEditor.inputHeight)
 
             self.description = QPlainTextEdit(self, minimumHeight=80)
+            self.description.setStyleSheet(
+                Theme.templateEditor.descriptionStyle)
+            self.description.setFont(Theme.templateEditor.descriptionFont)
 
         layout.addRow(self.tr("Run Command:"), self.runCommand)
 
@@ -197,7 +222,7 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
             self.codeView.setMode(self._template.editor_mode)
         self._code = self._template.setup_code
 
-        self.setWindowTitle("Track Editor")
+        self.setWindowTitle("Track Template Editor")
 
     def delete(self):
         self.deleted = True
@@ -220,7 +245,7 @@ class TrackEditor(Observation, QWidget, metaclass=FinalMeta):
                 question = "Do you want to save changes in " +\
                         f"{self._template.backend_name} template?"
                 confirmation = ConfirmationDialog("Update Track Template",
-                                                question)
+                                                  question)
 
                 if confirmation.exec_() == ConfirmationDialog.Yes:
                     self.onSave()

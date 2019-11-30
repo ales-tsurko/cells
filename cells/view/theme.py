@@ -271,6 +271,34 @@ class Confirmation:
             }
         """
 
+class TemplateEditor:
+    def __init__(self):
+        self.style = """
+            QWidget {
+                background: #272629;
+            }
+
+            QWidget QLabel {
+                font-family: \"Open Sans\";
+                font-size: 12px;
+                color: #DAD6DE;
+            }
+        """
+        self.inputStyle = "background: rgba(255, 255, 255, 0.1); \
+                border: none; \
+                color: #DAD6DE; \
+                selection-background-color: #5B00C3;"
+        self.inputHeight = 18
+        self.inputCodeFont = QFont("Fira Code", 11)
+        self.inputFont = QFont("Open Sans", 12)
+
+        self.descriptionStyle = "background: #19181B; \
+                border: none; \
+                color: #DAD6DE; \
+                selection-background-color: #5B00C3;"
+        self.descriptionFont = QFont("Open Sans", 12)
+
+
 class Theme:
     browser = Browser()
     confirmation = Confirmation()
@@ -278,7 +306,7 @@ class Theme:
     contextMenu = ContextMenu()
     editor = Editor()
     main = Main()
-    templateEditor = None
+    templateEditor = TemplateEditor()
     track = Track()
 
 
