@@ -96,7 +96,7 @@ class MenuBar:
 
 class Console:
     def __init__(self):
-        self.style = "background-color: #242127; margin: 0; padding: 0; selection-background-color: #19181B;"
+        self.style = "background-color: #242127; margin: 0; padding: 0; selection-background-color: #5B00C3;"
         self.stdoutFontColor = QColor(255, 246, 255)
         self.stderrFontColor = QColor(206, 24, 1)
         self.font = QFont("Fira Code", 12)
@@ -156,7 +156,7 @@ class TemplateInfo:
         self.headerFont.setItalic(True)
         self.headerStyle = "margin: 13px 9px 18px 9px; color: #4C4452;"
 
-        self.textAreaStyle = "background-color: #272629; margin: 0 0 18px 9px;"
+        self.textAreaStyle = "background-color: #272629; margin: 0 0 18px 9px; selection-background-color: #5B00C3;"
         self.textAreaFont = QFont("Open Sans", 13)
         self.textAreaFont.setWeight(QFont.Normal)
         self.textAreaFontColor = QColor(218, 214, 222)
