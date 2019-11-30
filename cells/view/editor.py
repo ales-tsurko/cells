@@ -120,6 +120,10 @@ class Editor(Observation, QScrollArea):
     def trackNewFromTemplateResponder(self, e):
         self.newTrack(e.template)
 
+        if self.numOfTracks() == 1:
+            track = self.trackAt(0)
+            track.addCell()
+
     def trackMoveLeftResponder(self, e):
         self.moveSelectedTrackTo(self.selectedTrackIndex - 1)
 

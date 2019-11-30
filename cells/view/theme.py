@@ -40,11 +40,11 @@ class Main:
             }
 
             QSplitter::handle:horizontal {
-                width: 5px;
+                width: 9px;
             }
 
             QSplitter::handle:vertical {
-                height: 5px;
+                height: 9px;
             }
         """
         self.menu = MenuBar()
