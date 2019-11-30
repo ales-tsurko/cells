@@ -32,6 +32,68 @@ class Fonts:
         QFontDatabase.addApplicationFont(monoLight)
 
 
+class Main:
+    def __init__(self):
+        self.style = """
+            QSplitter {
+                background: #272629;
+            }
+
+            QSplitter::handle:horizontal {
+                width: 5px;
+            }
+
+            QSplitter::handle:vertical {
+                height: 5px;
+            }
+        """
+        self.menu = MenuBar()
+
+
+class MenuBar:
+    def __init__(self):
+        self.style = """
+            QMenuBar {
+                background-color: #272629;
+                border: none;
+            }
+
+            QMenuBar::item {
+                spacing: 18px;
+                padding: 1px 9px;
+                background: transparent;
+                color: #FFF6FF;
+            }
+
+            QMenuBar::item:selected { /* when selected using mouse or keyboard */
+                background: #FFF6FF;
+                color: #272629;
+            }
+
+            QMenu {
+                background-color: rgba(0, 0, 0, 0.6);
+                font-family: Open Sans;
+                font-size: 13px;
+            }
+
+            QMenu::item {
+                color: #FFF6FF;
+            }
+
+            QMenu::item:selected {
+                color: #322F35;
+                background: #D9EBF5;
+            }
+
+            QMenu::separator {
+                height: 2px;
+                background: rgba(255, 255, 255, 0.14);
+                margin: 9px;
+            }
+        """
+        self.font = QFont("Open Sans", 13)
+
+
 class Console:
     def __init__(self):
         self.style = "background-color: #242127; margin: 0; padding: 0; selection-background-color: #19181B;"
@@ -103,27 +165,42 @@ class TemplateInfo:
 class ContextMenu:
     def __init__(self):
         self.style = """
-        QMenu {
-            background-color: rgba(0, 0, 0, 0.7);
-        }
-        QMenu::item {
-            color: #FFF6FF;
-        }
-        QMenu::item:selected {
-            color: #322F35;
-            background: #D9EBF5;
-        }
+            QMenu {
+                background-color: rgba(0, 0, 0, 0.6);
+                font-family: Open Sans;
+                font-size: 13px;
+            }
+
+            QMenu::item {
+                color: #FFF6FF;
+            }
+
+            QMenu::item:selected {
+                color: #322F35;
+                background: #D9EBF5;
+            }
+
+            QMenu::separator {
+                height: 2px;
+                background: rgba(255, 255, 255, 0.14);
+                margin: 9px;
+            }
         """
         self.font = QFont("Open Sans", 12)
 
 
+class Editor:
+    def __init__(self):
+        self.style = "background: #272629;"
+
+
 class Theme:
-    fonts = Fonts()
     browser = Browser()
     console = Console()
-    editor = None
-    templateEditor = None
     contextMenu = ContextMenu()
+    editor = Editor()
+    main = Main()
+    templateEditor = None
 
 
 class ScrollBar(QScrollBar):
@@ -132,7 +209,7 @@ class ScrollBar(QScrollBar):
         self.setStyleSheet("""
             QScrollBar:horizontal {
                 border: none;
-                background: rgba(0, 0, 0, 0.07);
+                background: rgba(0, 0, 0, 0);
                 height: 9px;
                 margin: 0;
             }
@@ -171,7 +248,7 @@ class ScrollBar(QScrollBar):
             /* VERTICAL */
             QScrollBar:vertical {
                 border: none;
-                background: rgba(0, 0, 0, 0.07);
+                background: rgba(0, 0, 0, 0);
                 width: 9px;
                 margin: 0;
             }

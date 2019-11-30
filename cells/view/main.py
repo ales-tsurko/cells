@@ -13,6 +13,7 @@ from .console import Console
 from .dialogs import ConfirmationDialog
 from .editor import Editor
 from .settings import Settings
+from .theme import Theme
 
 
 class Main(QMainWindow, Observation):
@@ -35,6 +36,8 @@ class Main(QMainWindow, Observation):
         self.setWindowTitle(self.document.name)
         self.saved = True
 
+        self.setStyleSheet(Theme.main.style)
+
         self.add_responder(events.document.Open, self.documentOpenResponder)
         self.add_responder(events.document.Update,
                            self.documentUpdateResponder)
@@ -44,6 +47,9 @@ class Main(QMainWindow, Observation):
         self._createFileMenu()
         self._createEditMenu()
         self._createViewMenu()
+        self.menuBar().setNativeMenuBar(False)
+        self.menuBar().setStyleSheet(Theme.main.menu.style)
+        self.menuBar().setFont(Theme.main.menu.font)
 
     def _createFileMenu(self):
         fileMenu = self.menuBar().addMenu("File")

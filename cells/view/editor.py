@@ -1,13 +1,13 @@
+from cells import events
+from cells.model import TrackTemplateModel
+from cells.observation import Observation
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (QFrame, QHBoxLayout, QMessageBox, QScrollArea,
                                QWidget)
 
-from cells import events
-from cells.model import TrackTemplateModel
-from cells.observation import Observation
-
 from .code import CodeView
 from .dialogs import ConfirmationDialog
+from .theme import ScrollBar, Theme
 from .track import Track
 from .track_editor import TrackEditor
 
@@ -33,6 +33,11 @@ class Editor(Observation, QScrollArea):
         self.innerLayout.setSpacing(0)
         self.innerLayout.setContentsMargins(0, 0, 0, 0)
         self.innerLayout.setAlignment(Qt.AlignLeft)
+
+        self.setAttribute(Qt.WA_StyledBackground)
+        self.setStyleSheet(Theme.editor.style)
+        self.setHorizontalScrollBar(ScrollBar())
+        self.setVerticalScrollBar(ScrollBar())
 
         widget = QWidget()
         widget.setLayout(self.innerLayout)
