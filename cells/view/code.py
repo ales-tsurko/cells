@@ -22,7 +22,7 @@ class CodeView(Observation, QWebEngineView):
         self.settings = Settings(subject)
         self.settings.open()
 
-        page = Ace(delegate, subject)
+        page = Ace(delegate, subject, self)
         self.setPage(page)
         self.setMinimumSize(500, 300)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -113,8 +113,9 @@ class CodeView(Observation, QWebEngineView):
 
 
 class Ace(Observation, QWebEnginePage):
-    def __init__(self, delegate, subject):
+    def __init__(self, delegate, subject, parentView):
         self.delegate = delegate
+        self.parentView = parentView
 
         QWebEnginePage.__init__(self)
         Observation.__init__(self, subject)
@@ -146,7 +147,7 @@ class Ace(Observation, QWebEnginePage):
                 events.view.code.Evaluate(self.delegate.template(), code))
 
     def getContent(self, content):
-        if self.delegate is not None:
+        if self.delegate is not None and content != self.parentView.tip():
             self.delegate.setCode(content, True)
 
 
