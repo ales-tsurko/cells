@@ -7,6 +7,7 @@ from cells import events
 from cells.backend import BackendRouter
 from cells.observation import Observation
 from cells.settings import ApplicationInfo
+from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QApplication
 from rx.subject import Subject
 

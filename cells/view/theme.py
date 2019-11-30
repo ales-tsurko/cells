@@ -7,12 +7,6 @@ from PySide2.QtWidgets import QScrollBar
 
 
 class Fonts:
-    def __init__(self):
-        self.regulars = QFont("OpenSans-Regular", 12)
-        self.lightItalic = QFont("OpenSans-LightItalic", 12)
-        self.semibold = QFont("OpenSans-SemiBold", 12)
-        self.mono = QFont("Fira Code", 12)
-
     def initDb():
         monoRegular = os.path.join(utility.viewResourcesDir(), "fonts",
                                    "FiraCode_2", "FiraCode-Regular.ttf")
@@ -92,6 +86,7 @@ class MenuBar:
             }
         """
         self.font = QFont("Open Sans", 13)
+        self.font.setPixelSize(13)
 
 
 class Console:
@@ -100,6 +95,7 @@ class Console:
         self.stdoutFontColor = QColor(255, 246, 255)
         self.stderrFontColor = QColor(206, 24, 1)
         self.font = QFont("Fira Code", 12)
+        self.font.setPixelSize(12)
         self.font.setWeight(QFont.Thin)
 
 
@@ -131,16 +127,19 @@ class BrowserItem:
         self.size = QSize(216, 108)
 
         self.headerFont = QFont("Open Sans", 13)
+        self.headerFont.setPixelSize(13)
         self.headerFont.setWeight(QFont.DemiBold)
         self.headerStyle = "margin-left: 18px; margin-right: 9px; color: #DAD6DE;"
         self.headerStyleSelected = "margin-left: 18px; margin-right: 9px; color: #322F35;"
 
         self.commandFont = QFont("Fira Code", 11)
+        self.commandFont.setPixelSize(11)
         self.commandFont.setWeight(QFont.Light)
         self.commandStyle = "margin-left: 18px; margin-right: 9px; color: #DAD6DE;"
         self.commandStyleSelected = "margin-left: 18px; margin-right: 9px; color: #322F35;"
 
         self.descriptionFont = QFont("Open Sans", 12)
+        self.descriptionFont.setPixelSize(12)
         self.descriptionStyle = "margin-left: 9px; margin-right: 9px; color: #DAD6DE;"
         self.descriptionStyleSelected = "margin-left: 9px; margin-right: 9px; color: #322F35;"
 
@@ -152,12 +151,14 @@ class TemplateInfo:
         self.width = 216
 
         self.headerFont = QFont("Open Sans", 15)
+        self.headerFont.setPixelSize(15)
         self.headerFont.setWeight(QFont.Light)
         self.headerFont.setItalic(True)
         self.headerStyle = "margin: 13px 9px 18px 9px; color: #4C4452;"
 
         self.textAreaStyle = "background-color: #272629; margin: 0 0 18px 9px; selection-background-color: #5B00C3;"
         self.textAreaFont = QFont("Open Sans", 13)
+        self.textAreaFont.setPixelSize(13)
         self.textAreaFont.setWeight(QFont.Normal)
         self.textAreaFontColor = QColor(218, 214, 222)
 
@@ -187,6 +188,7 @@ class ContextMenu:
             }
         """
         self.font = QFont("Open Sans", 12)
+        self.font.setPixelSize(12)
 
 
 class Editor:
@@ -199,6 +201,7 @@ class EditorTip:
     def __init__(self):
         self.style = "color: #3D3B40;"
         self.font = QFont("Open Sans", 30)
+        self.font.setPixelSize(30)
         self.font.setWeight(QFont.Bold)
 
 
@@ -217,10 +220,12 @@ class TrackHeader:
         self.height = 72
 
         self.backendNameFont = QFont("Open Sans", 13)
+        self.backendNameFont.setPixelSize(13)
         self.backendNameFont.setWeight(QFont.DemiBold)
         self.backendNameStyle = "color: #D9EBF5;"
 
         self.userNameFont = QFont("Open Sans", 12)
+        self.userNameFont.setPixelSize(12)
         self.userNameStyle = "color: #D9EBF5; \
                 background: transparent; \
                 border: none; \
@@ -243,6 +248,7 @@ class Cell:
                 padding: 0 18px 0 18px; \
                 margin: 0;"
         self.nameFont = QFont("Open Sans", 12)
+        self.nameFont.setPixelSize(12)
         self.nameHeight = 18
 
         self.previewStyle = "padding: 5px 9px 9px 9px; \
@@ -256,6 +262,8 @@ class Cell:
                 line-height: 14px; \
                 color: #343136;"
         self.previewFont = QFont("Fira Code", 11)
+        self.previewFont.setWeight(QFont.Light)
+        self.previewFont.setPixelSize(11)
 
 
 class Confirmation:
@@ -290,13 +298,17 @@ class TemplateEditor:
                 selection-background-color: #5B00C3;"
         self.inputHeight = 18
         self.inputCodeFont = QFont("Fira Code", 11)
+        self.inputCodeFont.setPixelSize(11)
+        self.inputCodeFont.setWeight(QFont.Light)
         self.inputFont = QFont("Open Sans", 12)
+        self.inputFont.setPixelSize(12)
 
         self.descriptionStyle = "background: #19181B; \
                 border: none; \
                 color: #DAD6DE; \
                 selection-background-color: #5B00C3;"
         self.descriptionFont = QFont("Open Sans", 12)
+        self.descriptionFont.setPixelSize(12)
 
 
 class Theme:
