@@ -62,11 +62,11 @@ class MenuBar:
                 spacing: 18px;
                 padding: 1px 9px;
                 background: transparent;
-                color: #FFF6FF;
+                color: #D9EBF5;
             }
 
             QMenuBar::item:selected { /* when selected using mouse or keyboard */
-                background: #FFF6FF;
+                background: #D9EBF5;
                 color: #272629;
             }
 
@@ -77,7 +77,7 @@ class MenuBar:
             }
 
             QMenu::item {
-                color: #FFF6FF;
+                color: #D9EBF5;
             }
 
             QMenu::item:selected {
@@ -201,6 +201,34 @@ class EditorTip:
         self.font = QFont("Open Sans", 30)
         self.font.setWeight(QFont.Bold)
 
+
+class Track:
+    def __init__(self):
+        self.style = "background: #3D3B40;"
+        self.width = 198
+        self.header = TrackHeader()
+        self.cell = Cell()
+
+
+class TrackHeader:
+    def __init__(self):
+        self.style = "background: #3D3B40;"
+        self.styleSelected = "background: #0059FB;"
+        self.height = 72
+
+        self.backendNameFont = QFont("Open Sans", 13)
+        self.backendNameFont.setWeight(QFont.DemiBold)
+        self.backendNameStyle = "color: #D9EBF5;"
+
+        self.userNameFont = QFont("Open Sans", 12)
+        self.userNameStyle = "color: #D9EBF5; background: transparent; border: none; selection-background-color: #5B00C3;"
+
+
+class Cell:
+    def __init__(self):
+        self.style = "background: #646167;"
+        self.height = 90
+
 class Theme:
     browser = Browser()
     console = Console()
@@ -208,6 +236,7 @@ class Theme:
     editor = Editor()
     main = Main()
     templateEditor = None
+    track = Track()
 
 
 class ScrollBar(QScrollBar):

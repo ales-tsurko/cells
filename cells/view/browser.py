@@ -84,6 +84,8 @@ class TemplateInfo(QWidget):
         self.description.setStyleSheet(Theme.browser.info.textAreaStyle)
         self.description.setFont(Theme.browser.info.textAreaFont)
         self.description.setTextColor(Theme.browser.info.textAreaFontColor)
+        self.description.setContextMenuPolicy(Qt.NoContextMenu)
+
         self.layout().addWidget(self.description)
 
     def setTemplate(self, template):

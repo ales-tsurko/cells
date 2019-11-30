@@ -1,16 +1,17 @@
 from copy import deepcopy
 
-from PySide2.QtCore import Qt
-from PySide2.QtGui import QFont
-from PySide2.QtWidgets import (QAction, QLabel, QLineEdit, QMessageBox,
-                               QVBoxLayout, QWidget)
-
 from cells import events
 from cells.model import CellModel
 from cells.observation import Observation
+from PySide2.QtCore import Qt
+from PySide2.QtGui import QFont
+from PySide2.QtSvg import QSvgWidget
+from PySide2.QtWidgets import (QAction, QHBoxLayout, QLabel, QLineEdit,
+                               QMessageBox, QVBoxLayout, QWidget)
 
 from .code import CodeDelegate
 from .dialogs import ConfirmationDialog
+from .theme import Theme
 
 
 class Track(Observation, QWidget):
@@ -27,9 +28,9 @@ class Track(Observation, QWidget):
         self.template = template
 
         self.setAttribute(Qt.WA_StyledBackground)
-        self.setStyleSheet("background-color: rgba(0, 0, 0, 0.5);")
+        self.setStyleSheet(Theme.track.style)
 
-        self.setFixedWidth(200)
+        self.setFixedWidth(Theme.track.width)
 
         self.header = Header(self, subject)
 
@@ -286,23 +287,12 @@ class CellBase(Observation, QWidget):
         self.index = index
         self.selected = False
 
-        self.setAttribute(Qt.WA_StyledBackground)
-        self.setStyleSheet("background-color: grey;")
-
-        self.setFixedHeight(100)
-
         self._initNameLabel()
-
-        self.setLayout(QVBoxLayout())
-        self.layout().setSpacing(0)
-        self.layout().setContentsMargins(0, 0, 0, 0)
-        self.layout().addWidget(self.nameLabel)
 
         self.updateStyle()
 
     def _initNameLabel(self):
         self.nameLabel = QLineEdit(self)
-        self.nameLabel.setAlignment(Qt.AlignCenter)
         self.nameLabel.setWindowFlags(Qt.FramelessWindowHint)
         self.nameLabel.setStyleSheet("background: transparent; border: none;")
         self.nameLabel.setMaxLength(30)
@@ -345,8 +335,42 @@ class Header(CellBase):
         super().__init__(subject, track.index)
         self.track = track
 
+        self.setAttribute(Qt.WA_StyledBackground)
+        self.setStyleSheet(Theme.track.header.style)
+
+        self.setFixedHeight(Theme.track.header.height)
+
+        self._initLabels()
+
         self.add_responder(events.view.main.TrackEditName,
                            self.editNameResponder)
+
+    def _initLabels(self):
+        self.backendName = QLabel(self.track.template.backend_name)
+        self.backendName.setFont(Theme.track.header.backendNameFont)
+        self.backendName.setStyleSheet(Theme.track.header.backendNameStyle)
+
+        self.nameLabel.setFont(Theme.track.header.userNameFont)
+        self.nameLabel.setStyleSheet(Theme.track.header.userNameStyle)
+        self.nameLabel.setMaxLength(15)
+
+        vlayout = QVBoxLayout()
+        vlayout.setSpacing(0)
+        vlayout.setContentsMargins(0, 0, 0, 0)
+        vlayout.addWidget(self.backendName)
+        vlayout.addWidget(self.nameLabel)
+        vlayout.setAlignment(Qt.AlignLeft)
+
+        layout = QHBoxLayout()
+        layout.setSpacing(18)
+        layout.setContentsMargins(18, 9, 18, 18)
+
+        self.icon = QSvgWidget(self.track.template.icon_path())
+        self.icon.setFixedSize(36, 36)
+
+        layout.addWidget(self.icon)
+        layout.addLayout(vlayout)
+        self.setLayout(layout)
 
     def onEditingNameFinished(self):
         self.notify(events.view.track.NameChanged(self.index, self.name()))
@@ -365,10 +389,10 @@ class Header(CellBase):
             self.setNormalStyle()
 
     def setSelectedStyle(self):
-        self.setStyleSheet("background-color: green;")
+        self.setStyleSheet(Theme.track.header.styleSelected)
 
     def setNormalStyle(self):
-        self.setStyleSheet("background-color: grey;")
+        self.setStyleSheet(Theme.track.header.style)
 
 
 class FinalMeta(type(QWidget), type(CodeDelegate)):
@@ -381,9 +405,15 @@ class Cell(CellBase, metaclass=FinalMeta):
         self._code = ""
 
         super().__init__(subject, index)
+
+        self.setAttribute(Qt.WA_StyledBackground)
+        self.setStyleSheet(Theme.track.cell.style)
+
+        self.setFixedHeight(Theme.track.cell.height)
+
         self._initContentPreview()
 
-        self.layout().setAlignment(Qt.AlignTop)
+        #  self.layout().setAlignment(Qt.AlignTop)
 
         self.add_responder(events.view.main.CellEditName,
                            self.editNameResponder)
@@ -407,7 +437,7 @@ class Cell(CellBase, metaclass=FinalMeta):
         self.preview.setContextMenuPolicy(Qt.NoContextMenu)
         self.preview.setAlignment(Qt.AlignTop)
 
-        self.layout().addWidget(self.preview)
+        #  self.layout().addWidget(self.preview)
 
     def editNameResponder(self, e):
         if self.selected and self.track.selected:
