@@ -62,11 +62,11 @@ class MenuBar:
                 spacing: 18px;
                 padding: 1px 9px;
                 background: transparent;
-                color: #D9EBF5;
+                color: #DAD6DE;
             }
 
             QMenuBar::item:selected { /* when selected using mouse or keyboard */
-                background: #D9EBF5;
+                background: #DAD6DE;
                 color: #272629;
             }
 
@@ -77,12 +77,12 @@ class MenuBar:
             }
 
             QMenu::item {
-                color: #D9EBF5;
+                color: #DAD6DE;
             }
 
             QMenu::item:selected {
                 color: #322F35;
-                background: #D9EBF5;
+                background: #DAD6DE;
             }
 
             QMenu::separator {
@@ -172,7 +172,7 @@ class ContextMenu:
             }
 
             QMenu::item {
-                color: #FFF6FF;
+                color: #D9EBF5;
             }
 
             QMenu::item:selected {
@@ -221,13 +221,41 @@ class TrackHeader:
         self.backendNameStyle = "color: #D9EBF5;"
 
         self.userNameFont = QFont("Open Sans", 12)
-        self.userNameStyle = "color: #D9EBF5; background: transparent; border: none; selection-background-color: #5B00C3;"
+        self.userNameStyle = "color: #D9EBF5; \
+                background: transparent; \
+                border: none; \
+                selection-background-color: #5B00C3;"
 
 
 class Cell:
     def __init__(self):
         self.style = "background: #646167;"
+        self.styleSelected = "background: #30EDD5;"
+        self.styleSelectedTrackNormal = "background: #8B878F;"
+        self.styleEvaluated = "background: #5B00C3;"
+
         self.height = 90
+
+        self.nameStyle = "background: rgba(255, 255, 255, 0.1); \
+                border: none; \
+                color: #343136; \
+                selection-background-color: #5B00C3; \
+                padding: 0 18px 0 18px; \
+                margin: 0;"
+        self.nameFont = QFont("Open Sans", 12)
+        self.nameHeight = 18
+
+        self.previewStyle = "padding: 5px 9px 9px 9px; \
+                margin: 0; \
+                border: none; \
+                line-height: 14px; \
+                color: #E1F0F9;"
+        self.previewStyleSelected = "padding: 5px 9px 9px 9px; \
+                margin: 0; \
+                border: none; \
+                line-height: 14px; \
+                color: #343136;"
+        self.previewFont = QFont("Fira Code", 11)
 
 class Theme:
     browser = Browser()

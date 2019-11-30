@@ -156,7 +156,7 @@ class Main(QMainWindow, Observation):
 
         consoleSub = viewMenu.addMenu("Console")
 
-        self._addMenuAction(consoleSub, "Toggle", self.tr("Ctrl+`"),
+        self._addMenuAction(consoleSub, "Toggle", self.tr("Ctrl+p"),
                             self.onConsoleToggle)
         self._addMenuAction(consoleSub, "Clear", self.tr("Ctrl+k"),
                             self.onConsoleClear)
@@ -373,7 +373,7 @@ class Main(QMainWindow, Observation):
         self.notify(events.view.main.Close())
         self.unregister()
 
-        return super().closeEvent(e)
+        super().closeEvent(e)
 
     def checkSave(self, e):
         if self.saved:

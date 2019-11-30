@@ -289,8 +289,6 @@ class CellBase(Observation, QWidget):
 
         self._initNameLabel()
 
-        self.updateStyle()
-
     def _initNameLabel(self):
         self.nameLabel = QLineEdit(self)
         self.nameLabel.setWindowFlags(Qt.FramelessWindowHint)
@@ -341,6 +339,8 @@ class Header(CellBase):
         self.setFixedHeight(Theme.track.header.height)
 
         self._initLabels()
+
+        self.updateStyle()
 
         self.add_responder(events.view.main.TrackEditName,
                            self.editNameResponder)
@@ -411,9 +411,19 @@ class Cell(CellBase, metaclass=FinalMeta):
 
         self.setFixedHeight(Theme.track.cell.height)
 
+
+        layout = QVBoxLayout()
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setAlignment(Qt.AlignTop)
+
+        self.setLayout(layout)
+
+        self.layout().addWidget(self.nameLabel)
+
         self._initContentPreview()
 
-        #  self.layout().setAlignment(Qt.AlignTop)
+        self.updateStyle()
 
         self.add_responder(events.view.main.CellEditName,
                            self.editNameResponder)
@@ -422,22 +432,21 @@ class Cell(CellBase, metaclass=FinalMeta):
     def _initNameLabel(self):
         super()._initNameLabel()
         self.nameLabel.setAlignment(Qt.AlignLeft)
-        self.nameLabel.setStyleSheet(
-            "background-color: rgba(255, 255, 255, 0.1); border: none;")
+        self.nameLabel.setStyleSheet(Theme.track.cell.nameStyle)
+        self.nameLabel.setFont(Theme.track.cell.nameFont)
+        self.nameLabel.setFixedHeight(Theme.track.cell.nameHeight)
 
     def _initContentPreview(self):
         self.preview = QLabel()
 
-        font = QFont("Fira Code", 12)
-        font.setWeight(QFont.Normal)
-        self.preview.setFont(font)
+        self.preview.setFont(Theme.track.cell.previewFont)
         self.preview.setFocusPolicy(Qt.NoFocus)
         self.preview.setWindowFlags(Qt.FramelessWindowHint)
-        self.preview.setStyleSheet("margin: 10;")
+        self.preview.setStyleSheet(Theme.track.cell.previewStyle)
         self.preview.setContextMenuPolicy(Qt.NoContextMenu)
         self.preview.setAlignment(Qt.AlignTop)
 
-        #  self.layout().addWidget(self.preview)
+        self.layout().addWidget(self.preview)
 
     def editNameResponder(self, e):
         if self.selected and self.track.selected:
@@ -468,6 +477,7 @@ class Cell(CellBase, metaclass=FinalMeta):
     def evaluate(self):
         self.notify(
             events.view.track.CellEvaluate(self.track.template, self.code()))
+        self.setEvaluatedStyle()
 
     def updateStyle(self):
         if self.track.selected and self.selected:
@@ -478,16 +488,20 @@ class Cell(CellBase, metaclass=FinalMeta):
             self.setNormalStyle()
 
     def setSelectedStyle(self):
-        self.setStyleSheet("background-color: brown;")
+        self.setStyleSheet(Theme.track.cell.styleSelected)
+        self.preview.setStyleSheet(Theme.track.cell.previewStyleSelected)
 
     def setInactiveStyle(self):
-        self.setStyleSheet("background-color: #444;")
+        self.setStyleSheet(Theme.track.cell.styleSelectedTrackNormal)
+        self.preview.setStyleSheet(Theme.track.cell.previewStyle)
 
     def setNormalStyle(self):
-        self.setStyleSheet("background-color: #333;")
+        self.setStyleSheet(Theme.track.cell.style)
+        self.preview.setStyleSheet(Theme.track.cell.previewStyle)
 
     def setEvaluatedStyle(self):
-        self.setStyleSheet("background-color: #49967d")
+        self.setStyleSheet(Theme.track.cell.styleEvaluated)
+        self.preview.setStyleSheet(Theme.track.cell.previewStyle)
 
     def serialize(self):
         return CellModel(self.name(), self.code())

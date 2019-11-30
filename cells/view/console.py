@@ -70,4 +70,4 @@ class Console(Observation, QTextEdit):
     def closeEvent(self, e):
         self.unregister()
 
-        return super().closeEvent(e)
+        super().closeEvent(e)
