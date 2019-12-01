@@ -5,4 +5,4 @@ set -e
 cd $(dirname "$0")
 
 export PYTHONPATH="python/lib/python3.7/site-packages"
-python/bin/python3 cells
+python/bin/python3 -m cells
