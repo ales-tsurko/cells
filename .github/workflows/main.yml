@@ -52,7 +52,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: linux-package
-          path: dist/packages/linux/cells-${{ CELLS_VERSION }}-${{ CELLS_REVISION_NUMBER }}_amd64.deb.zip
+          path: dist/packages/linux/cells-${CELLS_VERSION}-${CELLS_REVISION_NUMBER}_amd64.deb.zip
       
 
   create_release:
@@ -92,8 +92,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.cr.outputs.upload_url }}
-          asset_path: linux-package/cells-${{ CELLS_VERSION }}-${{ CELLS_REVISION_NUMBER }}_amd64.deb.zip
-          asset_name: cells-${{ CELLS_VERSION }}-${{ CELLS_REVISION_NUMBER }}_amd64.deb.zip
+          asset_path: linux-package/cells-${CELLS_VERSION}-${CELLS_REVISION_NUMBER}_amd64.deb.zip
+          asset_name: cells-${CELLS_VERSION}-${CELLS_REVISION_NUMBER}_amd64.deb.zip
           asset_content_type: application/zip
       
       - name: Upload macOS Release Asset
