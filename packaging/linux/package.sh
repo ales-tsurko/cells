@@ -11,6 +11,8 @@ fi
 PACKAGE_DIR=dist/package/linux
 DEB_PACK_DIR=$PACKAGE_DIR/cells-$CELLS_VERSION
 
+apt install zip -y
+
 echo "Cleaning up build/ and dist/"
 rm -rf build/*
 rm -rf dist/*
@@ -69,6 +71,10 @@ mv dist/Cells/* $DEB_PACK_DIR/usr/share/Cells
 
 echo "Building package"
 dpkg -b $DEB_PACK_DIR $PACKAGE_DIR/cells-${CELLS_VERSION}-${CELLS_REVISION_NUMBER}_amd64.deb
+
+echo "Archiving"
+zip -jrX $PACKAGE_DIR/cells-${CELLS_VERSION}-${CELLS_REVISION_NUMBER}_amd64.deb.zip \
+    $PACKAGE_DIR/cells-${CELLS_VERSION}-${CELLS_REVISION_NUMBER}_amd64.deb
 
 echo "Cleaning up"
 rm -rf $DEB_PACK_DIR
