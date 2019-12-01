@@ -1,0 +1,13 @@
+# See: man pkg-config
+prefix=/Users/alestsurko/Desktop/cells/packaging/macos/python
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: Python
+Description: Python library
+Requires: 
+Version: 3.7
+Libs.private: -ldl  -framework CoreFoundation
+Libs: -L${libdir} -lpython3.7m
+Cflags: -I${includedir}/python3.7m

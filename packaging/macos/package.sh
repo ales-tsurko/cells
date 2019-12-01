@@ -25,10 +25,10 @@ echo "Copying sources"
 cp -R cells $APPDIR
 
 echo "Copying python"
-cp -R ./packaging/macos/python $APPDIR
+cp -R packaging/macos/python $APPDIR/
 
 echo "Copying dependencies"
-cp -n -R .venv/lib/python3.7/site-packages/ ${APPDIR}/python/lib/python3.7/site-packages/ || true
+rsync -aq ".venv/lib/python3.7/site-packages/" "${APPDIR}/python/lib/python3.7/site-packages/"
 
 echo "Copying resources"
 cp -R resources $APPDIR
@@ -72,37 +72,37 @@ echo "Setting permissions"
 chmod -R 755 $APP
 
 # Packaging
-mkdir -p $PACKAGES_PATH
-
-echo "Packaging application"
-pkgbuild --identifier by.alestsurko.cells \
-         --install-location /Applications \
-         --component dist/Cells.app \
-         $PACKAGES_PATH/_cells.pkg
-
-echo "Packaging templates"
-mkdir -p /tmp/track_templates
-pkgbuild --identifier by.alestsurko.cells.ctt \
-         --install-location /tmp/track_templates \
-         --scripts packaging/macos/scripts/ \
-         --root track_templates \
-         $PACKAGES_PATH/_templates.pkg
-
-echo "Synthesizing Distribution.xml"
-productbuild --synthesize \
-             --package $PACKAGES_PATH/_cells.pkg \
-             --package $PACKAGES_PATH/_templates.pkg \
-             $PACKAGES_PATH/Distribution.xml
-
-echo "Generating final package"
-productbuild --distribution $PACKAGES_PATH/Distribution.xml \
-             --package-path $PACKAGES_PATH \
-             $PACKAGES_PATH/Cells.pkg
-
-echo "Archiving"
-zip -jrX $PACKAGES_PATH/Cells.pkg.zip $PACKAGES_PATH/Cells.pkg
-
-echo "Cleaning up"
-rm -f $PACKAGES_PATH/_cells.pkg
-rm -f $PACKAGES_PATH/_templates.pkg
-rm -rf dist/Cells.app
+# mkdir -p $PACKAGES_PATH
+# 
+# echo "Packaging application"
+# pkgbuild --identifier by.alestsurko.cells \
+         # --install-location /Applications \
+         # --component dist/Cells.app \
+         # $PACKAGES_PATH/_cells.pkg
+# 
+# echo "Packaging templates"
+# mkdir -p /tmp/track_templates
+# pkgbuild --identifier by.alestsurko.cells.ctt \
+         # --install-location /tmp/track_templates \
+         # --scripts packaging/macos/scripts/ \
+         # --root track_templates \
+         # $PACKAGES_PATH/_templates.pkg
+# 
+# echo "Synthesizing Distribution.xml"
+# productbuild --synthesize \
+             # --package $PACKAGES_PATH/_cells.pkg \
+             # --package $PACKAGES_PATH/_templates.pkg \
+             # $PACKAGES_PATH/Distribution.xml
+# 
+# echo "Generating final package"
+# productbuild --distribution $PACKAGES_PATH/Distribution.xml \
+             # --package-path $PACKAGES_PATH \
+             # $PACKAGES_PATH/Cells.pkg
+# 
+# echo "Archiving"
+# zip -jrX $PACKAGES_PATH/Cells.pkg.zip $PACKAGES_PATH/Cells.pkg
+# 
+# echo "Cleaning up"
+# rm -f $PACKAGES_PATH/_cells.pkg
+# rm -f $PACKAGES_PATH/_templates.pkg
+# rm -rf dist/Cells.app
