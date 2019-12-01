@@ -1,8 +1,6 @@
 name: CI
 
 on:
-  push:
-    branches: master
   release:
     types: [created]
 
@@ -17,8 +15,16 @@ jobs:
       - uses: dschep/install-poetry-action@v1.2
         with:
           preview: true
-      - name: Run package script
+      
+      - name: Run packaging script
         run: ./packaging/macos/package.sh
+      
+      - name: Upload to release
+        uses: JasonEtco/upload-to-release@master
+        with:
+          args: ./dist/packages/macos/Cells.pkg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
 #   package_linux:
 #     name: Package Linux
