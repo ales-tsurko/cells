@@ -24,7 +24,7 @@ echo "Copying sources"
 cp -R cells $APPDIR
 
 echo "Copying virtual environment"
-rsync -r .venv/. $APPDIR/venv
+rsync -r --copy-links .venv/. $APPDIR/venv
 
 echo "Copying resources"
 cp -R resources $APPDIR
