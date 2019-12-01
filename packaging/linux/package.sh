@@ -12,7 +12,6 @@ PACKAGE_DIR=dist/package/linux
 DEB_PACK_DIR=$PACKAGE_DIR/cells-$CELLS_VERSION
 
 poetry install
-poetry shell
 
 echo "Cleaning up build/ and dist/"
 rm -rf build/*
