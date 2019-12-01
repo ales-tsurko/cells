@@ -18,6 +18,6 @@ jobs:
       - name: Run package script
         run: ./packaging/macos/package.sh
         
-  package_linux:
-    name: Package Linux
-    runs-on: ubuntu-latest
+#   package_linux:
+#     name: Package Linux
+#     runs-on: ubuntu-latest
