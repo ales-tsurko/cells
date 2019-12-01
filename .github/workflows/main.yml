@@ -1,6 +1,8 @@
 name: CI
 
-on: 
+on:
+  push:
+    branches: master
   release:
     types: [created]
 
