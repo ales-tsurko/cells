@@ -11,8 +11,6 @@ fi
 PACKAGE_DIR=dist/package/linux
 DEB_PACK_DIR=$PACKAGE_DIR/cells-$CELLS_VERSION
 
-apt install zip -y
-
 echo "Cleaning up build/ and dist/"
 rm -rf build/*
 rm -rf dist/*
