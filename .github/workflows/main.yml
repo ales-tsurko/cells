@@ -57,7 +57,7 @@ jobs:
           prerelease: false
 
       - name: Upload Linux Release Asset
-        id: upload-release-asset 
+        id: upload-linux-release-asset 
         uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -68,7 +68,7 @@ jobs:
           asset_content_type: application/zip
       
       - name: Upload macOS Release Asset
-        id: upload-release-asset 
+        id: upload-mac-release-asset 
         uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
