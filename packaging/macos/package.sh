@@ -10,6 +10,8 @@ APPRESOURCES=$APP/Contents/Resources
 # init virtual environment
 poetry install
 
+python3 -m venv --copies .venv
+
 echo "Cleaning up dist/ and build/"
 rm -rf dist/*
 rm -rf build/*
@@ -34,14 +36,14 @@ cp packaging/macos/*.icns $APPRESOURCES/
 
 echo "Copying executable scripts"
 cp packaging/macos/runner $APPDIR
-cp packaging/macos/run $APPDIR
+# cp packaging/macos/run $APPDIR
 
 echo "Writing defaults"
 defaults write $PWD/$APP/Contents/Info.plist CFBundleName -string Cells
 defaults write $PWD/$APP/Contents/Info.plist CFBundleDisplayName -string Cells
 defaults write $PWD/$APP/Contents/Info.plist CFBundleIdentifier -string by.alestsurko.cells
 defaults write $PWD/$APP/Contents/Info.plist CFBundleVersion -string "1.0.0"
-defaults write $PWD/$APP/Contents/Info.plist CFBundleExecutable -string run
+defaults write $PWD/$APP/Contents/Info.plist CFBundleExecutable -string runner
 defaults write $PWD/$APP/Contents/Info.plist NSPrincipalClass -string NSApplication
 defaults write $PWD/$APP/Contents/Info.plist CFBundleIconFile -string "AppIcon"
 plutil -insert CFBundleDocumentTypes -json '[{ 

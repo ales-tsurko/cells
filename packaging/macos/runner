@@ -4,4 +4,4 @@ set -e
 
 cd $(dirname "$0")
 
-venv/bin/python3 cells
+open ./venv/bin/cells
