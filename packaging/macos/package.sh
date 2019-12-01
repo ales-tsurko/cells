@@ -10,7 +10,6 @@ APPRESOURCES=$APP/Contents/Resources
 # init virtual environment
 poetry install
 
-python3 -m venv --copies .venv
 
 echo "Cleaning up dist/ and build/"
 rm -rf dist/*
@@ -25,8 +24,11 @@ mkdir -p $APPRESOURCES
 echo "Copying sources"
 cp -R cells $APPDIR
 
-echo "Copying virtual environment"
-rsync -r --copy-links .venv/. $APPDIR/venv
+echo "Copying python"
+cp -R ./packaging/macos/python $APPDIR
+
+echo "Copying dependencies"
+rsync -aq .venv/lib/python3.7/site-packages/ ${APPDIR}/python/lib/python3.7/site-packages/
 
 echo "Copying resources"
 cp -R resources $APPDIR
@@ -36,7 +38,7 @@ cp packaging/macos/*.icns $APPRESOURCES/
 
 echo "Copying executable scripts"
 cp packaging/macos/runner $APPDIR
-# cp packaging/macos/run $APPDIR
+cp packaging/macos/run $APPDIR
 
 echo "Writing defaults"
 defaults write $PWD/$APP/Contents/Info.plist CFBundleName -string Cells

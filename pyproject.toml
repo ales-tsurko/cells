@@ -10,7 +10,7 @@ readme = "README.md"
 cells = "cells.__main__:main"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "~3.7"
 pyside2 = "^5.13.2"
 rx = "^3.0.1"
 appdirs = "^1.4.3"
