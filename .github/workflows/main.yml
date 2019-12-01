@@ -81,7 +81,7 @@ jobs:
       - name: Download macOS package
         uses: actions/download-artifact@v1
         with:
-          name: linux-package
+          name: macos-package
 
       - name: Upload Linux Release Asset
         id: upload-linux-release-asset 
