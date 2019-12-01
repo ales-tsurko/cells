@@ -20,6 +20,13 @@ jobs:
       - name: Run packaging script
         run: ./packaging/macos/package.sh
 
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: macos-package
+          path: dist/packages/macos/Cells.pkg.zip
+
+
   package_linux:
     name: Package Linux
     runs-on: ubuntu-latest
@@ -37,6 +44,12 @@ jobs:
       
       - name: Run packaging script
         run: ./packaging/linux/package.sh
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: linux-package
+          path: dist/packages/linux/cells-${{ github.ref }}-1_amd64.deb.zip
       
 
   create_release:
@@ -56,6 +69,16 @@ jobs:
           draft: false
           prerelease: false
 
+      - name: Download linux package
+        uses: actions/download-artifact@v1
+        with:
+          name: linux-package
+
+      - name: Download macOS package
+        uses: actions/download-artifact@v1
+        with:
+          name: linux-package
+
       - name: Upload Linux Release Asset
         id: upload-linux-release-asset 
         uses: actions/upload-release-asset@v1.0.1
@@ -63,7 +86,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.cr.outputs.upload_url }}
-          asset_path: ./dist/packages/linux/cells-${{ github.ref }}-1_amd64.deb.zip
+          asset_path: linux-package/cells-${{ github.ref }}-1_amd64.deb.zip
           asset_name: cells-${{ github.ref }}-1_amd64.deb.zip
           asset_content_type: application/zip
       
@@ -74,6 +97,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.cr.outputs.upload_url }}
-          asset_path: ./dist/packages/macos/Cells.pkg.zip
+          asset_path: macos-package/Cells.pkg.zip
           asset_name: Cells.pkg.zip
           asset_content_type: application/zip
