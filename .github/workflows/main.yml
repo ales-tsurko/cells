@@ -13,6 +13,8 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-python@v1
+        with:
+            python-version: 3.7
       - uses: dschep/install-poetry-action@v1.2
         with:
           preview: true
@@ -38,6 +40,8 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-python@v1
+        with:
+            python-version: 3.7
       - uses: dschep/install-poetry-action@v1.2
         with:
           preview: true
