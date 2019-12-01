@@ -1,5 +1,9 @@
 name: CD
 
+env:
+    CELLS_VERSION: 1.0.0-beta1
+    CELLS_REVISION_NUMBER: 1
+
 on:
   push:
     tags:
@@ -32,9 +36,6 @@ jobs:
   package_linux:
     name: Package Linux
     runs-on: ubuntu-latest
-    env:
-        CELLS_VERSION: 1.0.0-beta1
-        CELLS_REVISION_NUMBER: 1
         
     steps:
       - uses: actions/checkout@master
@@ -52,16 +53,13 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: linux-package
-          path: dist/packages/linux/cells-${CELLS_VERSION}-${CELLS_REVISION_NUMBER}_amd64.deb.zip
+          path: dist/packages/linux/cells_amd64.deb.zip
       
 
   create_release:
     name: Create Release
     runs-on: ubuntu-latest
     needs: [package_linux, package_macos]
-    env:
-        CELLS_VERSION: 1.0.0-beta1
-        CELLS_REVISION_NUMBER: 1
 
     steps:
       - name: Create Release
@@ -92,8 +90,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.cr.outputs.upload_url }}
-          asset_path: linux-package/cells-${CELLS_VERSION}-${CELLS_REVISION_NUMBER}_amd64.deb.zip
-          asset_name: cells-${CELLS_VERSION}-${CELLS_REVISION_NUMBER}_amd64.deb.zip
+          asset_path: linux-package/cells_amd64.deb.zip
+          asset_name: cells_amd64.deb.zip
           asset_content_type: application/zip
       
       - name: Upload macOS Release Asset

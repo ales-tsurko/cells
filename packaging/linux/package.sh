@@ -70,11 +70,11 @@ mkdir -p $DEB_PACK_DIR/usr/share/Cells
 mv dist/Cells/* $DEB_PACK_DIR/usr/share/Cells
 
 echo "Building package"
-dpkg -b $DEB_PACK_DIR $PACKAGE_DIR/cells-${CELLS_VERSION}-${CELLS_REVISION_NUMBER}_amd64.deb
+dpkg -b $DEB_PACK_DIR $PACKAGE_DIR/cells_amd64.deb
 
 echo "Archiving"
-zip -jrX $PACKAGE_DIR/cells-${CELLS_VERSION}-${CELLS_REVISION_NUMBER}_amd64.deb.zip \
-    $PACKAGE_DIR/cells-${CELLS_VERSION}-${CELLS_REVISION_NUMBER}_amd64.deb
+zip -jrX $PACKAGE_DIR/cells_amd64.deb.zip \
+    $PACKAGE_DIR/cells_amd64.deb
 
 echo "Cleaning up"
 rm -rf $DEB_PACK_DIR
