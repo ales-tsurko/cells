@@ -18,7 +18,7 @@ rm -rf build/*
 rm -rf dist/*
 
 echo "Compiling binary"
-pyinstaller packaging/Cells.spec -y
+poetry run pyinstaller packaging/Cells.spec -y
 
 echo "Copying app icon"
 cp ./packaging/linux/AppIcon.png ./dist/Cells/

@@ -18,11 +18,11 @@ toml = "^0.10.0"
 dataclasses_json = "^0.3.5"
 asyncqt = "^0.7.0"
 shiboken2 = "^5.13.2"
-pyinstaller = "^3.5"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
 macholib = "^1.11"
+pyinstaller = "^3.5"
 
 [build-system]
 requires = ["poetry>=1.0.0b4"]
