@@ -1,0 +1,23 @@
+name: CI
+
+on: 
+  release:
+    types: [created]
+
+jobs:
+  package_macos:
+    name: Package macOS
+    runs-on: macOS-latest
+        
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-python@v1
+      - uses: dschep/install-poetry-action@v1.2
+        with:
+          preview: true
+      - name: Run package script
+        run: ./packaging/macos/package.sh
+        
+  package_linux:
+    name: Package Linux
+    runs-on: ubuntu-latest
