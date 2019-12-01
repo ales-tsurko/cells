@@ -1,8 +1,9 @@
-name: CI
+name: CD
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+    - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
   package_macos:
@@ -19,13 +20,28 @@ jobs:
       - name: Run packaging script
         run: ./packaging/macos/package.sh
       
-      - name: Upload to release
-        uses: JasonEtco/upload-to-release@master
-        with:
-          args: ./dist/packages/macos/Cells.pkg
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/packages/macos/Cells.pkg.zip
+          asset_name: Cells.pkg.zip
+          asset_content_type: application/zip
+
 #   package_linux:
 #     name: Package Linux
 #     runs-on: ubuntu-latest

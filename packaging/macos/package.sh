@@ -95,6 +95,9 @@ productbuild --distribution $PACKAGES_PATH/Distribution.xml \
              --package-path $PACKAGES_PATH \
              $PACKAGES_PATH/Cells.pkg
 
+echo "Archiving"
+zip -r -X $PACKAGES_PATH/Cells.pkg.zip $PACKAGES_PATH/Cells.pkg
+
 echo "Cleaning up"
 rm -f $PACKAGES_PATH/_cells.pkg
 rm -f $PACKAGES_PATH/_templates.pkg
