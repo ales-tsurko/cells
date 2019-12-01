@@ -8,7 +8,7 @@ if [ -z "${CELLS_VERSION}" ] || [ -z "${CELLS_REVISION_NUMBER}" ]; then
     exit 1
 fi
 
-PACKAGE_DIR=dist/package/linux
+PACKAGE_DIR=dist/packages/linux
 DEB_PACK_DIR=$PACKAGE_DIR/cells-$CELLS_VERSION
 
 poetry install
