@@ -28,7 +28,7 @@ echo "Copying python"
 cp -R ./packaging/macos/python $APPDIR
 
 echo "Copying dependencies"
-rsync -aq .venv/lib/python3.7/site-packages/ ${APPDIR}/python/lib/python3.7/site-packages/
+cp -n -R .venv/lib/python3.7/site-packages/ ${APPDIR}/python/lib/python3.7/site-packages/ || true
 
 echo "Copying resources"
 cp -R resources $APPDIR
