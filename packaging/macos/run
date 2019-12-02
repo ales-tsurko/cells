@@ -4,5 +4,7 @@ set -e
 
 cd $(dirname "$0")
 
-export PYTHONPATH="python/lib/python3.7/site-packages"
+export PYTHONPATH="$(pwd)/python/lib/python3.7/site-packages"
+set PYTHONHOME="$(pwd)/python"
+export PYTHONHOME="$(pwd)/python"
 python/bin/python3 -m cells
