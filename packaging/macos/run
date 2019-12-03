@@ -2,11 +2,14 @@
 
 set -e
 
+if [[ ! -e ~/.bash_profile ]]; then
+    echo "export PATH=${PATH}" >> ~/.bash_profile
+fi
+
 . ~/.bash_profile
 
 cd $(dirname "$0")
 
-export PYTHONPATH="$(pwd)/python/lib/python3.7/site-packages"
+set PYTHONPATH="$(pwd)/python/lib/python3.7/site-packages"
 set PYTHONHOME="$(pwd)/python"
-export PYTHONHOME="$(pwd)/python"
 python/bin/python3 -m cells
