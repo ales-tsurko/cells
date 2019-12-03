@@ -2,6 +2,8 @@
 
 set -e
 
+. ~/.bash_profile
+
 cd $(dirname "$0")
 
 export PYTHONPATH="$(pwd)/python/lib/python3.7/site-packages"

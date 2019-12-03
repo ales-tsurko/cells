@@ -19,8 +19,6 @@ echo "Making app structure"
 mkdir -p $APPDIR
 mkdir -p $APPRESOURCES
 
-# pyinstaller packaging/Cells.spec -y
-
 echo "Copying sources"
 cp -R cells $APPDIR
 
@@ -37,7 +35,6 @@ echo "Copying icons"
 cp packaging/macos/*.icns $APPRESOURCES/
 
 echo "Copying executable scripts"
-cp packaging/macos/runner $APPDIR
 cp packaging/macos/run $APPDIR
 
 echo "Writing defaults"
@@ -45,7 +42,7 @@ defaults write $PWD/$APP/Contents/Info.plist CFBundleName -string Cells
 defaults write $PWD/$APP/Contents/Info.plist CFBundleDisplayName -string Cells
 defaults write $PWD/$APP/Contents/Info.plist CFBundleIdentifier -string by.alestsurko.cells
 defaults write $PWD/$APP/Contents/Info.plist CFBundleVersion -string "1.0.0"
-defaults write $PWD/$APP/Contents/Info.plist CFBundleExecutable -string runner
+defaults write $PWD/$APP/Contents/Info.plist CFBundleExecutable -string run
 defaults write $PWD/$APP/Contents/Info.plist NSPrincipalClass -string NSApplication
 defaults write $PWD/$APP/Contents/Info.plist CFBundleIconFile -string "AppIcon"
 plutil -insert CFBundleDocumentTypes -json '[{ 

@@ -25,7 +25,7 @@ FIGLET_NAME = \
 class ApplicationInfo:
     name = "Cells"
     author = "Ales Tsurko"
-    version = "1.0.0-beta1"
+    version = "1.0.0-beta2"
 
 
 class Settings(Observation, dict):

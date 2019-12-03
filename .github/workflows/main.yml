@@ -1,7 +1,7 @@
 name: CD
 
 env:
-    CELLS_VERSION: 1.0.0-beta1
+    CELLS_VERSION: 1.0.0-beta2
     CELLS_REVISION_NUMBER: 1
 
 on:
