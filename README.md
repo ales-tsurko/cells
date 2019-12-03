@@ -37,6 +37,17 @@ poetry run cells -d
 
 
 
+## Deploy
+
+Update version in `settings.py` and `.github/main.yml` then run:
+
+```
+./packaging/macos/publish.sh <version>
+```
+
+
+
+
 ## Status
 
 ### Version 1.0.0
