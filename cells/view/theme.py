@@ -104,12 +104,12 @@ class Browser:
         self.style = """
             QListView {
                 show-decoration-selected: 1;
-                background: #19181B;
+                background: #322F35;
             }
 
             QListView::item:selected {
                 border: none;
-                background: #D9EBF5;
+                background: #19181B;
             }
 
             QListView::item {
@@ -130,18 +130,18 @@ class BrowserItem:
         self.headerFont.setPixelSize(13)
         self.headerFont.setWeight(QFont.DemiBold)
         self.headerStyle = "margin-left: 18px; margin-right: 9px; color: #DAD6DE;"
-        self.headerStyleSelected = "margin-left: 18px; margin-right: 9px; color: #322F35;"
+        self.headerStyleSelected = "margin-left: 18px; margin-right: 9px; color: #30EDD5;"
 
         self.commandFont = QFont("Fira Code", 11)
         self.commandFont.setPixelSize(11)
         self.commandFont.setWeight(QFont.Light)
         self.commandStyle = "margin-left: 18px; margin-right: 9px; color: #DAD6DE;"
-        self.commandStyleSelected = "margin-left: 18px; margin-right: 9px; color: #322F35;"
+        self.commandStyleSelected = "margin-left: 18px; margin-right: 9px; color: #30EDD5;"
 
         self.descriptionFont = QFont("Open Sans", 12)
         self.descriptionFont.setPixelSize(12)
-        self.descriptionStyle = "margin-left: 9px; margin-right: 9px; color: #DAD6DE;"
-        self.descriptionStyleSelected = "margin-left: 9px; margin-right: 9px; color: #322F35;"
+        self.descriptionStyle = "margin-left: 9px; margin-right: 9px; color: rgba(218, 214, 222, 0.4);"
+        self.descriptionStyleSelected = "margin-left: 9px; margin-right: 9px; color: rgba(48, 237, 213, 0.4);"
 
 
 class TemplateInfo:
@@ -247,6 +247,7 @@ class Cell:
                 selection-background-color: #5B00C3; \
                 padding: 0 18px 0 18px; \
                 margin: 0;"
+
         self.nameFont = QFont("Open Sans", 12)
         self.nameFont.setPixelSize(12)
         self.nameHeight = 18
@@ -256,11 +257,13 @@ class Cell:
                 border: none; \
                 line-height: 14px; \
                 color: #E1F0F9;"
+
         self.previewStyleSelected = "padding: 5px 9px 9px 9px; \
                 margin: 0; \
                 border: none; \
                 line-height: 14px; \
                 color: #343136;"
+
         self.previewFont = QFont("Fira Code", 11)
         self.previewFont.setWeight(QFont.Light)
         self.previewFont.setPixelSize(11)
@@ -279,6 +282,7 @@ class Confirmation:
             }
         """
 
+
 class TemplateEditor:
     def __init__(self):
         self.style = """
@@ -296,6 +300,7 @@ class TemplateEditor:
                 border: none; \
                 color: #DAD6DE; \
                 selection-background-color: #5B00C3;"
+
         self.inputHeight = 18
         self.inputCodeFont = QFont("Fira Code", 11)
         self.inputCodeFont.setPixelSize(11)
@@ -307,6 +312,7 @@ class TemplateEditor:
                 border: none; \
                 color: #DAD6DE; \
                 selection-background-color: #5B00C3;"
+
         self.descriptionFont = QFont("Open Sans", 12)
         self.descriptionFont.setPixelSize(12)
 
