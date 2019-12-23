@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import Select from 'react-select';
 
@@ -74,26 +74,67 @@ function Cells() {
 }
 
 function Download() {
-    const [ selectedOption ] = useState();
-    const options = [
-        { value: 'macos', label: 'macOS' },
-        { value: 'deb', label: 'Debian Package' }
-	];
-	
-	const onDownloadChange = (value) => {
-		console.log(value);
-	};
-	
+    const [ selectedOption, setSelectedOption ] = useState();
+    const [ options, setOptions ] = useState([]);
+    const [ currentRelease, setCurrentRelease ] = useState('');
+
+    useEffect(() => {
+        async function fetchData() {
+            const resp = await fetch(
+                'https://api.github.com/repos/AlesTsurko/cells/releases/latest'
+            );
+
+            if (resp.ok) {
+                const res = await resp.json();
+                return res;
+            }
+        }
+
+        fetchData().then(handleResponse);
+    }, []);
+
+    function handleResponse(resp) {
+        if (resp) {
+            setCurrentRelease(resp);
+
+            const opts = resp.assets.map((asset) => ({
+                value: asset.browser_download_url,
+                label: asset.name
+            }));
+
+            setOptions(opts);
+        }
+    }
+
+    useEffect(
+        () => {
+            if (selectedOption) {
+                document.getElementById('download-link').click();
+            }
+        },
+        [ selectedOption ]
+    );
 
     return (
-        <Select
-			className="download"
-            value={selectedOption}
-            onChange={onDownloadChange}
-			options={options}
-			placeholder="Download"
-			isSearchable={false}
-        />
+        <React.Fragment>
+            <Select
+                className="download"
+                onChange={setSelectedOption}
+                options={options}
+                placeholder={currentRelease.name}
+                isSearchable={false}
+            />
+            {selectedOption && (
+                <a
+                    id="download-link"
+                    href={selectedOption.value}
+                    download
+                    style={{ display: 'none' }}
+                >
+                    Download
+                </a>
+            )}
+        </React.Fragment>
     );
 }
 
