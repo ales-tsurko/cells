@@ -32,8 +32,7 @@ function App() {
                         <div className="description-container">
                             <h5>
                                 Cells allows you to organize code into runnable
-                                snippets and mix different programming languages
-                                in the same project.
+                                snippets and mix programming languages.
                             </h5>
                             <Download />
                         </div>
