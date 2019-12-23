@@ -4,9 +4,6 @@ on:
     branches:
       - master
 jobs:
-  install-and-test:
-    runs-on: ubuntu-latest
-
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
