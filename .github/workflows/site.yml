@@ -32,5 +32,5 @@ jobs:
         env:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           BRANCH: gh-pages
-          FOLDER: site/build
+          FOLDER: build
           BUILD_SCRIPT: cd site && yarn && yarn build
