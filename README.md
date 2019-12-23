@@ -1,5 +1,7 @@
 # Cells
 
+[![Cells — Live Coding Environment](https://img.youtube.com/vi/S0QfVc6bMhg/0.jpg)](https://www.youtube.com/watch?v=S0QfVc6bMhg)
+
 Cells is a live coding environment. It allows you to organize and run code
 snippets for interactive programming languages. 
 
