@@ -25,10 +25,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Install and build
+      - name: Use Node.js 13.5
         uses: actions/setup-node@master
         with:
           node-version: 13.5
+      - name: Install and build
         run: |
           cd site
           yarn
