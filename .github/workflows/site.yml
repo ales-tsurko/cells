@@ -33,4 +33,4 @@ jobs:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           BRANCH: gh-pages
           FOLDER: site/build
-          BUILD_SCRIPT: yarn && yarn build
+          BUILD_SCRIPT: cd site && yarn && yarn build
