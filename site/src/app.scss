@@ -1,0 +1,156 @@
+$content_width: 1100px;
+$cell_size: 550px;
+
+.main {
+    position: relative;
+}
+
+h1 {
+    font-weight: 500;
+    font-size: 116px;
+}
+
+h5 {
+    font-weight: 400;
+    font-size: 22px;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    width: $content_width;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.header {
+    position: relative;
+    h1 {
+        position: absolute;
+        line-height: 0;
+        bottom: 125px;
+    }
+
+    h5 {
+        position: absolute;
+        line-height: 0;
+        bottom: 80px;
+    }
+}
+
+.content-row {
+    width: 100%;
+    height: $cell_size;
+}
+
+.middle {
+    display: flex;
+    flex-direction: flex-start;
+}
+
+.content-description {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: $cell_size;
+    height: $cell_size;
+
+    iframe {
+        position: absolute;
+        left: -86px;
+        -webkit-box-shadow: 10px 10px 16px 0px rgba(0, 0, 0, 0.72);
+        -moz-box-shadow: 10px 10px 16px 0px rgba(0, 0, 0, 0.72);
+        box-shadow: 10px 10px 16px 0px rgba(0, 0, 0, 0.72);
+    }
+}
+
+.description-container {
+    width: 405px;
+    height: 276px;
+
+    .download {
+        width: 199px;
+        height: 47px;
+    }
+
+    .react-select-container, .react-select-control {
+        background: red;
+        color: blue;
+    }
+}
+
+.cells {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    z-index: -1;
+    width: $content_width;
+
+    div {
+        display: block;
+        width: 100%;
+    }
+
+    div[class^='cell-'],
+    div[class*=' cell'] {
+        width: $cell_size;
+        height: $cell_size;
+        background-color: #000000;
+    }
+
+    .cell-1,
+    .cell-3 {
+        background: blue;
+    }
+    .cell-2 {
+        float: right;
+    }
+
+    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#5b00c3+0,d30099+37,ff006a+57,ff7547+74,ffbc41+87,f9f871+100 */
+    background: -moz-linear-gradient(
+        top,
+        #5b00c3 0%,
+        #d30099 37%,
+        #ff006a 57%,
+        #ff7547 74%,
+        #ffbc41 87%,
+        #f9f871 100%
+    ); /* FF3.6-15 */
+    background: -webkit-linear-gradient(
+        top,
+        #5b00c3 0%,
+        #d30099 37%,
+        #ff006a 57%,
+        #ff7547 74%,
+        #ffbc41 87%,
+        #f9f871 100%
+    ); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(
+        to bottom,
+        #5b00c3 0%,
+        #d30099 37%,
+        #ff006a 57%,
+        #ff7547 74%,
+        #ffbc41 87%,
+        #f9f871 100%
+    ); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+}
+
+.copyright {
+    display: block;
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    padding: 30px;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+}
