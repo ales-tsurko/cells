@@ -7,20 +7,6 @@ jobs:
   install-and-test:
     runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v1
-      - name: Use Node.js 13.5
-        uses: actions/setup-node@v1
-        with:
-          node-version: 13.5
-      - name: Install and Test
-        run: |
-          cd site
-          yarn
-          yarn test
-        env:
-          CI: true
-
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
