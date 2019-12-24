@@ -35,18 +35,24 @@ function App() {
                                 Cells allows you to organize code into runnable
                                 snippets and mix programming languages.
                             </h5>
-                            <div style={{display: "flex", justifyContent: "flex-start", alignItems: "center"}}>
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    justifyContent: 'flex-start',
+                                    alignItems: 'center'
+                                }}
+                            >
                                 <Download />
-                                <div style={{marginLeft: 28}}>
-                                <GitHubButton
-                                    href="https://github.com/AlesTsurko/cells"
-                                    data-size="large"
-                                    data-show-count="true"
-                                    aria-label="Star AlesTsurko/cells on GitHub"
-                                    style={{ display: 'inline-block' }}
-                                >
-                                    Star
-                                </GitHubButton>
+                                <div style={{ marginLeft: 28 }}>
+                                    <GitHubButton
+                                        href="https://github.com/AlesTsurko/cells"
+                                        data-size="large"
+                                        data-show-count="true"
+                                        aria-label="Star AlesTsurko/cells on GitHub"
+                                        style={{ display: 'inline-block' }}
+                                    >
+                                        Star
+                                    </GitHubButton>
                                 </div>
                             </div>
                         </div>

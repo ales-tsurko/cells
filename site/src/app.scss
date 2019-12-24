@@ -116,7 +116,7 @@ h5 {
 
     /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#5b00c3+0,d30099+37,ff006a+57,ff7547+74,ffbc41+87,f9f871+100 */
     background: -moz-linear-gradient(
-        top,
+        180deg,
         #5b00c3 0%,
         #d30099 37%,
         #ff006a 57%,
@@ -125,7 +125,7 @@ h5 {
         #f9f871 100%
     ); /* FF3.6-15 */
     background: -webkit-linear-gradient(
-        top,
+        180deg,
         #5b00c3 0%,
         #d30099 37%,
         #ff006a 57%,
@@ -134,7 +134,7 @@ h5 {
         #f9f871 100%
     ); /* Chrome10-25,Safari5.1-6 */
     background: linear-gradient(
-        to bottom,
+        180deg,
         #5b00c3 0%,
         #d30099 37%,
         #ff006a 57%,
@@ -142,6 +142,46 @@ h5 {
         #ffbc41 87%,
         #f9f871 100%
     ); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    // background: linear-gradient(0deg, #246655, #a722b1);
+    background-size: 150% 150%;
+
+    -webkit-animation: gradientAnimation 20s ease infinite;
+    -moz-animation: gradientAnimation 20s ease infinite;
+    animation: gradientAnimation 20s ease infinite;
+}
+
+@-webkit-keyframes gradientAnimation {
+    0% {
+        background-position: 50% 0%;
+    }
+    50% {
+        background-position: 51% 100%;
+    }
+    100% {
+        background-position: 50% 0%;
+    }
+}
+@-moz-keyframes gradientAnimation {
+    0% {
+        background-position: 50% 0%;
+    }
+    50% {
+        background-position: 51% 100%;
+    }
+    100% {
+        background-position: 50% 0%;
+    }
+}
+@keyframes gradientAnimation {
+    0% {
+        background-position: 50% 0%;
+    }
+    50% {
+        background-position: 51% 100%;
+    }
+    100% {
+        background-position: 50% 0%;
+    }
 }
 
 .copyright {
