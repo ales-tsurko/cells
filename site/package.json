@@ -10,6 +10,7 @@
     "node-sass": "^4.13.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
+    "react-github-btn": "^1.1.1",
     "react-scripts": "3.3.0",
     "react-select": "^3.0.8"
   },

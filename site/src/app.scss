@@ -69,6 +69,8 @@ h5 {
 }
 
 .description-container {
+    display: flex;
+    flex-direction: column;
     width: 405px;
     height: 276px;
 

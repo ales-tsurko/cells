@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import Select from 'react-select';
+import GitHubButton from 'react-github-btn';
 
 import './app.scss';
 import languages from './images/languages.jpg';
@@ -34,7 +35,20 @@ function App() {
                                 Cells allows you to organize code into runnable
                                 snippets and mix programming languages.
                             </h5>
-                            <Download />
+                            <div style={{display: "flex", justifyContent: "flex-start", alignItems: "center"}}>
+                                <Download />
+                                <div style={{marginLeft: 28}}>
+                                <GitHubButton
+                                    href="https://github.com/AlesTsurko/cells"
+                                    data-size="large"
+                                    data-show-count="true"
+                                    aria-label="Star AlesTsurko/cells on GitHub"
+                                    style={{ display: 'inline-block' }}
+                                >
+                                    Star
+                                </GitHubButton>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -136,7 +150,7 @@ function Download() {
                     {name.indexOf('.deb.') > 0 ? 'Linux | 64 bit' : 'macOS'}
                 </span>
                 <span>{label}</span>
-                <span style={{fontSize: 14, opacity: 0.7}}>{name}</span>
+                <span style={{ fontSize: 14, opacity: 0.7 }}>{name}</span>
             </div>
         );
     }
