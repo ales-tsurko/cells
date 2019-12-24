@@ -2,10 +2,13 @@
 
 [![Cells — Live Coding Environment](https://img.youtube.com/vi/S0QfVc6bMhg/0.jpg)](https://www.youtube.com/watch?v=S0QfVc6bMhg)
 
-Cells is a live coding environment. It allows you to organize and run code
-snippets for interactive programming languages. 
+Cells is a live and creative coding environment. It allows you to organize
+code into runnable snippets and mix programming languages.
 
-Cells allows you to run simultaneously in the same project:
+You can use it as a sequencer, effect processor, DAW, for
+generative/interactive installations, prototyping, visuals, and more.
+
+Cells supports:
 - Clojure 
 - Common Lisp (SBCL)
 - Haskell
