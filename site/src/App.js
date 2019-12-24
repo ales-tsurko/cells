@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
-import Select from 'react-select';
+import anime from 'animejs/lib/anime.es.js';
 import GitHubButton from 'react-github-btn';
+import Select from 'react-select';
 
 import './app.scss';
 import languages from './images/languages.jpg';
@@ -13,7 +14,7 @@ function App() {
             <div className="content">
                 <div className="content-row header">
                     <h1>Cells</h1>
-                    <h5>Live Coding Environment</h5>
+                    <Subtitle />
                 </div>
 
                 <div className="content-row middle">
@@ -90,6 +91,86 @@ function Cells() {
             </div>
         </div>
     );
+}
+
+function Subtitle() {
+    const [ subtitle, setSubtitle ] = useState([
+        'Live',
+        'Coding',
+        'Environment'
+    ]);
+    const [ shouldUpdate, setShouldUpdate ] = useState(true);
+    const words = [
+        [ 'Live', 'Generative', 'Algorithmic', 'Creative' ],
+        [
+            'Coding',
+            'Prototyping',
+            'Audio',
+            'Visuals',
+            'Thing',
+            'Music',
+            'Arts'
+        ],
+        [ 'Environment', 'Workstation', 'Sequencer', 'Editor' ]
+    ];
+
+    const updateSubtitle = () => {
+        const wordPosition = Math.round(Math.random() * (words.length - 1));
+        const index = Math.round(
+            Math.random() * (words[wordPosition].length - 1)
+        );
+
+        setShouldUpdate(false);
+
+        let transition = subtitle[wordPosition];
+
+        anime({
+            duration: 5000,
+            easing: 'easeInOutCirc',
+            update: (anim) => {
+                transition = interpolateString(
+                    transition,
+                    words[wordPosition][index]
+                );
+                let nextSubtitle = [ ...subtitle ];
+                nextSubtitle[wordPosition] = transition;
+                setSubtitle(nextSubtitle);
+            }
+        }).finished.then(() => setShouldUpdate(true));
+    };
+
+    useEffect(
+        () => {
+            setTimeout(updateSubtitle, 3000);
+        },
+        [ shouldUpdate ]
+    );
+
+    return <h5>{`${subtitle[0]} ${subtitle[1]} ${subtitle[2]}`}</h5>;
+}
+
+function interpolateString(from, to) {
+    if (from === to) return from;
+
+    let result = '';
+
+    for (let n = 0; n < from.length; n++) {
+        if (n > to.length - 1) return result;
+        result += interpolateChar(from.charAt(n), to.charAt(n));
+    }
+
+    for (let n = from.length; n < to.length; n++) {
+        result += interpolateChar(' ', to.charAt(n));
+    }
+
+    return result;
+}
+
+function interpolateChar(char, to) {
+    if (char === to) return to;
+    const code = char < to ? char.charCodeAt(0) + 1 : char.charCodeAt(0) - 1;
+
+    return String.fromCharCode(code);
 }
 
 function Download() {
