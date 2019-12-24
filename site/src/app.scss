@@ -189,12 +189,16 @@ h5 {
     position: absolute;
     bottom: 0;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 90%;
-    padding: 30px;
+    padding: 26px;
     left: 0;
     right: 0;
     margin-left: auto;
     margin-right: auto;
+    p {
+        margin: 3px;
+    }
 }

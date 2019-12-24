@@ -13,8 +13,10 @@ function App() {
             <Cells />
             <div className="content">
                 <div className="content-row header">
-                    <h1>Cells</h1>
-                    <Subtitle />
+                    <div className="content-description">
+                        <h1>Cells</h1>
+                        <Subtitle />
+                    </div>
                 </div>
 
                 <div className="content-row middle">
@@ -136,12 +138,9 @@ function Subtitle() {
         }).finished.then(updateSubtitle);
     };
 
-    useEffect(
-        () => {
-            setTimeout(updateSubtitle, 3000);
-        },
-        [ ]
-    );
+    useEffect(() => {
+        setTimeout(updateSubtitle, 3000);
+    }, []);
 
     return <h5>{`${subtitle[0]} ${subtitle[1]} ${subtitle[2]}`}</h5>;
 }
@@ -270,8 +269,11 @@ function Copyright() {
 
     return (
         <div className="copyright">
-            &copy; 2019{currentYear > 2019 ? `-${currentYear}` : null}, Ales
-            Tsurko
+            <p>Design by Victor Kamenetsky</p>
+            <p style={{ opacity: 0.4 }}>
+                &copy; 2019{currentYear > 2019 ? `-${currentYear}` : null}, Ales
+                Tsurko.
+            </p>
         </div>
     );
 }
