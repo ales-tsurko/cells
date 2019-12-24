@@ -13,10 +13,8 @@ function App() {
             <Cells />
             <div className="content">
                 <div className="content-row header">
-                    <div className="content-description">
-                        <h1>Cells</h1>
-                        <Subtitle />
-                    </div>
+                    <h1>Cells</h1>
+                    <Subtitle />
                 </div>
 
                 <div className="content-row middle">
