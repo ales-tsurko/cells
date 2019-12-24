@@ -267,11 +267,10 @@ function Copyright() {
 
     return (
         <div className="copyright">
-            <p>Design by Victor Kamenetsky</p>
-            <p style={{ opacity: 0.4 }}>
+            <span style={{ backgroundColor: '#5b00c3' }}>
                 &copy; 2019{currentYear > 2019 ? `-${currentYear}` : null}, Ales
                 Tsurko.
-            </p>
+            </span>
         </div>
     );
 }
