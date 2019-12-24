@@ -99,7 +99,6 @@ function Subtitle() {
         'Coding',
         'Environment'
     ]);
-    const [ shouldUpdate, setShouldUpdate ] = useState(true);
     const words = [
         [ 'Live', 'Generative', 'Algorithmic', 'Creative' ],
         [
@@ -120,14 +119,12 @@ function Subtitle() {
             Math.random() * (words[wordPosition].length - 1)
         );
 
-        setShouldUpdate(false);
-
         let transition = subtitle[wordPosition];
 
         anime({
-            duration: 5000,
+            duration: 4000,
             easing: 'easeInOutCirc',
-            update: (anim) => {
+            update: () => {
                 transition = interpolateString(
                     transition,
                     words[wordPosition][index]
@@ -136,14 +133,14 @@ function Subtitle() {
                 nextSubtitle[wordPosition] = transition;
                 setSubtitle(nextSubtitle);
             }
-        }).finished.then(() => setShouldUpdate(true));
+        }).finished.then(updateSubtitle);
     };
 
     useEffect(
         () => {
             setTimeout(updateSubtitle, 3000);
         },
-        [ shouldUpdate ]
+        [ ]
     );
 
     return <h5>{`${subtitle[0]} ${subtitle[1]} ${subtitle[2]}`}</h5>;
