@@ -72,14 +72,16 @@ h5 {
     width: 405px;
     height: 276px;
 
-    .download {
-        width: 275px;
+    .download-container {
+        width: 230px;
         height: 47px;
     }
 
-    .react-select-container, .react-select-control {
-        background: red;
-        color: blue;
+    .download-option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        line-height: 26px;
     }
 }
 

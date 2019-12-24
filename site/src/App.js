@@ -75,7 +75,23 @@ function Cells() {
 function Download() {
     const [ selectedOption, setSelectedOption ] = useState();
     const [ options, setOptions ] = useState([]);
-    const [ currentRelease, setCurrentRelease ] = useState('');
+    const styles = {
+        option: (provided, state) => ({
+            ...provided,
+            color: state.isFocused ? '#ffffff' : '#000000',
+            backgroundColor: state.isFocused ? '#5b00c3' : '#ffffff',
+            padding: 20
+        }),
+        placeholder: (provided, state) => ({
+            color: '#000000'
+        }),
+        singleValue: (provided, state) => {
+            const opacity = state.isDisabled ? 0.5 : 1;
+            const transition = 'opacity 300ms';
+
+            return { ...provided, opacity, transition };
+        }
+    };
 
     useEffect(() => {
         async function fetchData() {
@@ -94,11 +110,10 @@ function Download() {
 
     function handleResponse(resp) {
         if (resp) {
-            setCurrentRelease(resp);
-
             const opts = resp.assets.map((asset) => ({
                 value: asset.browser_download_url,
-                label: asset.name
+                label: resp.tag_name,
+                name: asset.name
             }));
 
             setOptions(opts);
@@ -114,13 +129,28 @@ function Download() {
         [ selectedOption ]
     );
 
+    function getLabel({ label, name }) {
+        return (
+            <div className="download-option">
+                <span style={{ fontWeight: 600 }}>
+                    {name.indexOf('.deb.') > 0 ? 'Linux | 64 bit' : 'macOS'}
+                </span>
+                <span>{label}</span>
+                <span style={{fontSize: 14, opacity: 0.7}}>{name}</span>
+            </div>
+        );
+    }
+
     return (
         <React.Fragment>
             <Select
-                className="download"
+                formatOptionLabel={getLabel}
+                styles={styles}
+                className="download-container"
+                classNamePrefix="download-select"
                 onChange={setSelectedOption}
                 options={options}
-                placeholder={currentRelease.name}
+                placeholder="Download"
                 isSearchable={false}
             />
             {selectedOption && (
