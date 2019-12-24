@@ -93,7 +93,7 @@ h5 {
     flex-direction: column;
     margin: auto;
     z-index: -1;
-    width: $content_width;
+    width: 100%;
 
     div {
         display: block;
@@ -102,7 +102,7 @@ h5 {
 
     div[class^='cell-'],
     div[class*=' cell'] {
-        width: $cell_size;
+        width: 50%;
         height: $cell_size;
         background-color: #000000;
     }
@@ -114,41 +114,43 @@ h5 {
     .cell-2 {
         float: right;
     }
+}
 
-    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#5b00c3+0,d30099+37,ff006a+57,ff7547+74,ffbc41+87,f9f871+100 */
-    background: -moz-linear-gradient(
-        180deg,
-        #5b00c3 0%,
-        #d30099 37%,
-        #ff006a 57%,
-        #ff7547 74%,
-        #ffbc41 87%,
-        #f9f871 100%
-    ); /* FF3.6-15 */
-    background: -webkit-linear-gradient(
-        180deg,
-        #5b00c3 0%,
-        #d30099 37%,
-        #ff006a 57%,
-        #ff7547 74%,
-        #ffbc41 87%,
-        #f9f871 100%
-    ); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(
-        180deg,
-        #5b00c3 0%,
-        #d30099 37%,
-        #ff006a 57%,
-        #ff7547 74%,
-        #ffbc41 87%,
-        #f9f871 100%
-    ); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    // background: linear-gradient(0deg, #246655, #a722b1);
-    background-size: 150% 150%;
-
-    -webkit-animation: gradientAnimation 20s ease infinite;
-    -moz-animation: gradientAnimation 20s ease infinite;
-    animation: gradientAnimation 20s ease infinite;
+body {
+        /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#5b00c3+0,d30099+37,ff006a+57,ff7547+74,ffbc41+87,f9f871+100 */
+        background: -moz-linear-gradient(
+            180deg,
+            #5b00c3 0%,
+            #d30099 37%,
+            #ff006a 57%,
+            #ff7547 74%,
+            #ffbc41 87%,
+            #f9f871 100%
+        ); /* FF3.6-15 */
+        background: -webkit-linear-gradient(
+            180deg,
+            #5b00c3 0%,
+            #d30099 37%,
+            #ff006a 57%,
+            #ff7547 74%,
+            #ffbc41 87%,
+            #f9f871 100%
+        ); /* Chrome10-25,Safari5.1-6 */
+        background: linear-gradient(
+            180deg,
+            #5b00c3 0%,
+            #d30099 37%,
+            #ff006a 57%,
+            #ff7547 74%,
+            #ffbc41 87%,
+            #f9f871 100%
+        ); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+        // background: linear-gradient(0deg, #246655, #a722b1);
+        background-size: 150% 150%;
+    
+        -webkit-animation: gradientAnimation 20s ease infinite;
+        -moz-animation: gradientAnimation 20s ease infinite;
+        animation: gradientAnimation 20s ease infinite;
 }
 
 @-webkit-keyframes gradientAnimation {
