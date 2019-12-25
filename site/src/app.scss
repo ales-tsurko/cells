@@ -187,11 +187,13 @@ body {
     }
 }
 
+.bottom {
+    display: flex;
+    flex-direction: row;
+}
+
 .copyright {
-    display: block;
     position: absolute;
-    bottom: 0;
-    float: right;
-    padding: 26px;
-    right: 5%;
+    bottom: 28px;
+    right: 0;
 }
