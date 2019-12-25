@@ -24,9 +24,6 @@ h5 {
     @media screen and (min-width: 1280px) {
         width: $content_width;
     }
-    @media screen and (max-width: 1279px) {
-        width: $mobile_content_width;
-    }
     top: 0;
     left: 0;
     right: 0;
@@ -109,8 +106,8 @@ h5 {
     }
 
     @media screen and (max-width: 1279px) {
-        padding: 40px;
-        width: 90%;
+        padding: 35px;
+        width: 85%;
         iframe {
             width: 100%;
         }
@@ -246,6 +243,9 @@ body {
 
 .bottom {
     display: flex;
+    .copyright {
+        background-color: #5b00c3;
+    }
     @media screen and (min-width: 1280px) {
         flex-direction: row;
 
@@ -253,7 +253,6 @@ body {
             position: absolute;
             bottom: 28px;
             right: 0;
-            background-color: '#5b00c3'
         }
     }
     @media screen and (max-width: 1279px) {
