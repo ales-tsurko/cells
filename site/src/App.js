@@ -70,7 +70,7 @@ function App() {
                             }}
                         />
                     </div>
-                    <div className="content-description">
+                    <div className="content-description copy">
                         <Copyright />
                     </div>
                 </div>
@@ -268,10 +268,10 @@ function Copyright() {
     const [ currentYear ] = useState(new Date().getFullYear());
 
     return (
-            <span style={{ backgroundColor: '#5b00c3' }} className="copyright">
-                &copy; 2019{currentYear > 2019 ? `-${currentYear}` : null}, Ales
-                Tsurko.
-            </span>
+        <span className="copyright">
+            &copy; 2019{currentYear > 2019 ? `-${currentYear}` : null}, Ales
+            Tsurko.
+        </span>
     );
 }
 

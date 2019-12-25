@@ -1,5 +1,7 @@
 $content_width: 1100px;
+$mobile_content_width: 100%;
 $cell_size: 550px;
+$mobile_cell_height: 500px;
 
 .main {
     position: relative;
@@ -19,7 +21,12 @@ h5 {
     display: flex;
     flex-direction: column;
     position: absolute;
-    width: $content_width;
+    @media screen and (min-width: 1280px) {
+        width: $content_width;
+    }
+    @media screen and (max-width: 1279px) {
+        width: $mobile_content_width;
+    }
     top: 0;
     left: 0;
     right: 0;
@@ -29,40 +36,87 @@ h5 {
 
 .header {
     position: relative;
-    padding-left: 53px;
-    h1 {
-        position: absolute;
-        line-height: 0;
-        bottom: 125px;
-    }
-
+    h1,
     h5 {
         position: absolute;
         line-height: 0;
-        bottom: 80px;
+    }
+    @media screen and (min-width: 1280px) {
+        padding-left: 53px;
+        h1 {
+            bottom: 125px;
+        }
+        h5 {
+            bottom: 80px;
+        }
+    }
+    @media screen and (max-width: 1279px) {
+        padding-left: 5%;
+        background-color: #000000;
+        height: 250px !important;
+        h1 {
+            bottom: 40px;
+        }
+
+        h5 {
+            bottom: 10px;
+        }
     }
 }
 
 .content-row {
-    width: 100%;
-    height: $cell_size;
+    @media screen and (max-width: 1279px) {
+        display: flex;
+        flex-direction: column;
+    }
+    @media screen and (min-width: 1280px) {
+        height: $cell_size;
+    }
 }
 
 .middle {
     display: flex;
-    flex-direction: flex-start;
+    @media screen and (min-width: 1280px) {
+        flex-direction: flex-start;
+    }
+    @media screen and (max-width: 1279px) {
+        flex-direction: column;
+        align-items: center;
+    }
 }
 
 .content-description {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: $cell_size;
-    height: $cell_size;
+
+    @media screen and (min-width: 1280px) {
+        width: $cell_size;
+        height: $cell_size;
+    }
+
+    @media screen and (max-width: 1279px) {
+        flex-direction: column;
+    }
+}
+
+.video {
+    @media screen and (min-width: 1280px) {
+        iframe {
+            position: absolute;
+            left: -86px;
+        }
+    }
+
+    @media screen and (max-width: 1279px) {
+        padding: 40px;
+        width: 90%;
+        iframe {
+            width: 100%;
+        }
+    }
 
     iframe {
-        position: absolute;
-        left: -86px;
         -webkit-box-shadow: 10px 10px 16px 0px rgba(0, 0, 0, 0.72);
         -moz-box-shadow: 10px 10px 16px 0px rgba(0, 0, 0, 0.72);
         box-shadow: 10px 10px 16px 0px rgba(0, 0, 0, 0.72);
@@ -72,7 +126,16 @@ h5 {
 .description-container {
     display: flex;
     flex-direction: column;
-    width: 405px;
+
+    @media screen and (max-width: 1279px) {
+        padding: 40px;
+        background-color: #000000;
+    }
+
+    @media screen and (min-width: 1280px) {
+        width: 405px;
+    }
+
     height: 276px;
 
     .download-container {
@@ -89,68 +152,62 @@ h5 {
 }
 
 .cells {
-    display: flex;
-    flex-direction: column;
-    margin: auto;
-    z-index: -1;
-    width: 100%;
-
-    div {
-        display: block;
-        width: 100%;
+    @media screen and (max-width: 1279px) {
+        display: none;
     }
 
-    div[class^='cell-'],
-    div[class*=' cell'] {
-        width: 50%;
-        height: $cell_size;
-        background-color: #000000;
-    }
-
-    .cell-1,
-    .cell-3 {
-        background: blue;
-    }
-    .cell-2 {
-        float: right;
+    @media screen and (min-width: 1280px) {
+        display: flex;
+        flex-direction: column;
+        margin: auto;
+        z-index: -1;
+        div[class^='cell-'],
+        div[class*=' cell'] {
+            width: 50%;
+            height: $cell_size;
+            background-color: #000000;
+        }
+        .cell-2 {
+            float: right;
+        }
     }
 }
 
 body {
-        /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#5b00c3+0,d30099+37,ff006a+57,ff7547+74,ffbc41+87,f9f871+100 */
-        background: -moz-linear-gradient(
-            180deg,
-            #5b00c3 0%,
-            #d30099 37%,
-            #ff006a 57%,
-            #ff7547 74%,
-            #ffbc41 87%,
-            #f9f871 100%
-        ); /* FF3.6-15 */
-        background: -webkit-linear-gradient(
-            180deg,
-            #5b00c3 0%,
-            #d30099 37%,
-            #ff006a 57%,
-            #ff7547 74%,
-            #ffbc41 87%,
-            #f9f871 100%
-        ); /* Chrome10-25,Safari5.1-6 */
-        background: linear-gradient(
-            180deg,
-            #5b00c3 0%,
-            #d30099 37%,
-            #ff006a 57%,
-            #ff7547 74%,
-            #ffbc41 87%,
-            #f9f871 100%
-        ); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-        // background: linear-gradient(0deg, #246655, #a722b1);
-        background-size: 150% 150%;
-    
-        -webkit-animation: gradientAnimation 20s ease infinite;
-        -moz-animation: gradientAnimation 20s ease infinite;
-        animation: gradientAnimation 20s ease infinite;
+    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#5b00c3+0,d30099+37,ff006a+57,ff7547+74,ffbc41+87,f9f871+100 */
+    background: -moz-linear-gradient(
+        180deg,
+        #5b00c3 0%,
+        #d30099 37%,
+        #ff006a 57%,
+        #ff7547 74%,
+        #ffbc41 87%,
+        #f9f871 100%
+    ); /* FF3.6-15 */
+    background: -webkit-linear-gradient(
+        180deg,
+        #5b00c3 0%,
+        #d30099 37%,
+        #ff006a 57%,
+        #ff7547 74%,
+        #ffbc41 87%,
+        #f9f871 100%
+    ); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(
+        180deg,
+        #5b00c3 0%,
+        #d30099 37%,
+        #ff006a 57%,
+        #ff7547 74%,
+        #ffbc41 87%,
+        #f9f871 100%
+    ); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    // background: linear-gradient(0deg, #246655, #a722b1);
+    background-size: 150% 150%;
+
+    -webkit-animation: gradientAnimation 20s ease infinite;
+    -moz-animation: gradientAnimation 20s ease infinite;
+    animation: gradientAnimation 20s ease infinite;
 }
 
 @-webkit-keyframes gradientAnimation {
@@ -189,11 +246,27 @@ body {
 
 .bottom {
     display: flex;
-    flex-direction: row;
+    @media screen and (min-width: 1280px) {
+        flex-direction: row;
+
+        .copyright {
+            position: absolute;
+            bottom: 28px;
+            right: 0;
+            background-color: '#5b00c3'
+        }
+    }
+    @media screen and (max-width: 1279px) {
+        flex-direction: column;
+        align-items: center;
+        background-color: #000000;
+    }
 }
 
-.copyright {
-    position: absolute;
-    bottom: 28px;
-    right: 0;
+.copy {
+    @media screen and (min-width: 1280px) {
+    }
+    @media screen and (max-width: 1279px) {
+        height: 200px !important;
+    }
 }
