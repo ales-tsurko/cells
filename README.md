@@ -2,6 +2,9 @@
 
 [![Cells — Live Coding Environment](https://img.youtube.com/vi/S0QfVc6bMhg/0.jpg)](https://www.youtube.com/watch?v=S0QfVc6bMhg)
 
+![Screenshot 1](screenshots/001.png)
+![Screenshot 2](screenshots/002.png)
+
 Cells is a live and creative coding environment. It allows you to organize
 code into runnable snippets and mix programming languages.
 
