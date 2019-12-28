@@ -42,6 +42,8 @@ Then:
 poetry run cells -d
 ```
 
+Or checkout [releases](https://github.com/AlesTsurko/cells/releases) section for distributed packages.
+
 
 
 
