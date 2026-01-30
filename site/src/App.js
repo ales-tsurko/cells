@@ -39,7 +39,11 @@ function App() {
                             height="323"
                             src="https://www.youtube.com/embed/S0QfVc6bMhg"
                             frameBorder="0"
-                            allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+                            allow={
+                                'accelerometer; encrypted-media; ' +
+                                'gyroscope; ' +
+                                'picture-in-picture'
+                            }
                             allowFullScreen
                         />
                     </div>
@@ -60,10 +64,15 @@ function App() {
                                 <Download />
                                 <div style={{ marginLeft: 28 }}>
                                     <GitHubButton
-                                        href="https://github.com/AlesTsurko/cells"
+                                        href={
+                                            'https://github.com/' +
+                                            'AlesTsurko/cells'
+                                        }
                                         data-size="large"
                                         data-show-count="true"
-                                        aria-label="Star AlesTsurko/cells on GitHub"
+                                        aria-label={
+                                            'Star AlesTsurko/cells on GitHub'
+                                        }
                                         style={{ display: 'inline-block' }}
                                     >
                                         Star
