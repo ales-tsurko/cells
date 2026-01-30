@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 import anime from 'animejs/lib/anime.es.js';
 import GitHubButton from 'react-github-btn';
@@ -6,6 +6,20 @@ import Select from 'react-select';
 
 import './app.scss';
 import languages from './images/languages.jpg';
+
+const SUBTITLE_WORDS = [
+    [ 'Live', 'Generative', 'Algorithmic', 'Creative' ],
+    [
+        'Coding',
+        'Prototyping',
+        'Audio',
+        'Visuals',
+        'Thing',
+        'Music',
+        'Arts'
+    ],
+    [ 'Environment', 'Workstation', 'Sequencer', 'Editor' ]
+];
 
 function App() {
     return (
@@ -101,27 +115,22 @@ function Subtitle() {
         'Coding',
         'Environment'
     ]);
-    const words = [
-        [ 'Live', 'Generative', 'Algorithmic', 'Creative' ],
-        [
-            'Coding',
-            'Prototyping',
-            'Audio',
-            'Visuals',
-            'Thing',
-            'Music',
-            'Arts'
-        ],
-        [ 'Environment', 'Workstation', 'Sequencer', 'Editor' ]
-    ];
+    const subtitleRef = useRef(subtitle);
 
-    const updateSubtitle = () => {
-        const wordPosition = Math.round(Math.random() * (words.length - 1));
+    useEffect(() => {
+        subtitleRef.current = subtitle;
+    }, [ subtitle ]);
+
+    const updateSubtitle = useCallback(() => {
+        const currentSubtitle = subtitleRef.current;
+        const wordPosition = Math.round(
+            Math.random() * (SUBTITLE_WORDS.length - 1)
+        );
         const index = Math.round(
-            Math.random() * (words[wordPosition].length - 1)
+            Math.random() * (SUBTITLE_WORDS[wordPosition].length - 1)
         );
 
-        let transition = subtitle[wordPosition];
+        let transition = currentSubtitle[wordPosition];
 
         anime({
             duration: 4000,
@@ -129,18 +138,20 @@ function Subtitle() {
             update: () => {
                 transition = interpolateString(
                     transition,
-                    words[wordPosition][index]
+                    SUBTITLE_WORDS[wordPosition][index]
                 );
-                let nextSubtitle = [ ...subtitle ];
+                let nextSubtitle = [ ...currentSubtitle ];
                 nextSubtitle[wordPosition] = transition;
                 setSubtitle(nextSubtitle);
             }
         }).finished.then(updateSubtitle);
-    };
+    }, [ subtitleRef ]);
 
     useEffect(() => {
-        setTimeout(updateSubtitle, 3000);
-    }, []);
+        const timeoutId = setTimeout(updateSubtitle, 3000);
+
+        return () => clearTimeout(timeoutId);
+    }, [ updateSubtitle ]);
 
     return <h5>{`${subtitle[0]} ${subtitle[1]} ${subtitle[2]}`}</h5>;
 }
